@@ -196,14 +196,23 @@ class Client extends require('events') {
 
 exports.Client = Client;
 
+const GetId = obj => obj.id || obj;
+
 const Routes = {
-    User: user => `/users/${user.id || user}`,
-    Server: server => `/guilds/${server.id || server}`,
-    Channel: channel => `/channels/${channel.id || channel}`,
-    Message: (channel, message) => `${Routes.Channel(channel)}/messages/${message.id || message}`,
-    Member: (server, member) => `${Routes.Server(server)}/members/${member.id || member}`,
+    User: user => `/users/${GetId(user)}`,
+    Server: server => `/guilds/${GetId(server)}`,
+    Channel: channel => `/channels/${GetId(channel)}`,
+    Invite: invite => `/invite/${invite}`,
+    Webhook: (webhook, token) => `/webhooks/${webhook}/${token}`,
+    Member: (server, member) => `${Routes.Server(server)}/members/${GetId(member)}`,
     Role: (server, member, role) => `${Routes.Member(server, member)}/roles/${role}`,
+    Emoji: (server, emoji) => `${Routes.Server(server)}/emojis/${emoji}`,
+    Message: (channel, message) => `${Routes.Channel(channel)}/messages/${GetId(message)}`,
     Reaction: (channel, message, emoji) => `${Routes.Message(channel, message)}/reactions/${emoji}`,
+    Pin: (channel, message) => `${Routes.Channel(channel)}/pins/${GetId(message)}`,
+    Recipient: (channel, user) => `${Routes.Channel(channel)}/recipients/${GetId(user)}`,
+    Relationship: (fromUser, toUser) => `${Routes.User(fromUser)}/relationships/${GetId(toUser)}`,
+    Note: (user, note) => `${Routes.User(user)}/notes/${note}`,
 };
 
 exports.Routes = Routes;
