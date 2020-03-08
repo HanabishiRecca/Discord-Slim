@@ -1,0 +1,12 @@
+{
+    "name": "discordlite",
+    "version": "1.0.0",
+    "description": "Lightweight discord client",
+    "author": "Hanabishi",
+    "repository": "https://github.com/HanabishiRecca/DiscordLite",
+    "main": "discordlite.js",
+    "license": "MIT",
+    "dependencies": {
+        "ws": "^7.2.1"
+    }
+}
