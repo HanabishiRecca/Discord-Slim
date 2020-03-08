@@ -132,13 +132,15 @@ class Client extends require('events') {
     }
     
     #OnClose = code => {
-        if(code == 2000) {
-            return;
-        } else if(code == 1000) {
+        if(code == 1000) {
             this.#WsConnect(true);
-        } else {
-            this.#ConnectionError('Connection closed by the server.');
+        } else if(code != 2000) {
+            const message = 'Connection closed by the server.';
+            this.#ConnectionError(message);
+            this.emit('disconnect', message);
+            return;
         }
+        this.emit('reconnecting');
     }
     
     #OnError = error => {
@@ -147,7 +149,7 @@ class Client extends require('events') {
     }
     
     #ConnectionError = message => {
-        critical && this.#ws && this.#ws.close(2000);
+        this.#ws && this.#ws.close(2000);
         this.emit('error', message);
     }
     
