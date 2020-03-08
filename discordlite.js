@@ -6,10 +6,12 @@ const
 
 const
     API = 'https://discordapp.com/api/v7',
+    CDN = 'https://cdn.discordapp.com',
     STANDARD_TIMEOUT = 1000,
     REQUEST_RETRY_COUNT = 5;
 
 exports.ApiHost = API;
+exports.CdnHost = CDN;
 
 const OPCode = {
     DISPATCH: 0,
