@@ -32,7 +32,6 @@ class Client extends require('events') {
     #sessionId;
     #lastSequence;
     #lastHeartbeatAck;
-    #heartbeatInterval;
     #heartbeatTimer;
     #ws;
     
@@ -41,22 +40,20 @@ class Client extends require('events') {
     }
     
     #WsConnect = async resume => {
-        this.#ws && this.#ws.close(2000);
+        this.#ws && this.#ws.close(1001);
         
         if(!resume) {
             this.#sessionId = undefined;
             this.#lastSequence = 0;
         }
         
-        this.#heartbeatInterval = 0;
-        this.#SetHeartbeatTimer();
-        
-        const gateway = JSON.parse(await Util.HttpsRequest(`${API}/gateway/bot`, { headers: this.#auth }));
-        this.#ws = new WebSocket(gateway.url);
-        this.#ws.on('message', this.#OnMessage);
+        this.#ws = new WebSocket(JSON.parse(await Util.HttpsRequest(`${API}/gateway/bot`, { headers: this.#auth })).url);
+        this.#ws.on('open', this.#OnOpen);
         this.#ws.on('close', this.#OnClose);
         this.#ws.on('error', this.#OnError);
     }
+    
+    #OnOpen = () => this.#ws.on('message', this.#OnMessage);
     
     #OnMessage = data => {
         const packet = JSON.parse(data);
@@ -69,32 +66,41 @@ class Client extends require('events') {
         const op = packet.op;
         if(op == OPCode.DISPATCH) {
             const t = packet.t;
-            if(t == 'READY') {
-                this.#sessionId = packet.d.session_id;
+            if((t == 'READY') || (t == 'RESUMED')) {
+                if(packet.d.session_id)
+                    this.#sessionId = packet.d.session_id;
+                
                 this.#lastHeartbeatAck = true;
                 this.#SendHeartbeat();
-            } else if(t == 'RESUMED') {
-                this.#lastHeartbeatAck = true;
-                this.#SendHeartbeat();
+                this.emit('connect');
             }
             this.emit('packet', packet);
         } else if(op == OPCode.HELLO) {
-            this.#heartbeatInterval = packet.d.heartbeat_interval;
-            this.#sessionId ? this.#Resume() : this.#Identify();
-            this.#SetHeartbeatTimer();
+            this.#Identify();
+            this.#lastHeartbeatAck = true;
+            this.#SetHeartbeatTimer(packet.d.heartbeat_interval);
         } else if(op == OPCode.HEARTBEAT_ACK) {
             this.#lastHeartbeatAck = true;
         } else if(op == OPCode.HEARTBEAT) {
             this.#SendHeartbeat();
         } else if(op == OPCode.INVALID_SESSION) {
-            this.#sessionId ? this.#WsConnect(packet.d) : this.#ConnectionError('Invalid session.');
+            this.emit('warn', 'Invalid session.');
+            this.#WsConnect(packet.d);
         } else if(op == OPCode.RECONNECT) {
-            this.#WsConnect();
+            this.emit('warn', 'Server forced reconnect.');
+            this.#WsConnect(true);
         }
     }
     
     #Identify = () => {
-        this.#ws.send(JSON.stringify({
+        this.#ws.send(JSON.stringify(this.#sessionId ? {
+            op: OPCode.RESUME,
+            d: {
+                token: this.#token,
+                session_id: this.#sessionId,
+                seq: this.#lastSequence,
+            },
+        } : {
             op: OPCode.IDENTIFY,
             d: {
                 token: this.#token,
@@ -104,54 +110,33 @@ class Client extends require('events') {
         }));
     }
     
-    #Resume = () => {
-        this.#ws.send(JSON.stringify({
-            op: OPCode.RESUME,
-            d: {
-                token: this.#token,
-                session_id: this.#sessionId,
-                seq: this.#lastSequence,
-            },
-        }));
-    }
-    
     #SendHeartbeat = () => {
         if(this.#lastHeartbeatAck) {
-            this.#lastHeartbeatAck = false;
-            this.#ws.send(JSON.stringify({ op: OPCode.HEARTBEAT, d: this.#lastSequence }));
+            if(this.#ws && (this.#ws.readyState == 1)) {
+                this.#lastHeartbeatAck = false;
+                this.#ws.send(JSON.stringify({ op: OPCode.HEARTBEAT, d: this.#lastSequence }));
+            }
         } else {
             this.#WsConnect(true);
         }
     }
     
-    #SetHeartbeatTimer = () => {
+    #SetHeartbeatTimer = interval => {
         if(this.#heartbeatTimer) {
             clearInterval(this.#heartbeatTimer);
             this.#heartbeatTimer = undefined;
         }
-        if(this.#heartbeatInterval)
-            this.#heartbeatTimer = setInterval(this.#SendHeartbeat, this.#heartbeatInterval);
+        if(interval)
+            this.#heartbeatTimer = setInterval(this.#SendHeartbeat, interval);
     }
     
     #OnClose = code => {
-        if(code == 1000) {
+        this.emit('disconnect', code);
+        if(code != 1001)
             this.#WsConnect(true);
-        } else if(code != 2000) {
-            this.emit('disconnect', `Connection closed by the server. (${code})`);
-            return;
-        }
-        this.emit('reconnecting');
     }
     
-    #OnError = error => {
-        this.#ConnectionError(error);
-        this.#WsConnect(true);
-    }
-    
-    #ConnectionError = message => {
-        this.#ws && this.#ws.close(2000);
-        this.emit('error', message);
-    }
+    #OnError = error => this.emit('error', error);
     
     Connect = token => {
         if(!token)
