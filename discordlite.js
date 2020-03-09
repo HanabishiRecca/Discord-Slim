@@ -137,9 +137,7 @@ class Client extends require('events') {
         if(code == 1000) {
             this.#WsConnect(true);
         } else if(code != 2000) {
-            const message = 'Connection closed by the server.';
-            this.#ConnectionError(message);
-            this.emit('disconnect', message);
+            this.emit('disconnect', `Connection closed by the server. (${code})`);
             return;
         }
         this.emit('reconnecting');
