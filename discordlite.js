@@ -51,7 +51,7 @@ class Client extends require('events') {
         this.#heartbeatInterval = 0;
         this.#SetHeartbeatTimer();
         
-        const gateway = JSON.parse(await Util.HttpsRequest(`${API}/gateway/bot`, { headers: { Authorization: this.#auth } }));
+        const gateway = JSON.parse(await Util.HttpsRequest(`${API}/gateway/bot`, { headers: this.#auth }));
         this.#ws = new WebSocket(gateway.url);
         this.#ws.on('message', this.#OnMessage);
         this.#ws.on('close', this.#OnClose);
@@ -156,48 +156,84 @@ class Client extends require('events') {
     }
     
     Connect = token => {
-        this.#token = token;
-        this.#auth = `Bot ${token}`;
-        this.#WsConnect();
+        if(!token)
+            throw 'Token required.';
+        
+        if(typeof(token) == 'string') {
+            this.#token = token;
+            this.#auth = { Authorization: `Bot ${token}` };
+            this.#WsConnect();
+        } else {
+            throw 'Token must be a string.';
+        }
     }
     
-    Request = (method, route, data) => new Promise((resolve, reject) => {
-        const
-            url = `${API}/${route}`,
-            options = { method: method, headers: { Authorization: this.#auth } },
-            comp = JSON.stringify(data);
+    Request = (method, route, data = null) => {
+        if(!method)
+            throw 'Method required.';
         
-        const RequestError = result => {
-            if(!result)
-                return Retry();
+        if(typeof(method) != 'string')
+            throw 'Method must be a string.';
+        
+        if(!route)
+            throw 'Route required.';
+        
+        if(typeof(route) != 'string')
+            throw 'Route must be a string.';
+        
+        return new Promise((resolve, reject) => {
+            const
+                url = `${API}/${route}`,
+                options = { method: method, headers: this.#auth },
+                comp = (data && (typeof(data) == 'object')) ? JSON.stringify(data) : data;
             
-            const response = result.data ? JSON.parse(result.data) : null;
-            if(result.code == 429) {
-                Retry(response.retry_after + 100);
-                this.emit('rateLimit');
-            } else if((result.code >= 400) && (result.code < 500)) {
-                reject(`[API error] ${response.message}`);
-            } else {
-                Retry();
-            }
-        };
-        
-        const TryRequest = () => Util.HttpsRequest(url, options, comp).then(result => resolve(JSON.parse(result))).catch(RequestError);
-        
-        let retryCount = 0;
-        const Retry = time => {
-            if(retryCount < REQUEST_RETRY_COUNT) {
+            let retryCount = 0;
+            
+            const RequestError = result => {
+                if(!result)
+                    return reject('Unexpected request error');
+                
+                if(typeof(result) != 'object') {
+                    if(result == 1) {
+                        Retry();
+                        this.emit('error', 'Request timeout.');
+                    } else {
+                        reject(result);
+                    }
+                    return;
+                }
+                
+                let response = result.data;
+                try { response = JSON.parse(result.data).message; } catch {}
+                
+                if(result.code == 429) {
+                    Retry(response.retry_after + 100);
+                    this.emit('error', 'Rate limit reached.');
+                } else if((result.code >= 400) && (result.code < 500)) {
+                    reject(`[API] ${response}`);
+                } else {
+                    Retry();
+                    this.emit('error', `${result.code} ${result.ext}`);
+                }
+            };
+            
+            const TryRequest = () => Util.HttpsRequest(url, options, comp).then(result => resolve(JSON.parse(result))).catch(RequestError);
+            
+            const Retry = time => {
                 retryCount++;
-                setTimeout(TryRequest, time || STANDARD_TIMEOUT);
-            } else {
-                reject('Connection error.');
-            }
-        };
-        
-        TryRequest();
-    });
+                this.emit('warn', `Try ${retryCount}/${REQUEST_RETRY_COUNT} was failed.`);
+                
+                if(retryCount < REQUEST_RETRY_COUNT)
+                    setTimeout(TryRequest, time || STANDARD_TIMEOUT);
+                else
+                    reject('Unable to complete operation.');
+            };
+            
+            TryRequest();
+        });
+    }
     
-    WsSend = data => this.#ws && this.#ws.send(JSON.stringify(data));
+    WsSend = data => this.#ws && this.#ws.send((data && (typeof(data) == 'object')) ? JSON.stringify(data) : data);
 }
 
 exports.Client = Client;
