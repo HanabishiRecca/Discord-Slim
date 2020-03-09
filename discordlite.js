@@ -5,11 +5,13 @@ const
     Util = require('./util.js');
 
 const
-    API = 'https://discordapp.com/api/v7',
+    WEB = 'https://discordapp.com',
+    API = `${WEB}/api/v7`,
     CDN = 'https://cdn.discordapp.com',
     STANDARD_TIMEOUT = 1000,
     REQUEST_RETRY_COUNT = 5;
 
+exports.WebHost = WEB;
 exports.ApiHost = API;
 exports.CdnHost = CDN;
 
