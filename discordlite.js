@@ -117,6 +117,7 @@ class Client extends require('events') {
                 this.#ws.send(JSON.stringify({ op: OPCode.HEARTBEAT, d: this.#lastSequence }));
             }
         } else {
+            this.emit('warn', 'Heartbeat timeout.');
             this.#WsConnect(true);
         }
     }
