@@ -48,12 +48,10 @@ class Client extends require('events') {
         }
         
         this.#ws = new WebSocket(JSON.parse(await Util.HttpsRequest(`${API}/gateway/bot`, { headers: this.#auth })).url);
-        this.#ws.on('open', this.#OnOpen);
+        this.#ws.on('message', this.#OnMessage);
         this.#ws.on('close', this.#OnClose);
         this.#ws.on('error', this.#OnError);
     }
-    
-    #OnOpen = () => this.#ws.on('message', this.#OnMessage);
     
     #OnMessage = data => {
         const packet = JSON.parse(data);
