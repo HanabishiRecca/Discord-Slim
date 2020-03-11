@@ -40,7 +40,10 @@ class Client extends require('events') {
     }
     
     #WsConnect = async resume => {
-        this.#ws && this.#ws.close(1001);
+        if(this.#ws) {
+            this.#ws.off('close', this.#OnClose);
+            this.#ws.close(1001);
+        }
         
         if(!resume) {
             this.#sessionId = undefined;
@@ -131,8 +134,7 @@ class Client extends require('events') {
     
     #OnClose = code => {
         this.emit('disconnect', code);
-        if(code != 1001)
-            this.#WsConnect(true);
+        this.#WsConnect(true);
     }
     
     #OnError = error => this.emit('error', error);
