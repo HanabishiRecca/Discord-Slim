@@ -188,13 +188,13 @@ class Client extends require('events') {
                 }
                 
                 let response = result.data;
-                try { response = JSON.parse(result.data).message; } catch {}
+                try { response = JSON.parse(result.data); } catch {}
                 
                 if(result.code == 429) {
-                    Retry(response.retry_after + 100);
-                    this.emit('error', 'Rate limit reached.');
+                    Retry(response.retry_after);
+                    this.emit('warn', `${response.message} Global: ${response.global}`);
                 } else if((result.code >= 400) && (result.code < 500)) {
-                    reject(`[API] ${response}`);
+                    reject(`[API] ${response.message}`);
                 } else {
                     Retry();
                     this.emit('error', `${result.code} ${result.ext}`);
