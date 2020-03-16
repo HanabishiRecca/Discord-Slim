@@ -92,7 +92,7 @@ class Client extends require('events') {
         } else if(op == OPCode.HEARTBEAT) {
             this.#SendHeartbeat();
         } else if(op == OPCode.INVALID_SESSION) {
-            this.emit('warn', 'Invalid session.');
+            this.emit('warn', `Invalid session. Resumable: ${packet.d}`);
             this.#WsConnect(packet.d);
         } else if(op == OPCode.RECONNECT) {
             this.emit('warn', 'Server forced reconnect.');
