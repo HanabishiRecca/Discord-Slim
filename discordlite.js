@@ -40,10 +40,7 @@ class Client extends require('events') {
     }
     
     #WsConnect = async resume => {
-        if(this.#ws) {
-            this.#ws.off('close', this.#OnClose);
-            this.#ws.close(1001);
-        }
+        this.#WsDisconnect();
         
         if(!resume) {
             this.#sessionId = undefined;
@@ -54,6 +51,16 @@ class Client extends require('events') {
         this.#ws.on('message', this.#OnMessage);
         this.#ws.on('close', this.#OnClose);
         this.#ws.on('error', this.#OnError);
+    }
+    
+    #WsDisconnect = (code = 1001) => {
+        if(!this.#ws)
+            return;
+        
+        this.emit('disconnect', code);
+        this.#ws.removeAllListeners();
+        this.#ws.close(code);
+        this.#ws = undefined;
     }
     
     #OnMessage = data => {
@@ -133,24 +140,32 @@ class Client extends require('events') {
     }
     
     #OnClose = code => {
-        this.emit('disconnect', code);
+        this.#WsDisconnect(code);
         this.#WsConnect(true);
     }
     
     #OnError = error => this.emit('error', error);
     
-    Connect = token => {
+    Auth = token => {
         if(!token)
             throw 'Token required.';
         
         if(typeof(token) == 'string') {
             this.#token = token;
             this.#auth = { Authorization: `Bot ${token}` };
-            this.#WsConnect();
         } else {
             throw 'Token must be a string.';
         }
     }
+    
+    Connect = resume => {
+        if(this.#token)
+            this.#WsConnect(resume);
+        else
+            throw 'Authorization required.';
+    }
+    
+    Disconnect = code => this.#WsDisconnect(code);
     
     Request = (method, route, data = null) => {
         if(!method)
@@ -175,17 +190,10 @@ class Client extends require('events') {
             
             const RequestError = result => {
                 if(!result)
-                    return reject('Unexpected request error');
+                    return reject('Unexpected request error.');
                 
-                if(typeof(result) != 'object') {
-                    if(result == 1) {
-                        Retry();
-                        this.emit('error', 'Request timeout.');
-                    } else {
-                        reject(result);
-                    }
-                    return;
-                }
+                if(typeof(result) != 'object')
+                    return reject((result == 1) ? 'Request timeout.' : result);
                 
                 let response = result.data;
                 try { response = JSON.parse(result.data); } catch {}
