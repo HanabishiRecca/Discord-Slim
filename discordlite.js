@@ -209,7 +209,7 @@ class Client extends require('events') {
                 }
             };
             
-            const TryRequest = () => Util.HttpsRequest(url, options, comp).then(result => resolve(JSON.parse(result))).catch(RequestError);
+            const TryRequest = () => Util.HttpsRequest(url, options, comp).then(result => resolve(JSON.parse(result) || true)).catch(RequestError);
             
             const Retry = time => {
                 retryCount++;
