@@ -47,7 +47,7 @@ class Client extends require('events') {
             this.#lastSequence = 0;
         }
         
-        this.#ws = new WebSocket(JSON.parse(await Util.HttpsRequest(`${API}/gateway/bot`, { headers: this.#auth })).url);
+        this.#ws = new WebSocket(JSON.parse(await Util.HttpsRequest(`${API}/gateway/bot`, { headers: { Authorization: this.#auth } })).url);
         this.#ws.on('message', this.#OnMessage);
         this.#ws.on('close', this.#OnClose);
         this.#ws.on('error', this.#OnError);
@@ -152,7 +152,7 @@ class Client extends require('events') {
         
         if(typeof(token) == 'string') {
             this.#token = token;
-            this.#auth = { Authorization: `Bot ${token}` };
+            this.#auth = `Bot ${token}`;
         } else {
             throw 'Token must be a string.';
         }
@@ -167,7 +167,7 @@ class Client extends require('events') {
     
     Disconnect = code => this.#WsDisconnect(code);
     
-    Request = (method, route, data = null) => {
+    Request = (method, route, data = null, auth = null) => {
         if(!method)
             throw 'Method required.';
         
@@ -181,12 +181,45 @@ class Client extends require('events') {
             throw 'Route must be a string.';
         
         return new Promise((resolve, reject) => {
+            let comp, contentType, contentLength;
+            if(data) {
+                if(typeof(data) == 'object') {
+                    comp = JSON.stringify(data);
+                    contentType = 'application/json';
+                } else {
+                    comp = data.toString();
+                    contentType = 'application/x-www-form-urlencoded';
+                }
+                contentLength = Buffer.byteLength(comp);
+            } else {
+                contentType = 'application/x-www-form-urlencoded';
+                contentLength = 0;
+            }
+            
             const
-                url = `${API}/${route}`,
-                options = { method: method, headers: this.#auth },
-                comp = (data && (typeof(data) == 'object')) ? JSON.stringify(data) : data;
+                url = `${API}${route}`,
+                options = {
+                    method: method,
+                    headers: {
+                        Authorization: auth || this.#auth,
+                        'Content-Type': contentType,
+                        'Content-Length': contentLength,
+                    },
+                };
+            
+            const TryRequest = () => Util.HttpsRequest(url, options, comp).then(result => resolve(JSON.parse(result) || true)).catch(RequestError);
             
             let retryCount = 0;
+            
+            const Retry = time => {
+                retryCount++;
+                this.emit('warn', `Try ${retryCount}/${REQUEST_RETRY_COUNT} was failed.`);
+                
+                if(retryCount < REQUEST_RETRY_COUNT)
+                    setTimeout(TryRequest, time || STANDARD_TIMEOUT);
+                else
+                    reject('Unable to complete operation.');
+            };
             
             const RequestError = result => {
                 if(!result)
@@ -202,23 +235,11 @@ class Client extends require('events') {
                     Retry(response.retry_after);
                     this.emit('warn', `${response.message} Global: ${response.global}`);
                 } else if((result.code >= 400) && (result.code < 500)) {
-                    reject(`[API] ${response.message}`);
+                    reject(`[API] ${response.message || response.error}`);
                 } else {
                     Retry();
                     this.emit('error', `${result.code} ${result.ext}`);
                 }
-            };
-            
-            const TryRequest = () => Util.HttpsRequest(url, options, comp).then(result => resolve(JSON.parse(result) || true)).catch(RequestError);
-            
-            const Retry = time => {
-                retryCount++;
-                this.emit('warn', `Try ${retryCount}/${REQUEST_RETRY_COUNT} was failed.`);
-                
-                if(retryCount < REQUEST_RETRY_COUNT)
-                    setTimeout(TryRequest, time || STANDARD_TIMEOUT);
-                else
-                    reject('Unable to complete operation.');
             };
             
             TryRequest();

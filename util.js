@@ -39,12 +39,6 @@ exports.HttpsRequest = (url, options, data = null) => {
         request.on('error', () => reject('Request error.'));
         request.on('timeout', () => reject(1));
         
-        if(data) {
-            request.setHeader('Content-Length', Buffer.byteLength(data));
-            request.setHeader('Content-Type', 'application/json');
-            request.write(data);
-        }
-        
-        request.end();
+        request.end(data);
     });
 }
