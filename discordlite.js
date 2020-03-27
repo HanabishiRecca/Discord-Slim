@@ -34,50 +34,50 @@ class Client extends require('events') {
     #lastHeartbeatAck;
     #heartbeatTimer;
     #ws;
-    
+
     constructor() {
         super();
     }
-    
+
     #WsConnect = async resume => {
         this.#WsDisconnect();
-        
+
         if(!resume) {
             this.#sessionId = undefined;
             this.#lastSequence = 0;
         }
-        
+
         this.#ws = new WebSocket(JSON.parse(await Util.HttpsRequest(`${API}/gateway/bot`, { headers: { Authorization: this.#auth } })).url);
         this.#ws.on('message', this.#OnMessage);
         this.#ws.on('close', this.#OnClose);
         this.#ws.on('error', this.#OnError);
     }
-    
+
     #WsDisconnect = (code = 1001) => {
         if(!this.#ws)
             return;
-        
+
         this.emit('disconnect', code);
         this.#ws.removeAllListeners();
         this.#ws.close(code);
         this.#ws = undefined;
     }
-    
+
     #OnMessage = data => {
         const packet = JSON.parse(data);
         if(!packet)
             return;
-        
+
         if(packet.s > this.#lastSequence)
             this.#lastSequence = packet.s;
-        
+
         const op = packet.op;
         if(op == OPCode.DISPATCH) {
             const t = packet.t;
             if((t == 'READY') || (t == 'RESUMED')) {
                 if(packet.d.session_id)
                     this.#sessionId = packet.d.session_id;
-                
+
                 this.#lastHeartbeatAck = true;
                 this.#SendHeartbeat();
                 this.emit('connect');
@@ -99,7 +99,7 @@ class Client extends require('events') {
             this.#WsConnect(true);
         }
     }
-    
+
     #Identify = () => {
         this.#ws.send(JSON.stringify(this.#sessionId ? {
             op: OPCode.RESUME,
@@ -117,7 +117,7 @@ class Client extends require('events') {
             },
         }));
     }
-    
+
     #SendHeartbeat = () => {
         if(this.#lastHeartbeatAck) {
             if(this.#ws && (this.#ws.readyState == 1)) {
@@ -129,7 +129,7 @@ class Client extends require('events') {
             this.#WsConnect(true);
         }
     }
-    
+
     #SetHeartbeatTimer = interval => {
         if(this.#heartbeatTimer) {
             clearInterval(this.#heartbeatTimer);
@@ -138,18 +138,18 @@ class Client extends require('events') {
         if(interval)
             this.#heartbeatTimer = setInterval(this.#SendHeartbeat, interval);
     }
-    
+
     #OnClose = code => {
         this.#WsDisconnect(code);
         this.#WsConnect(true);
     }
-    
+
     #OnError = error => this.emit('error', error);
-    
+
     Auth = token => {
         if(!token)
             throw 'Token required.';
-        
+
         if(typeof(token) == 'string') {
             this.#token = token;
             this.#auth = `Bot ${token}`;
@@ -157,29 +157,29 @@ class Client extends require('events') {
             throw 'Token must be a string.';
         }
     }
-    
+
     Connect = resume => {
         if(this.#token)
             this.#WsConnect(resume);
         else
             throw 'Authorization required.';
     }
-    
+
     Disconnect = code => this.#WsDisconnect(code);
-    
+
     Request = (method, route, data = null, auth = null) => {
         if(!method)
             throw 'Method required.';
-        
+
         if(typeof(method) != 'string')
             throw 'Method must be a string.';
-        
+
         if(!route)
             throw 'Route required.';
-        
+
         if(typeof(route) != 'string')
             throw 'Route must be a string.';
-        
+
         return new Promise((resolve, reject) => {
             let comp, contentType, contentLength;
             if(data) {
@@ -195,7 +195,7 @@ class Client extends require('events') {
                 contentType = 'application/x-www-form-urlencoded';
                 contentLength = 0;
             }
-            
+
             const
                 url = `${API}${route}`,
                 options = {
@@ -206,31 +206,31 @@ class Client extends require('events') {
                         'Content-Length': contentLength,
                     },
                 };
-            
+
             const TryRequest = () => Util.HttpsRequest(url, options, comp).then(result => resolve(JSON.parse(result) || true)).catch(RequestError);
-            
+
             let retryCount = 0;
-            
+
             const Retry = time => {
                 retryCount++;
                 this.emit('warn', `Try ${retryCount}/${REQUEST_RETRY_COUNT} was failed.`);
-                
+
                 if(retryCount < REQUEST_RETRY_COUNT)
                     setTimeout(TryRequest, time || STANDARD_TIMEOUT);
                 else
                     reject('Unable to complete operation.');
             };
-            
+
             const RequestError = result => {
                 if(!result)
                     return reject('Unexpected request error.');
-                
+
                 if(typeof(result) != 'object')
                     return reject((result == 1) ? 'Request timeout.' : result);
-                
+
                 let response = result.data;
                 try { response = JSON.parse(result.data); } catch {}
-                
+
                 if(result.code == 429) {
                     Retry(response.retry_after);
                     this.emit('warn', `${response.message} Global: ${response.global}`);
@@ -241,11 +241,11 @@ class Client extends require('events') {
                     this.emit('error', `${result.code} ${result.ext}`);
                 }
             };
-            
+
             TryRequest();
         });
     }
-    
+
     WsSend = data => this.#ws && this.#ws.send((data && (typeof(data) == 'object')) ? JSON.stringify(data) : data);
 }
 
