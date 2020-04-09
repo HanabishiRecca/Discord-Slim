@@ -96,7 +96,7 @@ class Client extends require('events') {
             this.#WsConnect(packet.d);
         } else if(op == OPCode.RECONNECT) {
             this.emit('warn', 'Server forced reconnect.');
-            this.#WsConnect(true);
+            this.#WsConnect();
         }
     }
 
