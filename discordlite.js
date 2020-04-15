@@ -53,7 +53,7 @@ class Client extends require('events') {
         this.#ws.on('error', this.#OnError);
     }
 
-    #WsDisconnect = (code = 1001) => {
+    #WsDisconnect = (code = 1012) => {
         if(!this.#ws)
             return;
 
