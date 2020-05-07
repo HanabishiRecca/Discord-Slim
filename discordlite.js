@@ -167,7 +167,7 @@ class Client extends require('events') {
 
     Disconnect = code => this.#WsDisconnect(code);
 
-    Request = (method, route, data = null) => {
+    Request = (method, route, data = null, auth = null) => {
         if(!method)
             throw 'Method required.';
 
@@ -179,9 +179,6 @@ class Client extends require('events') {
 
         if(typeof(route) != 'string')
             throw 'Route must be a string.';
-
-        if(!this.#auth)
-            throw 'Client is not authenticated.';
 
         return new Promise((resolve, reject) => {
             let comp, contentType, contentLength;
@@ -204,7 +201,7 @@ class Client extends require('events') {
                 options = {
                     method: method,
                     headers: {
-                        Authorization: this.#auth,
+                        Authorization: auth || this.#auth,
                         'Content-Type': contentType,
                         'Content-Length': contentLength,
                     },
