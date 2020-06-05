@@ -27,13 +27,7 @@ const OPCode = {
 };
 
 class Client extends require('events') {
-    #token;
-    #auth;
-    #sessionId;
-    #lastSequence;
-    #lastHeartbeatAck;
-    #heartbeatTimer;
-    #ws;
+    #token; #auth; #sessionId; #lastSequence; #lastHeartbeatAck; #heartbeatTimer; #ws;
 
     constructor() {
         super();
@@ -51,7 +45,7 @@ class Client extends require('events') {
         this.#ws.on('message', this.#OnMessage);
         this.#ws.on('close', this.#OnClose);
         this.#ws.on('error', this.#OnError);
-    }
+    };
 
     #WsDisconnect = (code = 1012) => {
         if(!this.#ws)
@@ -61,7 +55,7 @@ class Client extends require('events') {
         this.#ws.removeAllListeners();
         this.#ws.close(code);
         this.#ws = undefined;
-    }
+    };
 
     #OnMessage = data => {
         const packet = JSON.parse(data);
@@ -98,25 +92,28 @@ class Client extends require('events') {
             this.emit('warn', 'Server forced reconnect.');
             this.#WsConnect(true);
         }
-    }
+    };
 
     #Identify = () => {
-        this.#ws.send(JSON.stringify(this.#sessionId ? {
-            op: OPCode.RESUME,
-            d: {
-                token: this.#token,
-                session_id: this.#sessionId,
-                seq: this.#lastSequence,
-            },
-        } : {
-            op: OPCode.IDENTIFY,
-            d: {
-                token: this.#token,
-                properties: { $os: 'linux', $browser: 'bot', $device: 'bot' },
-                version: 6,
-            },
-        }));
-    }
+        this.#ws.send(JSON.stringify(this.#sessionId ?
+            {
+                op: OPCode.RESUME,
+                d: {
+                    token: this.#token,
+                    session_id: this.#sessionId,
+                    seq: this.#lastSequence,
+                },
+            } :
+            {
+                op: OPCode.IDENTIFY,
+                d: {
+                    token: this.#token,
+                    properties: { $os: 'linux', $browser: 'bot', $device: 'bot' },
+                    version: 6,
+                },
+            }
+        ));
+    };
 
     #SendHeartbeat = () => {
         if(this.#lastHeartbeatAck) {
@@ -128,7 +125,7 @@ class Client extends require('events') {
             this.emit('warn', 'Heartbeat timeout.');
             this.#WsConnect(true);
         }
-    }
+    };
 
     #SetHeartbeatTimer = interval => {
         if(this.#heartbeatTimer) {
@@ -137,12 +134,12 @@ class Client extends require('events') {
         }
         if(interval)
             this.#heartbeatTimer = setInterval(this.#SendHeartbeat, interval);
-    }
+    };
 
     #OnClose = code => {
         this.#WsDisconnect(code);
         this.#WsConnect(true);
-    }
+    };
 
     #OnError = error => this.emit('error', error);
 
@@ -150,20 +147,20 @@ class Client extends require('events') {
         if(!token)
             throw 'Token required.';
 
-        if(typeof(token) == 'string') {
+        if(typeof (token) == 'string') {
             this.#token = token;
             this.#auth = `Bot ${token}`;
         } else {
             throw 'Token must be a string.';
         }
-    }
+    };
 
     Connect = resume => {
         if(this.#token)
             this.#WsConnect(resume);
         else
             throw 'Authorization required.';
-    }
+    };
 
     Disconnect = code => this.#WsDisconnect(code);
 
@@ -171,19 +168,19 @@ class Client extends require('events') {
         if(!method)
             throw 'Method required.';
 
-        if(typeof(method) != 'string')
+        if(typeof (method) != 'string')
             throw 'Method must be a string.';
 
         if(!route)
             throw 'Route required.';
 
-        if(typeof(route) != 'string')
+        if(typeof (route) != 'string')
             throw 'Route must be a string.';
 
         return new Promise((resolve, reject) => {
             let comp, contentType, contentLength;
             if(data) {
-                if(typeof(data) == 'object') {
+                if(typeof (data) == 'object') {
                     comp = JSON.stringify(data);
                     contentType = 'application/json';
                 } else {
@@ -225,11 +222,11 @@ class Client extends require('events') {
                 if(!result)
                     return reject('Unexpected request error.');
 
-                if(typeof(result) != 'object')
+                if(typeof (result) != 'object')
                     return reject((result == 1) ? 'Request timeout.' : result);
 
                 let response = result.data;
-                try { response = JSON.parse(result.data); } catch {}
+                try { response = JSON.parse(result.data); } catch { }
 
                 if(result.code == 429) {
                     Retry(response.retry_after);
@@ -244,9 +241,9 @@ class Client extends require('events') {
 
             TryRequest();
         });
-    }
+    };
 
-    WsSend = data => this.#ws && this.#ws.send((data && (typeof(data) == 'object')) ? JSON.stringify(data) : data);
+    WsSend = data => this.#ws && this.#ws.send((data && (typeof (data) == 'object')) ? JSON.stringify(data) : data);
 }
 
 exports.Client = Client;
