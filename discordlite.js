@@ -27,7 +27,7 @@ const OPCode = {
 };
 
 class Client extends require('events') {
-    #token; #auth; #sessionId; #lastSequence; #lastHeartbeatAck; #heartbeatTimer; #ws;
+    #token; #auth; #sessionId; #lastSequence; #lastHeartbeatAck; #heartbeatTimer; #ws; #intents;
 
     constructor() {
         super();
@@ -110,6 +110,7 @@ class Client extends require('events') {
                     token: this.#token,
                     properties: { $os: 'linux', $browser: 'bot', $device: 'bot' },
                     version: 6,
+                    intents: this.#intents,
                 },
             }
         ));
@@ -155,9 +156,10 @@ class Client extends require('events') {
         }
     };
 
-    Connect = resume => {
+    Connect = (resume, intents) => {
+        this.#intents = intents;
         if(this.#token)
-            this.#WsConnect(resume);
+            this.#WsConnect(resume === true);
         else
             throw 'Authorization required.';
     };
@@ -269,7 +271,7 @@ const Routes = {
 
 exports.Routes = Routes;
 
-const Permissions = {
+exports.Permissions = {
     CREATE_INSTANT_INVITE: 0x1,
     KICK_MEMBERS: 0x2,
     BAN_MEMBERS: 0x4,
@@ -302,4 +304,20 @@ const Permissions = {
     MANAGE_EMOJIS: 0x40000000,
 };
 
-exports.Permissions = Permissions;
+exports.Intents = {
+    GUILDS: (1 << 0),
+    GUILD_MEMBERS: (1 << 1),
+    GUILD_BANS: (1 << 2),
+    GUILD_EMOJIS: (1 << 3),
+    GUILD_INTEGRATIONS: (1 << 4),
+    GUILD_WEBHOOKS: (1 << 5),
+    GUILD_INVITES: (1 << 6),
+    GUILD_VOICE_STATES: (1 << 7),
+    GUILD_PRESENCES: (1 << 8),
+    GUILD_MESSAGES: (1 << 9),
+    GUILD_MESSAGE_REACTIONS: (1 << 10),
+    GUILD_MESSAGE_TYPING: (1 << 11),
+    DIRECT_MESSAGES: (1 << 12),
+    DIRECT_MESSAGE_REACTIONS: (1 << 13),
+    DIRECT_MESSAGE_TYPING: (1 << 14),
+};
