@@ -7,6 +7,6 @@
     "main": "discordlite.js",
     "license": "MIT",
     "dependencies": {
-        "ws": "^7.2.3"
+        "ws": "^7.3.0"
     }
 }
