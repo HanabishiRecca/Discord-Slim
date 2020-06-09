@@ -99,3 +99,9 @@ public
 
 # TernJS port file
 .tern-port
+
+# Build
+lib/
+
+# Ignore lockfile for library
+package-lock.json

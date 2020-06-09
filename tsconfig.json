@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "ESNext",
+        "strict": true,
+        "moduleResolution": "node",
+        "outDir": "lib",
+        "baseUrl": ".",
+        "declaration": true,
+        "paths": {
+            "*": [
+                "node_modules/*"
+            ]
+        },
+        "lib": [
+            "ESNext"
+        ]
+    },
+    "include": [
+        "src/client.ts"
+    ]
+}
