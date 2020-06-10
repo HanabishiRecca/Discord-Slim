@@ -45,7 +45,7 @@ export class Client extends EventEmitter {
             this.#lastSequence = 0;
         }
 
-        const gateway = SafeJsonParse(await HttpsRequest(`${API}/gateway/bot`, { headers: { Authorization: this.#auth } }));
+        const gateway = SafeJsonParse((await HttpsRequest(`${API}/gateway/bot`, { headers: { Authorization: this.#auth } })).data);
         if(!(gateway && (typeof gateway.url == 'string')))
             throw 'Unable to connect: unexpected gateway API response.';
 
@@ -191,6 +191,8 @@ export class Client extends EventEmitter {
         if(typeof route != 'string')
             throw 'Route must be a string.';
 
+        const url = `${API}${route}`;
+
         if((auth != null) && (typeof auth != 'string'))
             throw 'Auth must be a string.';
 
@@ -210,51 +212,43 @@ export class Client extends EventEmitter {
             contentLength = Buffer.byteLength(content);
         }
 
-        return new Promise<object>((resolve, reject) => {
-            const
-                url = `${API}${route}`,
-                options = {
-                    method: method,
-                    headers: {
-                        Authorization: auth || this.#auth,
-                        'Content-Type': contentType,
-                        'Content-Length': contentLength,
-                    },
-                };
+        const options = {
+            method: method,
+            headers: {
+                Authorization: auth || this.#auth,
+                'Content-Type': contentType,
+                'Content-Length': contentLength,
+            },
+        };
 
-            const TryRequest = () => HttpsRequest(url, options, content).then(result => resolve(SafeJsonParse(result) || {})).catch(RequestError);
-
+        return new Promise<any>((resolve, reject) => {
             let retryCount = 0;
 
-            const Retry = (time = STANDARD_TIMEOUT) => {
-                retryCount++;
-                this.emit('warn', `Try ${retryCount}/${REQUEST_RETRY_COUNT} was failed.`);
-
-                if(retryCount < REQUEST_RETRY_COUNT)
-                    setTimeout(TryRequest, time);
-                else
-                    reject('Unable to complete operation.');
-            };
-
-            const RequestError = (result: { code: number; ext?: string; data?: string | null; } | number | string) => {
-                if(!result)
-                    return reject('Unexpected request error.');
-
-                if(typeof result != 'object')
-                    return reject((result == 1) ? 'Request timeout.' : result);
-
-                if(result.code == 429) {
+            const RequestResult = (result: RequestResult) => {
+                const code = result.code;
+                if((code >= 200) && (code < 300)) {
+                    resolve(SafeJsonParse(result.data));
+                } else if((code >= 400) && (code < 500)) {
                     const response = SafeJsonParse(result.data);
-                    Retry(response.retry_after);
-                    this.emit('warn', `${response.message} Global: ${response.global}`);
-                } else if((result.code >= 400) && (result.code < 500)) {
-                    const response = SafeJsonParse(result.data);
-                    reject(`[API] ${response.message || response.error}`);
+                    if(code == 429) {
+                        retryCount++;
+                        this.emit('warn', `${response.message} Global: ${response.global}`);
+                        this.emit('warn', `Try ${retryCount}/${REQUEST_RETRY_COUNT} was failed.`);
+                        if(retryCount < REQUEST_RETRY_COUNT)
+                            setTimeout(TryRequest, response.retry_after || STANDARD_TIMEOUT);
+                        else
+                            RequestError('Unable to complete operation.');
+                    } else {
+                        RequestError(`[API] ${code} ${response.message || response.error || ''}`);
+                    }
                 } else {
-                    Retry();
-                    this.emit('error', `${result.code} ${result.ext}`);
+                    RequestError(`Unknown request error (${code}).`);
                 }
             };
+
+            const RequestError = (error: string | Error) => reject((error instanceof Error) ? error.message : error);
+
+            const TryRequest = () => HttpsRequest(url, options, content).then(RequestResult).catch(RequestError);
 
             TryRequest();
         });
@@ -352,10 +346,18 @@ export enum Intents {
     DIRECT_MESSAGE_TYPING = (1 << 14),
 };
 
+type RequestResult = {
+    code: number;
+    data?: string;
+};
+
 const HttpsRequest = (url: string | URL, options: https.RequestOptions, data?: string | Buffer) => {
-    return new Promise<string | null>((resolve, reject) => {
+    return new Promise<RequestResult>((resolve, reject) => {
         const request = https.request(url, options, response => {
-            const ReturnResult = (result?: string | null) => (response.statusCode && (response.statusCode >= 200) && (response.statusCode < 300)) ? resolve(result) : reject({ code: response.statusCode || 0, ext: response.statusMessage, data: result });
+            if(response.statusCode == null)
+                return reject('Unknown response.');
+
+            const ReturnResult = (result?: string) => resolve({ code: response.statusCode || 0, data: result });
 
             const chunks: Buffer[] = [];
             let responseLen = 0;
@@ -387,17 +389,20 @@ const HttpsRequest = (url: string | URL, options: https.RequestOptions, data?: s
             });
         });
 
-        request.on('error', () => reject('Request error.'));
-        request.on('timeout', () => reject(1));
+        request.on('error', reject);
+        request.on('timeout', () => reject('Request timeout.'));
 
         request.end(data);
     });
 };
 
-const SafeJsonParse = (data?: string | null) => {
+const SafeJsonParse = (data?: string) => {
+    if(data == null)
+        return data;
+
     try {
-        if(data)
-            return JSON.parse(data);
-    } catch { }
-    return null;
+        return JSON.parse(data);
+    } catch {
+        return null;
+    }
 };
