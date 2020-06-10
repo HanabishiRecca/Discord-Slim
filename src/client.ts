@@ -270,28 +270,23 @@ export interface Client {
     on(event: 'error', listener: (this: this, message: string) => void): this;
 }
 
-type ObjectWithId = {
-    id: string;
-    [key: string]: any;
-};
-
 const GetId = (obj: any) => obj.id || obj;
 
 export const Routes = {
-    User: (user: string | ObjectWithId) => `/users/${GetId(user)}`,
-    Server: (server: string | ObjectWithId) => `/guilds/${GetId(server)}`,
-    Channel: (channel: string | ObjectWithId) => `/channels/${GetId(channel)}`,
+    User: (user: string | { id: string; }) => `/users/${GetId(user)}`,
+    Server: (server: string | { id: string; }) => `/guilds/${GetId(server)}`,
+    Channel: (channel: string | { id: string; }) => `/channels/${GetId(channel)}`,
     Invite: (invite: string) => `/invite/${invite}`,
-    Webhook: (webhook: string | ObjectWithId, token: string) => `/webhooks/${GetId(webhook)}/${token}`,
-    Member: (server: string | ObjectWithId, member: string | ObjectWithId) => `${Routes.Server(server)}/members/${GetId(member)}`,
-    Role: (server: string | ObjectWithId, member: string | ObjectWithId, role: string | ObjectWithId) => `${Routes.Member(server, member)}/roles/${GetId(role)}`,
-    Emoji: (server: string | ObjectWithId, emoji: string | ObjectWithId) => `${Routes.Server(server)}/emojis/${GetId(emoji)}`,
-    Message: (channel: string | ObjectWithId, message: string | ObjectWithId) => `${Routes.Channel(channel)}/messages/${GetId(message)}`,
-    Reaction: (channel: string | ObjectWithId, message: string | ObjectWithId, emoji: string | ObjectWithId) => `${Routes.Message(channel, message)}/reactions/${GetId(emoji)}`,
-    Pin: (channel: string | ObjectWithId, message: string | ObjectWithId) => `${Routes.Channel(channel)}/pins/${GetId(message)}`,
-    Recipient: (channel: string | ObjectWithId, user: string | ObjectWithId) => `${Routes.Channel(channel)}/recipients/${GetId(user)}`,
-    Relationship: (fromUser: string | ObjectWithId, toUser: string | ObjectWithId) => `${Routes.User(fromUser)}/relationships/${GetId(toUser)}`,
-    Note: (user: string | ObjectWithId, note: string) => `${Routes.User(user)}/notes/${note}`,
+    Webhook: (webhook: string | { id: string; }, token: string) => `/webhooks/${GetId(webhook)}/${token}`,
+    Member: (server: string | { id: string; }, member: string | { id: string; }) => `${Routes.Server(server)}/members/${GetId(member)}`,
+    Role: (server: string | { id: string; }, member: string | { id: string; }, role: string | { id: string; }) => `${Routes.Member(server, member)}/roles/${GetId(role)}`,
+    Emoji: (server: string | { id: string; }, emoji: string | { id: string; }) => `${Routes.Server(server)}/emojis/${GetId(emoji)}`,
+    Message: (channel: string | { id: string; }, message: string | { id: string; }) => `${Routes.Channel(channel)}/messages/${GetId(message)}`,
+    Reaction: (channel: string | { id: string; }, message: string | { id: string; }, emoji: string | { id: string; }) => `${Routes.Message(channel, message)}/reactions/${GetId(emoji)}`,
+    Pin: (channel: string | { id: string; }, message: string | { id: string; }) => `${Routes.Channel(channel)}/pins/${GetId(message)}`,
+    Recipient: (channel: string | { id: string; }, user: string | { id: string; }) => `${Routes.Channel(channel)}/recipients/${GetId(user)}`,
+    Relationship: (fromUser: string | { id: string; }, toUser: string | { id: string; }) => `${Routes.User(fromUser)}/relationships/${GetId(toUser)}`,
+    Note: (user: string | { id: string; }, note: string) => `${Routes.User(user)}/notes/${note}`,
 };
 
 export enum Permissions {
