@@ -1,5 +1,3 @@
-'use strict';
-
 import * as WebSocket from 'ws';
 import { EventEmitter } from 'events';
 import * as https from 'https';
