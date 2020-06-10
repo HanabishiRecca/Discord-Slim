@@ -268,6 +268,33 @@ export interface Client {
     on(event: 'packet', listener: (this: this, packet: { op: number; s: number; t: string; d: any; }) => void): this;
     on(event: 'warn', listener: (this: this, message: string) => void): this;
     on(event: 'error', listener: (this: this, message: string) => void): this;
+
+    addListener(event: 'connect', listener: (this: this) => void): this;
+    addListener(event: 'disconnect', listener: (this: this, code: number) => void): this;
+    addListener(event: 'packet', listener: (this: this, packet: { op: number; s: number; t: string; d: any; }) => void): this;
+    addListener(event: 'warn', listener: (this: this, message: string) => void): this;
+    addListener(event: 'error', listener: (this: this, message: string) => void): this;
+
+    off(event: 'connect', listener: (this: this) => void): this;
+    off(event: 'disconnect', listener: (this: this, code: number) => void): this;
+    off(event: 'packet', listener: (this: this, packet: { op: number; s: number; t: string; d: any; }) => void): this;
+    off(event: 'warn', listener: (this: this, message: string) => void): this;
+    off(event: 'error', listener: (this: this, message: string) => void): this;
+
+    removeListener(event: 'connect', listener: (this: this) => void): this;
+    removeListener(event: 'disconnect', listener: (this: this, code: number) => void): this;
+    removeListener(event: 'packet', listener: (this: this, packet: { op: number; s: number; t: string; d: any; }) => void): this;
+    removeListener(event: 'warn', listener: (this: this, message: string) => void): this;
+    removeListener(event: 'error', listener: (this: this, message: string) => void): this;
+
+    once(event: 'connect', listener: (this: this) => void): this;
+    once(event: 'disconnect', listener: (this: this, code: number) => void): this;
+    once(event: 'packet', listener: (this: this, packet: { op: number; s: number; t: string; d: any; }) => void): this;
+    once(event: 'warn', listener: (this: this, message: string) => void): this;
+    once(event: 'error', listener: (this: this, message: string) => void): this;
+
+    removeAllListeners(): this;
+    removeAllListeners(event: 'connect' | 'disconnect' | 'packet' | 'warn' | 'error'): this;
 }
 
 const GetId = (obj: any) => obj.id || obj;
@@ -401,3 +428,6 @@ const SafeJsonParse = (data?: string) => {
         return null;
     }
 };
+
+const c = new Client();
+c.removeAllListeners();
