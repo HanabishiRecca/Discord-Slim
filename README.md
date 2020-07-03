@@ -1,5 +1,5 @@
 # Discord Slim
-[![npm version](https://badge.fury.io/js/discord-slim.svg)](https://www.npmjs.com/package/discord-slim)  
+[![npm](https://img.shields.io/npm/v/discord-slim?style=for-the-badge)](https://www.npmjs.com/package/discord-slim)  
 
 Lightweight **Discord** client for **Node.js**.  
 
