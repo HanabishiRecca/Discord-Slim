@@ -26,8 +26,9 @@ Events
 * `connect` - client established a connection to the gateway.
 * `disconnect` - client disconnected.
 * `packet` - intent packet received.
-* `error` - some error happened.
 * `warn` - other noticeable information.
+* `error` - error appeared, client will continue to work.
+* `fatal` - fatal error, client will shutdown.
 
 ### Other exports
 `Host` - contains current Discord domain.  
