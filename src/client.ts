@@ -237,16 +237,16 @@ export class Client extends EventEmitter {
                         if(retryCount < REQUEST_RETRY_COUNT)
                             setTimeout(TryRequest, response.retry_after || STANDARD_TIMEOUT);
                         else
-                            RequestError('Unable to complete operation.');
+                            RequestError({ code: 429, message: 'Unable to complete operation because of rate limit.' });
                     } else {
-                        RequestError(`[API] ${code} ${response.message || response.error || ''}`);
+                        RequestError({ code, message: response.message || response.error || '' });
                     }
                 } else {
-                    RequestError(`Unknown request error (${code}).`);
+                    RequestError({ code, message: `Unknown request error.` });
                 }
             };
 
-            const RequestError = (error: string | Error) => reject((error instanceof Error) ? error.message : error);
+            const RequestError = (error: RequestError) => reject(error);
 
             const TryRequest = () => HttpsRequest(url, options, content).then(RequestResult).catch(RequestError);
 
@@ -301,6 +301,11 @@ export interface Client {
     removeAllListeners(): this;
     removeAllListeners(event: 'connect' | 'disconnect' | 'packet' | 'warn' | 'error' | 'fatal'): this;
 }
+
+export type RequestError = {
+    code: number;
+    message: string;
+};
 
 const GetId = (obj: any) => obj.id || obj;
 
