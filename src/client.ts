@@ -45,9 +45,13 @@ export class Client extends EventEmitter {
             this.#lastSequence = 0;
         }
 
-        const gateway = SafeJsonParse((await HttpsRequest(`${API}/gateway/bot`, { headers: { Authorization: this.#auth } })).data);
+        const response = await SafePromise(HttpsRequest(`${API}/gateway/bot`, { headers: { Authorization: this.#auth } }));
+        if(!response)
+            return this.emit('fatal', 'Unable to retrieve a gateway.');
+
+        const gateway = SafeJsonParse(response.data);
         if(!(gateway && (typeof gateway.url == 'string')))
-            return this.emit('fatal', 'Unable to connect: unexpected gateway API response.');
+            return this.emit('fatal', 'Unexpected gateway API response.');
 
         this.#ws = new WebSocket(gateway.url);
         this.#ws.on('message', this.#OnMessage);
@@ -439,5 +443,4 @@ const SafeJsonParse = (data?: string) => {
     }
 };
 
-const c = new Client();
-c.removeAllListeners();
+const SafePromise = (promise: Promise<any>) => new Promise<any>(resolve => promise.then(result => resolve(result)).catch(() => resolve(null)));
