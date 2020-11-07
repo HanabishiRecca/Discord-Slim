@@ -212,10 +212,10 @@ export class Client extends EventEmitter {
             contentLength = Buffer.byteLength(content);
         }
 
-        const options = {
+        const options: https.RequestOptions = {
             method: method,
             headers: {
-                Authorization: auth || this.#auth,
+                'Authorization': auth || this.#auth || '',
                 'Content-Type': contentType,
                 'Content-Length': contentLength,
             },
