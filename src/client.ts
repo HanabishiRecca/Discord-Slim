@@ -328,6 +328,11 @@ export const Routes = {
     Recipient: (channel: string | { id: string; }, user: string | { id: string; }) => `${Routes.Channel(channel)}/recipients/${GetId(user)}`,
     Relationship: (fromUser: string | { id: string; }, toUser: string | { id: string; }) => `${Routes.User(fromUser)}/relationships/${GetId(toUser)}`,
     Note: (user: string | { id: string; }, note: string) => `${Routes.User(user)}/notes/${note}`,
+    Application: (application: string | { id: string; }) => `/applications/${GetId(application)}`,
+    Command: (command: string | { id: string; }) => `/commands/${GetId(command)}`,
+    ApplicationCommand: (application: string | { id: string; }, command: string | { id: string; }) => Routes.Application(application) + Routes.Command(command),
+    ApplicationServerCommand: (application: string | { id: string; }, server: string | { id: string; }, command: string | { id: string; }) => Routes.Application(application) + Routes.Server(server) + Routes.Command(command),
+    Interaction: (interaction: string | { id: string; }, token: string) => `/interactions/${GetId(interaction)}/${token}`,
 };
 
 export enum Permissions {
