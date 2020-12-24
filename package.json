@@ -17,7 +17,7 @@
         "lib/**/*"
     ],
     "dependencies": {
-        "ws": "^7.3.1"
+        "ws": "^7.4.1"
     },
     "devDependencies": {
         "@types/node": "latest",
