@@ -37,6 +37,9 @@ Events
 `Routes` - base API route constructors.  
 `Permissions` - list of known permissions.  
 `Intents` - list of known intents.  
+`OPCode` - list of the gateway opcodes.  
+
+Other exports from API: `AuditLogEvents`, `ChannelTypes`, `MessageTypes`, `MessageActivityTypes`, `MessageFlags`, `MessageStickerFormatTypes`, `DefaultMessageNotificationLevel`, `ExplicitContentFilterLevel`, `MFA_Level`, `VerificationLevel`, `PremiumTier`, `TargetUserTypes`, `ActivityTypes`.
 
 ## Installation
 ```sh
