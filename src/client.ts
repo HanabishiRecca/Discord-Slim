@@ -246,7 +246,7 @@ export class Client extends EventEmitter {
                         else
                             RequestError({ code: 429, message: 'Unable to complete operation because of rate limit.' });
                     } else {
-                        RequestError({ code, message: response?.message || response?.error || '' });
+                        RequestError({ code, message: response ? (response.message || response.error || '') : '' });
                     }
                 } else {
                     RequestError({ code, message: `Unknown request error.` });
