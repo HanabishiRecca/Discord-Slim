@@ -10,7 +10,9 @@ export const
 
 const
     STANDARD_TIMEOUT = 1000,
-    REQUEST_RETRY_COUNT = 5;
+    REQUEST_RETRY_COUNT = 5,
+    API_VERSION = 6,
+    API_PATH = `${API}/v${API_VERSION}`;
 
 export enum OPCode {
     DISPATCH = 0,
@@ -48,15 +50,14 @@ export class Client extends EventEmitter {
             this.#lastSequence = 0;
         }
 
-        const response = await SafePromise(HttpsRequest(`${API}/gateway/bot`, { headers: { Authorization: this.#auth } }));
+        const response = await SafePromise(this.Request('GET', '/gateway/bot'));
         if(!response)
             return this.emit('fatal', 'Unable to retrieve a gateway.');
 
-        const gateway = SafeJsonParse(response.data);
-        if(!(gateway && (typeof gateway.url == 'string')))
+        if(typeof response.url != 'string')
             return this.emit('fatal', 'Unexpected gateway API response.');
 
-        this.#ws = new WebSocket(gateway.url);
+        this.#ws = new WebSocket(`${response.url}?v=${API_VERSION}`);
         this.#ws.on('message', this.#OnMessage);
         this.#ws.on('close', this.#OnClose);
         this.#ws.on('error', this.#OnError);
@@ -124,7 +125,6 @@ export class Client extends EventEmitter {
                 d: {
                     token: this.#token,
                     properties: { $os: 'linux', $browser: 'bot', $device: 'bot' },
-                    version: 6,
                     intents: this.#intents,
                 },
             }
@@ -198,7 +198,7 @@ export class Client extends EventEmitter {
         if(typeof route != 'string')
             throw 'Route must be a string.';
 
-        const url = `${API}${route}`;
+        const url = API_PATH + route;
 
         if((auth != null) && (typeof auth != 'string'))
             throw 'Auth must be a string.';
