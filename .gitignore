@@ -101,7 +101,7 @@ public
 .tern-port
 
 # Build
-lib/
+dist/
 
 # Ignore lockfile for library
 package-lock.json

@@ -1,22 +1,25 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "target": "ESNext",
+        "target": "ES2019",
         "strict": true,
         "moduleResolution": "node",
-        "outDir": "lib",
+        "outDir": "dist",
         "baseUrl": ".",
         "declaration": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "removeComments": true,
         "paths": {
             "*": [
                 "node_modules/*"
             ]
         },
         "lib": [
-            "ESNext"
+            "ES2019"
         ]
     },
     "include": [
-        "src/client.ts"
+        "src/index.ts"
     ]
 }
