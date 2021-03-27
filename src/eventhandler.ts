@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import type * as types from './types';
-import { Events, TargetUserTypes } from './helpers';
+import type { Events, TargetUserTypes } from './helpers';
 
 export type GenericEvents = {
     [Events.READY]: {

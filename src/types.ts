@@ -1,4 +1,4 @@
-import * as helpers from './helpers';
+import type * as helpers from './helpers';
 
 // Audit Log types
 
