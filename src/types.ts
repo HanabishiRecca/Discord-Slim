@@ -698,3 +698,9 @@ export type ActivitySecrets = {
     spectate?: string;
     match?: string;
 };
+
+export type ClientStatus = {
+    desktop?: string;
+    mobile?: string;
+    web?: string;
+};

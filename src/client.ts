@@ -1,8 +1,9 @@
 import WebSocket from 'ws';
 import { EventEmitter } from 'events';
-import { API_VERSION, OPCodes, Intents } from './helpers';
+import * as helpers from './helpers';
 import { SafePromise, SafeJsonParse } from './util';
 import { Request, Authorization } from './request';
+import { EventHandler, GenericEvents } from './eventhandler';
 
 const enum OPCode {
     DISPATCH = 0,
@@ -18,6 +19,24 @@ const enum OPCode {
     HEARTBEAT_ACK = 11,
 }
 
+const enum Events {
+    READY = 'READY',
+    RESUMED = 'RESUMED',
+}
+
+type Intent = (
+    | { op: OPCode.HELLO; d: { heartbeat_interval: number; }; }
+    | { op: OPCode.HEARTBEAT_ACK; }
+    | { op: OPCode.HEARTBEAT; }
+    | { op: OPCode.INVALID_SESSION; d: boolean; }
+    | { op: OPCode.RECONNECT; }
+    | { op: OPCode.DISPATCH; s?: number; } & (
+        | { t: Events.READY; d: {}; }
+        | { t: Events.RESUMED; d: null; }
+        | { t: string; d: any; }
+    )
+);
+
 export class Client extends EventEmitter {
     private _sessionId?: string;
     private _lastSequence = 0;
@@ -25,7 +44,8 @@ export class Client extends EventEmitter {
     private _heartbeatTimer?: NodeJS.Timeout;
     private _ws?: WebSocket;
     private _auth?: { authorization: Authorization; };
-    private _intents?: Intents;
+    private _intents?: helpers.Intents;
+    private _eventHandler = new EventHandler<GenericEvents>();
 
     constructor() {
         super();
@@ -46,7 +66,7 @@ export class Client extends EventEmitter {
         if(typeof response.url != 'string')
             return this.emit('fatal', 'Unexpected gateway API response.');
 
-        this._ws = new WebSocket(`${response.url}?v=${API_VERSION}`);
+        this._ws = new WebSocket(`${response.url}?v=${helpers.API_VERSION}`);
         this._ws.on('message', this._onMessage);
         this._ws.on('close', this._onClose);
         this._ws.on('error', this._onError);
@@ -64,36 +84,38 @@ export class Client extends EventEmitter {
         if(typeof data != 'string')
             data = data.toString();
 
-        const packet: { op: number; s?: number; t?: string; d?: any; } = SafeJsonParse(data);
-        if(!packet) return;
+        const intent = SafeJsonParse(data) as Intent | null;
+        if(!intent) return;
 
-        if(packet.s && (packet.s > this._lastSequence))
-            this._lastSequence = packet.s;
+        if(intent.op == OPCode.DISPATCH) {
+            if(intent.s && (intent.s > this._lastSequence))
+                this._lastSequence = intent.s;
 
-        const op = packet.op;
-        if(op == OPCode.DISPATCH) {
-            const t = packet.t;
-            if((t == 'READY') || (t == 'RESUMED')) {
-                if(packet.d.session_id)
-                    this._sessionId = packet.d.session_id;
-
+            if(intent.t == Events.READY) {
+                this._sessionId = intent.d.session_id;
+                this._lastHeartbeatAck = true;
+                this._sendHeartbeat();
+                this.emit('connect');
+            } else if(intent.t == Events.RESUMED) {
                 this._lastHeartbeatAck = true;
                 this._sendHeartbeat();
                 this.emit('connect');
             }
-            this.emit('packet', packet);
-        } else if(op == OPCode.HELLO) {
+
+            this.emit('intent', intent);
+            this.EventHandler.emit(intent.t, intent.d);
+        } else if(intent.op == OPCode.HELLO) {
             this._identify();
             this._lastHeartbeatAck = true;
-            this._setHeartbeatTimer(packet.d.heartbeat_interval);
-        } else if(op == OPCode.HEARTBEAT_ACK) {
+            this._setHeartbeatTimer(intent.d.heartbeat_interval);
+        } else if(intent.op == OPCode.HEARTBEAT_ACK) {
             this._lastHeartbeatAck = true;
-        } else if(op == OPCode.HEARTBEAT) {
+        } else if(intent.op == OPCode.HEARTBEAT) {
             this._sendHeartbeat();
-        } else if(op == OPCode.INVALID_SESSION) {
-            this.emit('warn', `Invalid session. Resumable: ${packet.d}`);
-            this._wsConnect(packet.d);
-        } else if(op == OPCode.RECONNECT) {
+        } else if(intent.op == OPCode.INVALID_SESSION) {
+            this.emit('warn', `Invalid session. Resumable: ${intent.d}`);
+            this._wsConnect(intent.d);
+        } else if(intent.op == OPCode.RECONNECT) {
             this.emit('warn', 'Server forced reconnect.');
             this._wsConnect(true);
         }
@@ -114,7 +136,7 @@ export class Client extends EventEmitter {
                 d: {
                     token: this._auth?.authorization.token,
                     properties: { $os: 'linux', $browser: 'bot', $device: 'bot' },
-                    intents: this._intents ?? Intents.SYSTEM_ONLY,
+                    intents: this._intents ?? helpers.Intents.SYSTEM_ONLY,
                 },
             }
         ));
@@ -148,7 +170,7 @@ export class Client extends EventEmitter {
 
     private _onError = (error: Error) => this.emit('error', error);
 
-    Connect = (authorization: Authorization, intents?: Intents) => {
+    Connect = (authorization: Authorization, intents?: helpers.Intents) => {
         this._auth = { authorization };
         this._intents = intents;
         this._wsConnect();
@@ -158,10 +180,12 @@ export class Client extends EventEmitter {
         this._wsDisconnect(code);
     };
 
-    WsSend = (packet: { op: OPCodes | number; d: any; }) => {
+    WsSend = (packet: { op: helpers.OPCodes | number; d: any; }) => {
         if(!this._ws) throw 'Unable to send packet: no connection.';
         this._ws.send((packet && (typeof packet == 'object')) ? JSON.stringify(packet) : packet);
     };
+
+    get EventHandler() { return this._eventHandler; }
 }
 
 export interface Client {
@@ -172,13 +196,6 @@ export interface Client {
     on(event: 'error', listener: (this: this, message: string) => void): this;
     on(event: 'fatal', listener: (this: this, message: string) => void): this;
 
-    addListener(event: 'connect', listener: (this: this) => void): this;
-    addListener(event: 'disconnect', listener: (this: this, code: number) => void): this;
-    addListener(event: 'packet', listener: (this: this, packet: { op: number; s: number; t: string; d: any; }) => void): this;
-    addListener(event: 'warn', listener: (this: this, message: string) => void): this;
-    addListener(event: 'error', listener: (this: this, message: string) => void): this;
-    addListener(event: 'fatal', listener: (this: this, message: string) => void): this;
-
     off(event: 'connect', listener: (this: this) => void): this;
     off(event: 'disconnect', listener: (this: this, code: number) => void): this;
     off(event: 'packet', listener: (this: this, packet: { op: number; s: number; t: string; d: any; }) => void): this;
@@ -186,20 +203,10 @@ export interface Client {
     off(event: 'error', listener: (this: this, message: string) => void): this;
     off(event: 'fatal', listener: (this: this, message: string) => void): this;
 
-    removeListener(event: 'connect', listener: (this: this) => void): this;
-    removeListener(event: 'disconnect', listener: (this: this, code: number) => void): this;
-    removeListener(event: 'packet', listener: (this: this, packet: { op: number; s: number; t: string; d: any; }) => void): this;
-    removeListener(event: 'warn', listener: (this: this, message: string) => void): this;
-    removeListener(event: 'error', listener: (this: this, message: string) => void): this;
-    removeListener(event: 'fatal', listener: (this: this, message: string) => void): this;
-
     once(event: 'connect', listener: (this: this) => void): this;
     once(event: 'disconnect', listener: (this: this, code: number) => void): this;
     once(event: 'packet', listener: (this: this, packet: { op: number; s: number; t: string; d: any; }) => void): this;
     once(event: 'warn', listener: (this: this, message: string) => void): this;
     once(event: 'error', listener: (this: this, message: string) => void): this;
     once(event: 'fatal', listener: (this: this, message: string) => void): this;
-
-    removeAllListeners(): this;
-    removeAllListeners(event: 'connect' | 'disconnect' | 'packet' | 'warn' | 'error' | 'fatal'): this;
 }
