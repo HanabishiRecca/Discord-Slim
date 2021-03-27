@@ -103,7 +103,7 @@ export class Client extends EventEmitter {
             }
 
             this.emit('intent', intent);
-            this.EventHandler.emit(intent.t, intent.d);
+            this._eventHandler.emit(intent.t, intent.d);
         } else if(intent.op == OPCode.HELLO) {
             this._identify();
             this._lastHeartbeatAck = true;
@@ -185,7 +185,7 @@ export class Client extends EventEmitter {
         this._ws.send((packet && (typeof packet == 'object')) ? JSON.stringify(packet) : packet);
     };
 
-    get EventHandler() { return this._eventHandler; }
+    get events() { return this._eventHandler; }
 }
 
 export interface Client {
