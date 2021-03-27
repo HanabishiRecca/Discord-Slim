@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import { EventEmitter } from 'events';
 import { API_VERSION, OPCodes, Intents } from './helpers';
 import { SafePromise, SafeJsonParse } from './util';
-import { Request, Authorization, TokenTypes } from './request';
+import { Request, Authorization } from './request';
 
 const enum OPCode {
     DISPATCH = 0,
@@ -18,19 +18,14 @@ const enum OPCode {
     HEARTBEAT_ACK = 11,
 }
 
-type ConnectionOptions = {
-    token: string;
-    intents: Intents;
-    retryTimeout?: number;
-};
-
 export class Client extends EventEmitter {
     private _sessionId?: string;
     private _lastSequence = 0;
     private _lastHeartbeatAck = false;
     private _heartbeatTimer?: NodeJS.Timeout;
     private _ws?: WebSocket;
-    private _options: ConnectionOptions = { token: '', intents: 0 };
+    private _auth?: { authorization: Authorization; };
+    private _intents?: Intents;
 
     constructor() {
         super();
@@ -44,7 +39,7 @@ export class Client extends EventEmitter {
             this._lastSequence = 0;
         }
 
-        const response = await SafePromise(Request('GET', '/gateway/bot', { authorization: new Authorization(TokenTypes.Bot, this._options.token) }));
+        const response = await SafePromise(Request('GET', '/gateway/bot', this._auth));
         if(!response)
             return this.emit('fatal', 'Unable to retrieve a gateway.');
 
@@ -109,7 +104,7 @@ export class Client extends EventEmitter {
             {
                 op: OPCode.RESUME,
                 d: {
-                    token: this._options.token,
+                    token: this._auth?.authorization.token,
                     session_id: this._sessionId,
                     seq: this._lastSequence,
                 },
@@ -117,9 +112,9 @@ export class Client extends EventEmitter {
             {
                 op: OPCode.IDENTIFY,
                 d: {
-                    token: this._options.token,
+                    token: this._auth?.authorization.token,
                     properties: { $os: 'linux', $browser: 'bot', $device: 'bot' },
-                    intents: this._options.intents,
+                    intents: this._intents ?? Intents.SYSTEM_ONLY,
                 },
             }
         ));
@@ -153,8 +148,9 @@ export class Client extends EventEmitter {
 
     private _onError = (error: Error) => this.emit('error', error);
 
-    Connect = (options: ConnectionOptions) => {
-        this._options = { ...options };
+    Connect = (authorization: Authorization, intents?: Intents) => {
+        this._auth = { authorization };
+        this._intents = intents;
         this._wsConnect();
     };
 

@@ -5,6 +5,11 @@ export const
     API_PATH = `${API}/v${API_VERSION}` as const,
     CDN = 'https://cdn.discordapp.com';
 
+export enum TokenTypes {
+    Bot = 'Bot',
+    Bearer = 'Bearer',
+}
+
 export enum OPCodes {
     DISPATCH = 0,
     HEARTBEAT = 1,

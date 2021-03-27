@@ -1,25 +1,20 @@
 import https from 'https';
 import { URL } from 'url';
 import { SafeJsonParse } from './util';
-import { API_PATH } from './helpers';
+import { API_PATH, TokenTypes } from './helpers';
 
 const
     DEFAULT_RETRY_TIMEOUT = 1000,
     DEFAULT_CONNECTION_TIMEOUT = 5000,
     DEFAULT_RETRY_COUNT = 5;
 
-export enum TokenTypes {
-    Bot = 'Bot',
-    Bearer = 'Bearer',
-}
-
 export class Authorization {
-    private _type: TokenTypes | string;
+    private _type: TokenTypes;
     private _token: string;
     private _cache: string;
 
-    constructor(type: TokenTypes | string, token: string) {
-        this._type = type;
+    constructor(token: string, type?: TokenTypes) {
+        this._type = type ?? TokenTypes.Bot;
         this._token = token;
         this._cache = '';
         this._update();
@@ -28,7 +23,7 @@ export class Authorization {
     _update = () => this._cache = `${this._type} ${this._token}`;
 
     get type() { return this._type; };
-    set type(value: TokenTypes | string) { this._type = value; this._update(); };
+    set type(value: TokenTypes) { this._type = value; this._update(); };
 
     get token() { return this._token; };
     set token(value: string) { this._token = value; this._update(); };
@@ -53,11 +48,11 @@ export const Request = (method: string, endpoint: string, options?: RequestOptio
         method: method,
         timeout: options?.connectionTimeout ?? DEFAULT_CONNECTION_TIMEOUT,
         headers: {
-            ...(data && (typeof data == 'string') ?
+            ...data && ((typeof data == 'string') ?
                 { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(content = data) } :
                 { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(content = JSON.stringify(data)) }
             ),
-            ...(options?.authorization && { 'Authorization': options.authorization.toString() }),
+            ...options?.authorization && { 'Authorization': options.authorization.toString() },
         },
     };
 
