@@ -1,12 +1,13 @@
 {
     "name": "discord-slim",
-    "version": "1.1.7",
+    "version": "1.1.8",
     "description": "Lightweight Discord client for Node.js.",
     "author": "Hanabishi",
     "repository": {
         "type": "git",
         "url": "https://github.com/HanabishiRecca/Discord-Slim"
     },
+    "discord": "https://discord.gg/drsXkP8R4h",
     "main": "./lib/client.js",
     "types": "./lib/client.d.ts",
     "license": "MIT",
@@ -17,7 +18,7 @@
         "lib/**/*"
     ],
     "dependencies": {
-        "ws": "^7.4.1"
+        "ws": "^7.4"
     },
     "devDependencies": {
         "@types/node": "latest",

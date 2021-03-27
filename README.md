@@ -6,6 +6,13 @@ Lightweight **Discord** client for **Node.js**.
 Provides access to Discord client gateway and API for bots.  
 Very minimalistic way without excessive abstractions and dependencies. Also with very low resources usage.  
 
+### Note
+New version (V2) is under development.  
+This version (V1) is now legacy and will be deprecated.  
+
+### Support & suggestions server
+https://discord.gg/drsXkP8R4h  
+
 ## Before you start
 ### **Node.js** 12+ is required!
 Make sure you have some understaning of **[Discord API](https://discordapp.com/developers/docs)**.  
