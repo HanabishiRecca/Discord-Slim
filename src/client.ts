@@ -4,6 +4,7 @@ import * as helpers from './helpers';
 import { SafePromise, SafeJsonParse } from './util';
 import { Request, Authorization } from './request';
 import { EventHandler, GenericEvents } from './eventhandler';
+import type { User } from './types';
 
 const enum OPCode {
     DISPATCH = 0,
@@ -31,9 +32,8 @@ type Intent = (
     | { op: OPCode.INVALID_SESSION; d: boolean; }
     | { op: OPCode.RECONNECT; }
     | { op: OPCode.DISPATCH; s?: number; } & (
-        | { t: Events.READY; d: {}; }
+        | { t: Events.READY; d: { session_id: string; user: User; }; }
         | { t: Events.RESUMED; d: null; }
-        | { t: string; d: any; }
     )
 );
 
@@ -46,6 +46,7 @@ export class Client extends EventEmitter {
     private _auth?: { authorization: Authorization; };
     private _intents?: helpers.Intents;
     private _eventHandler = new EventHandler<GenericEvents>();
+    private _user?: User;
 
     constructor() {
         super();
@@ -92,6 +93,7 @@ export class Client extends EventEmitter {
                 this._lastSequence = intent.s;
 
             if(intent.t == Events.READY) {
+                this._user = intent.d.user;
                 this._sessionId = intent.d.session_id;
                 this._lastHeartbeatAck = true;
                 this._sendHeartbeat();
@@ -186,6 +188,7 @@ export class Client extends EventEmitter {
     };
 
     get events() { return this._eventHandler; }
+    get user() { return this._user; }
 }
 
 export interface Client {

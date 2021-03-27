@@ -171,5 +171,5 @@ export class EventHandler<T extends EventMap> {
     on = <K extends EventKey<T>>(event: K, callback: EventReceiver<T[K]>) => this._em.on(event, callback);
     once = <K extends EventKey<T>>(event: K, callback: EventReceiver<T[K]>) => this._em.once(event, callback);
     off = <K extends EventKey<T>>(event: K, callback: EventReceiver<T[K]>) => this._em.off(event, callback);
-    emit = <K extends EventKey<T>>(event: K | string, params: T[K]) => this._em.emit(event, params);
+    emit = <K extends EventKey<T>>(event: K | string, params: T[K] | any) => this._em.emit(event, params);
 }
