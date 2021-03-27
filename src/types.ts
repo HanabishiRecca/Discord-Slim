@@ -180,6 +180,7 @@ export type Message = {
     flags?: number;
     stickers?: MessageSticker[];
     referenced_message?: Message | null;
+    interaction?: MessageInteraction;
 };
 
 export type MessageActivity = {
@@ -573,6 +574,74 @@ export type Webhook = {
     avatar: string | null;
     token?: string;
     application_id: string | null;
+};
+
+// Slash commands types
+
+export type ApplicationCommand = {
+    id: string;
+    application_id: string;
+    name: string;
+    description: string;
+    options?: ApplicationCommandOption[];
+};
+
+export type ApplicationCommandOption = {
+    type: helpers.ApplicationCommandOptionTypes;
+    name: string;
+    description: string;
+    required?: boolean;
+    choices?: ApplicationCommandOptionChoice[];
+    options?: ApplicationCommandOption[];
+};
+
+export type ApplicationCommandOptionChoice = {
+    name: string;
+    value: string | number;
+};
+
+export type Interaction = {
+    id: string;
+    type: helpers.InteractionTypes;
+    data?: ApplicationCommandInteractionData;
+    guild_id?: string;
+    channel_id?: string;
+    member?: Member;
+    user?: User;
+    token: string;
+    version: number;
+};
+
+export type ApplicationCommandInteractionData = {
+    id: string;
+    name: string;
+    options?: ApplicationCommandInteractionDataOption[];
+};
+
+export type ApplicationCommandInteractionDataOption = {
+    name: string;
+    value?: helpers.ApplicationCommandOptionTypes;
+    options?: ApplicationCommandInteractionDataOption[];
+};
+
+export type InteractionResponse = {
+    type: helpers.InteractionResponseTypes;
+    data?: InteractionApplicationCommandCallbackData;
+};
+
+export type InteractionApplicationCommandCallbackData = {
+    tts?: boolean;
+    content?: string;
+    embeds?: Embed[];
+    allowed_mentions?: AllowedMentions;
+    flags?: number;
+};
+
+export type MessageInteraction = {
+    id: string;
+    type: helpers.InteractionTypes;
+    name: string;
+    user: User;
 };
 
 // Gateway types

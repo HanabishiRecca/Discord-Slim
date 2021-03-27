@@ -46,6 +46,11 @@ const enum PATHS {
     webhooks = '/webhooks',
     slack = '/slack',
     github = '/github',
+    applications = '/applications',
+    commands = '/commands',
+    interactions = '/interactions',
+    callback = '/callback',
+    original = '/@original',
 }
 
 const enum PATHS_S {
@@ -66,6 +71,9 @@ const enum PATHS_S {
     templates = PATHS.templates + '/',
     users = PATHS.users + '/',
     webhooks = PATHS.webhooks + '/',
+    applications = PATHS.applications + '/',
+    commands = PATHS.commands + '/',
+    interactions = PATHS.interactions + '/',
 }
 
 const enum PATHS_Q {
@@ -590,6 +598,87 @@ export const Webhook = {
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.PATCH, PATHS_S.webhooks + webhook_id + '/' + webhook_token + PATHS_S.messages + message_id, requestOptions, params),
 
-    DeleteMessage: (webhook_id: string, webhook_token: string, message_id: string, requestOptions?: RequestOptions): Promise<types.Message> =>
+    DeleteMessage: (webhook_id: string, webhook_token: string, message_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, PATHS_S.webhooks + webhook_id + '/' + webhook_token + PATHS_S.messages + message_id, requestOptions),
+};
+
+export const Application = {
+    GetGlobalCommands: (application_id: string, requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
+        Request(METHODS.GET, PATHS_S.applications + application_id + PATHS.commands, requestOptions),
+
+    CreateGlobalCommand: (application_id: string, params: {
+        name: string;
+        description: string;
+        options?: types.ApplicationCommandOption[];
+    }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
+        Request(METHODS.POST, PATHS_S.applications + application_id + PATHS.commands, requestOptions, params),
+
+    GetGlobalCommand: (application_id: string, command_id: string, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
+        Request(METHODS.GET, PATHS_S.applications + application_id + PATHS_S.commands + command_id, requestOptions),
+
+    EditGlobalCommand: (application_id: string, command_id: string, params: {
+        name?: string;
+        description?: string;
+        options?: types.ApplicationCommandOption[];
+    }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
+        Request(METHODS.PATCH, PATHS_S.applications + application_id + PATHS_S.commands + command_id, requestOptions, params),
+
+    DeleteGlobalCommand: (application_id: string, command_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.DELETE, PATHS_S.applications + application_id + PATHS_S.commands + command_id, requestOptions),
+
+    GetGuildCommands: (application_id: string, guild_id: string, requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
+        Request(METHODS.GET, PATHS_S.applications + application_id + PATHS_S.guilds + guild_id + PATHS.commands, requestOptions),
+
+    CreateGuildCommand: (application_id: string, guild_id: string, params: {
+        name: string;
+        description: string;
+        options?: types.ApplicationCommandOption[];
+    }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
+        Request(METHODS.POST, PATHS_S.applications + application_id + PATHS_S.guilds + guild_id + PATHS.commands, requestOptions, params),
+
+    GetGuildCommand: (application_id: string, guild_id: string, command_id: string, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
+        Request(METHODS.GET, PATHS_S.applications + application_id + PATHS_S.guilds + guild_id + PATHS_S.commands + command_id, requestOptions),
+
+    EditGuildCommand: (application_id: string, guild_id: string, command_id: string, params: {
+        name?: string;
+        description?: string;
+        options?: types.ApplicationCommandOption[];
+    }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
+        Request(METHODS.PATCH, PATHS_S.applications + application_id + PATHS_S.guilds + guild_id + PATHS_S.commands + command_id, requestOptions, params),
+
+    DeleteGuildCommand: (application_id: string, guild_id: string, command_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.DELETE, PATHS_S.applications + application_id + PATHS_S.guilds + guild_id + PATHS_S.commands + command_id, requestOptions),
+
+    CreateInteractionResponse: (interaction_id: string, interaction_token: string, params: types.InteractionResponse, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.POST, PATHS_S.interactions + interaction_id + '/' + interaction_token + PATHS.callback, requestOptions, params),
+
+    EditOriginalInteractionResponse: (application_id: string, interaction_token: string, params: {
+        content?: string;
+        embeds?: types.Embed[];
+        allowed_mentions?: types.AllowedMentions;
+    }, requestOptions?: RequestOptions): Promise<types.Message> =>
+        Request(METHODS.PATCH, PATHS_S.webhooks + application_id + '/' + interaction_token + PATHS.messages + PATHS.original, requestOptions, params),
+
+    DeleteOriginalInteractionResponse: (application_id: string, interaction_token: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.DELETE, PATHS_S.webhooks + application_id + '/' + interaction_token + PATHS.messages + PATHS.original, requestOptions),
+
+    CreateFollowupMessage: (application_id: string, interaction_token: string, params: {
+        content?: string;
+        username?: string;
+        avatar_url?: string;
+        tts?: string;
+        embeds?: types.Embed[];
+        allowed_mentions?: types.AllowedMentions;
+    }, requestOptions?: RequestOptions): Promise<types.Message | null> =>
+        Request(METHODS.POST, PATHS_S.webhooks + application_id + '/' + interaction_token, requestOptions, params),
+
+    EditFollowupMessage: (application_id: string, interaction_token: string, message_id: string, params: {
+        content?: string;
+        embeds?: types.Embed[];
+        allowed_mentions?: types.AllowedMentions;
+    }, requestOptions?: RequestOptions): Promise<types.Message> =>
+        Request(METHODS.PATCH, PATHS_S.webhooks + application_id + '/' + interaction_token + PATHS_S.messages + message_id, requestOptions, params),
+
+    DeleteFollowupMessage: (application_id: string, interaction_token: string, message_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.DELETE, PATHS_S.webhooks + application_id + '/' + interaction_token + PATHS_S.messages + message_id, requestOptions),
 };
