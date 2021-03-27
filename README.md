@@ -1,12 +1,26 @@
 # Discord Slim
-
-V2 IS UNDER DEVELOPMENT!  
+### V2 IS UNDER DEVELOPMENT!  
 Contains breaking changes and incompatible with V1.  
+API is unfinished and may be changed with further updates.  
 
-Support & suggestions server:  
+### V2 main features
+- Typed actions API instead of manual requests.  
+- Typed events API instead of manual packet handling.  
+- Actions is now independent from the client.  
+
+### Support & suggestions server
 https://discord.gg/drsXkP8R4h  
 
-# Usage example
+## Before you start
+### **Node.js** 12+ is required!
+Make sure you have some understaning of **[Discord API](https://discordapp.com/developers/docs)**.  
+
+## Installation
+### Note: this version is unstable!
+```
+npm i discord-slim@dev
+```
+## Usage example
 
 ```js
 const
@@ -26,3 +40,6 @@ client.events.on(Events.MESSAGE_CREATE, (message) => {
 
 client.Connect(authorization, Intents.GUILDS | Intents.GUILD_MESSAGES);
 ```
+
+## Build from source
+Install `typescript` package from `npm` and run `tsc`.  
