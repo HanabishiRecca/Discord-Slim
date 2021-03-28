@@ -35,7 +35,13 @@ const
 client.events.on(Events.MESSAGE_CREATE, (message) => {
     if(message.author.id == client.user.id) return;
     if(message.content.toLowerCase().indexOf('hello bot') < 0) return;
-    Actions.Message.Create(message.channel_id, { content: `Hi, <@${message.author.id}>!` }, requestOptions);
+    Actions.Message.Create(message.channel_id, {
+        content: `Hi, <@${message.author.id}>!`,
+        message_reference: {
+            channel_id: message.channel_id,
+            message_id: message.id,
+        },
+    }, requestOptions);
 });
 
 client.Connect(authorization, Intents.GUILDS | Intents.GUILD_MESSAGES);
