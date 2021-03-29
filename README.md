@@ -26,20 +26,19 @@ npm i discord-slim@dev
 ## Usage example
 ### Initial setup
 ```js
-const
-    Discord = require('discord-slim'),
-    client = new Discord.Client();
-
-// Authorization object. Required for client and actions.
-const authorization = new Discord.Authorization('token');
+const { Client, Authorization, Actions, Helpers } = require('discord-slim');
 
 // Basic setup to control client operation.
 // You probably want to use such code for every bot.
+const client = new Client();
 client.on('connect', () => console.log('Connection established.'));
 client.on('disconnect', (code) => console.error(`Disconnect. (${code})`));
 client.on('warn', console.warn);
 client.on('error', console.error);
 client.on('fatal', (e) => { console.error(e); process.exit(1); });
+
+// Authorization object. Required for client and actions.
+const authorization = new Authorization('token');
 
 // Request options for actions
 const requestOptions = {
@@ -61,7 +60,7 @@ const requestOptions = {
 
 ### Basic message response
 ```js
-client.events.on(Events.MESSAGE_CREATE, (message) => {
+client.events.on(Helpers.Events.MESSAGE_CREATE, (message) => {
     if(message.author.id == client.user.id) return;
     if(message.content.toLowerCase().indexOf('hello bot') < 0) return;
     Actions.Message.Create(message.channel_id, {
@@ -73,20 +72,20 @@ client.events.on(Events.MESSAGE_CREATE, (message) => {
     }, requestOptions);
 });
 
-client.Connect(authorization, Intents.GUILDS | Intents.GUILD_MESSAGES);
+client.Connect(authorization, Helpers.Intents.GUILDS | Helpers.Intents.GUILD_MESSAGES);
 ```
 
 ### Using slash commands
 Note: slash commands requires `applications.commands` scope. Read details in [docs](https://discord.com/developers/docs/interactions/slash-commands).  
 ```js
 // Create a command in your guild(s).
-client.events.on(Events.GUILD_CREATE, (guild) => {
+client.events.on(Helpers.Events.GUILD_CREATE, (guild) => {
     Actions.Application.CreateGuildCommand(client.user.id, guild.id, {
         name: 'echo',
         description: 'Test slash command.',
         options: [
             {
-                type: Discord.Helpers.ApplicationCommandOptionTypes.STRING,
+                type: Helpers.ApplicationCommandOptionTypes.STRING,
                 name: 'text',
                 description: 'Echo message text.',
                 required: true,
@@ -96,18 +95,18 @@ client.events.on(Events.GUILD_CREATE, (guild) => {
 });
 
 // Respond to interaction event.
-client.events.on(Events.INTERACTION_CREATE, (interaction) => {
+client.events.on(Helpers.Events.INTERACTION_CREATE, (interaction) => {
     if(!(interaction.data && interaction.data.name == 'echo')) return;
     Actions.Application.CreateInteractionResponse(interaction.id, interaction.token, {
-        type: Discord.Helpers.InteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE,
+        type: Helpers.InteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
             content: interaction.data.options[0].value,
-            flags: Discord.Helpers.InteractionResponseFlags.EPHEMERAL,
+            flags: Helpers.InteractionResponseFlags.EPHEMERAL,
         },
     }, requestOptions);
 });
 
-client.Connect(authorization, Intents.GUILDS);
+client.Connect(authorization, Helpers.Intents.GUILDS);
 ```
 
 ## Build from source
