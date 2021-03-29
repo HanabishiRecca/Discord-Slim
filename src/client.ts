@@ -197,21 +197,21 @@ export class Client extends EventEmitter {
 export interface Client {
     on(event: 'connect', listener: (this: this) => void): this;
     on(event: 'disconnect', listener: (this: this, code: number) => void): this;
-    on(event: 'packet', listener: (this: this, packet: { op: number; s: number; t: string; d: any; }) => void): this;
+    on(event: 'intent', listener: (this: this, intent: { op: number; s: number; t: string; d: any; }) => void): this;
     on(event: 'warn', listener: (this: this, message: string) => void): this;
     on(event: 'error', listener: (this: this, message: string) => void): this;
     on(event: 'fatal', listener: (this: this, message: string) => void): this;
 
     off(event: 'connect', listener: (this: this) => void): this;
     off(event: 'disconnect', listener: (this: this, code: number) => void): this;
-    off(event: 'packet', listener: (this: this, packet: { op: number; s: number; t: string; d: any; }) => void): this;
+    off(event: 'intent', listener: (this: this, intent: { op: number; s: number; t: string; d: any; }) => void): this;
     off(event: 'warn', listener: (this: this, message: string) => void): this;
     off(event: 'error', listener: (this: this, message: string) => void): this;
     off(event: 'fatal', listener: (this: this, message: string) => void): this;
 
     once(event: 'connect', listener: (this: this) => void): this;
     once(event: 'disconnect', listener: (this: this, code: number) => void): this;
-    once(event: 'packet', listener: (this: this, packet: { op: number; s: number; t: string; d: any; }) => void): this;
+    once(event: 'intent', listener: (this: this, intent: { op: number; s: number; t: string; d: any; }) => void): this;
     once(event: 'warn', listener: (this: this, message: string) => void): this;
     once(event: 'error', listener: (this: this, message: string) => void): this;
     once(event: 'fatal', listener: (this: this, message: string) => void): this;
