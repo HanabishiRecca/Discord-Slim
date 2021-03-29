@@ -32,6 +32,12 @@ const
     authorization = new Discord.Authorization('token'),
     requestOptions = { authorization };
 
+client.on('connect', () => console.log('Connection established.'));
+client.on('disconnect', (code) => console.error(`Disconnect. (${code})`));
+client.on('warn', console.warn);
+client.on('error', console.error);
+client.on('fatal', (e) => { console.error(e); process.exit(1); });
+
 client.events.on(Events.MESSAGE_CREATE, (message) => {
     if(message.author.id == client.user.id) return;
     if(message.content.toLowerCase().indexOf('hello bot') < 0) return;
