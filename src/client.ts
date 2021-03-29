@@ -167,7 +167,10 @@ export class Client extends EventEmitter {
 
     private _onClose = (code: number) => {
         this._wsDisconnect(code);
-        this._wsConnect(true);
+        if(code < 4000)
+            this._wsConnect(true);
+        else
+            this.emit('fatal', `Fatal gateway error. Code: ${code}`);
     };
 
     private _onError = (error: Error) => this.emit('error', error);
