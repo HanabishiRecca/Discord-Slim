@@ -634,7 +634,7 @@ export type InteractionApplicationCommandCallbackData = {
     content?: string;
     embeds?: Embed[];
     allowed_mentions?: AllowedMentions;
-    flags?: number;
+    flags?: helpers.InteractionResponseFlags;
 };
 
 export type MessageInteraction = {

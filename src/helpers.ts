@@ -365,3 +365,7 @@ export enum InteractionResponseTypes {
     CHANNEL_MESSAGE_WITH_SOURCE = 4,
     DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE = 5,
 }
+
+export enum InteractionResponseFlags {
+    EPHEMERAL = 64,
+}
