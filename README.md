@@ -1,6 +1,7 @@
 # Discord Slim
 ### V2 IS UNDER DEVELOPMENT!  
 Contains breaking changes and incompatible with V1.  
+Dev version is unstable and can have bugs!  
 API is unfinished and may be changed with further updates.  
 
 ### V2 main features
@@ -16,7 +17,7 @@ https://discord.gg/drsXkP8R4h
 Make sure you have some understaning of **[Discord API](https://discordapp.com/developers/docs)**.  
 
 ## Installation
-### Note: this version is unstable!
+### Note: NPM version may be out-of-date and not contain latest repo commits.
 ```
 npm i discord-slim@dev
 ```
