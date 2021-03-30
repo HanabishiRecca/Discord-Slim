@@ -81,6 +81,8 @@ export class Client extends EventEmitter {
         this._ws = undefined;
     };
 
+    private _send = (op: OPCode, d: any) => this._ws && this._ws.send(JSON.stringify({ op, d }));
+
     private _onMessage = (data: WebSocket.Data) => {
         if(typeof data != 'string')
             data = data.toString();
@@ -124,31 +126,24 @@ export class Client extends EventEmitter {
     };
 
     private _identify = () => {
-        this._ws && this._ws.send(JSON.stringify(this._sessionId ?
-            {
-                op: OPCode.RESUME,
-                d: {
-                    token: this._auth?.authorization.token,
-                    session_id: this._sessionId,
-                    seq: this._lastSequence,
-                },
-            } :
-            {
-                op: OPCode.IDENTIFY,
-                d: {
-                    token: this._auth?.authorization.token,
-                    properties: { $os: 'linux', $browser: 'bot', $device: 'bot' },
-                    intents: this._intents ?? helpers.Intents.SYSTEM_ONLY,
-                },
-            }
-        ));
+        this._sessionId ?
+            this._send(OPCode.RESUME, {
+                token: this._auth?.authorization.token,
+                session_id: this._sessionId,
+                seq: this._lastSequence,
+            }) :
+            this._send(OPCode.IDENTIFY, {
+                token: this._auth?.authorization.token,
+                properties: { $os: 'linux', $browser: 'bot', $device: 'bot' },
+                intents: this._intents ?? helpers.Intents.SYSTEM_ONLY,
+            });
     };
 
     private _sendHeartbeat = () => {
         if(this._lastHeartbeatAck) {
             if(this._ws && (this._ws.readyState == 1)) {
                 this._lastHeartbeatAck = false;
-                this._ws.send(JSON.stringify({ op: OPCode.HEARTBEAT, d: this._lastSequence }));
+                this._send(OPCode.HEARTBEAT, this._lastSequence);
             }
         } else {
             this.emit('warn', 'Heartbeat timeout.');
@@ -183,11 +178,6 @@ export class Client extends EventEmitter {
 
     Disconnect = (code?: number) => {
         this._wsDisconnect(code);
-    };
-
-    WsSend = (packet: { op: helpers.OPCodes | number; d: any; }) => {
-        if(!this._ws) throw 'Unable to send packet: no connection.';
-        this._ws.send((packet && (typeof packet == 'object')) ? JSON.stringify(packet) : packet);
     };
 
     get events() { return this._eventHandler; }
