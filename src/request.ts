@@ -4,7 +4,6 @@ import { SafeJsonParse } from './util';
 import { API_PATH, TokenTypes } from './helpers';
 
 const
-    DEFAULT_RETRY_TIMEOUT = 1000,
     DEFAULT_CONNECTION_TIMEOUT = 5000,
     DEFAULT_RETRY_COUNT = 5;
 
@@ -35,7 +34,6 @@ export type RequestOptions = {
     authorization?: Authorization;
     connectionTimeout?: number;
     rateLimit?: {
-        retryTimeout?: number;
         retryCount?: number;
         callback?: (response: { message: string; retry_after: number; global: boolean; }, attempts: number) => {};
     };
@@ -59,7 +57,6 @@ export const Request = (method: string, endpoint: string, options?: RequestOptio
     return new Promise<any>((resolve, reject) => {
         const
             URL = API_PATH + endpoint,
-            retryTimeout = options?.rateLimit?.retryTimeout ?? DEFAULT_RETRY_TIMEOUT,
             retryCount = options?.rateLimit?.retryCount ?? DEFAULT_RETRY_COUNT;
 
         let attempts = 0;
@@ -73,8 +70,8 @@ export const Request = (method: string, endpoint: string, options?: RequestOptio
                 if(code == 429) {
                     attempts++;
                     options?.rateLimit?.callback?.(response, attempts);
-                    if(attempts < retryCount)
-                        setTimeout(TryRequest, Math.ceil(Number(response.retry_after) * 1000) ?? retryTimeout);
+                    if(response.retry_after && (attempts < retryCount))
+                        setTimeout(TryRequest, Math.ceil(Number(response.retry_after) * 1000));
                     else
                         RequestError({ code, response });
                 } else {
