@@ -135,13 +135,7 @@ export type GenericEvents = {
         message_id: string;
         emoji: types.Emoji;
     };
-    [Events.PRESENCE_UPDATE]: {
-        user: types.User;
-        guild_id: string;
-        status: string;
-        activities: types.Activity[];
-        client_status: types.ClientStatus;
-    };
+    [Events.PRESENCE_UPDATE]: types.Presence;
     [Events.TYPING_START]: {
         channel_id: string;
         guild_id?: string;

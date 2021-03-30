@@ -647,10 +647,11 @@ export type MessageInteraction = {
 // Gateway types
 
 export type Presence = {
-    since: number | null;
-    activities: Activity[] | null;
-    status: string;
-    afk: boolean;
+    user: { id: string; };
+    guild_id?: string;
+    status?: 'online' | 'dnd' | 'idle' | 'offline';
+    activities?: Activity[];
+    client_status?: ClientStatus;
 };
 
 export type Activity = {
