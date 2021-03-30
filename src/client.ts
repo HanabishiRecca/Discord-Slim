@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import { EventEmitter } from 'events';
 import * as helpers from './helpers';
-import { SafePromise, SafeJsonParse } from './util';
+import { SafePromise, SafeJsonParse, Sleep } from './util';
 import { Request, Authorization } from './request';
 import { EventHandler, GenericEvents } from './eventhandler';
 import type { User, Activity } from './types';
@@ -58,6 +58,7 @@ export class Client extends EventEmitter {
         if(!resume) {
             this._sessionId = undefined;
             this._lastSequence = 0;
+            await Sleep(5000);
         }
 
         const response = await SafePromise(Request('GET', '/gateway/bot', this._auth));
@@ -76,6 +77,7 @@ export class Client extends EventEmitter {
     private _wsDisconnect = (code = 1012) => {
         if(!this._ws) return;
         this.emit('disconnect', code);
+        this._setHeartbeatTimer();
         this._ws.removeAllListeners();
         this._ws.close(code);
         this._ws = undefined;
@@ -151,7 +153,7 @@ export class Client extends EventEmitter {
         }
     };
 
-    private _setHeartbeatTimer = (interval: number) => {
+    private _setHeartbeatTimer = (interval?: number) => {
         if(this._heartbeatTimer) {
             clearInterval(this._heartbeatTimer);
             this._heartbeatTimer = undefined;
@@ -173,7 +175,7 @@ export class Client extends EventEmitter {
     Connect = (authorization: Authorization, intents?: helpers.Intents) => {
         this._auth = { authorization };
         this._intents = intents;
-        this._wsConnect();
+        this._wsConnect(true);
     };
 
     Disconnect = (code?: number) => {
