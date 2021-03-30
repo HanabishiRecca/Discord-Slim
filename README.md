@@ -26,7 +26,7 @@ npm i discord-slim@dev
 ## Usage example
 ### Initial setup
 ```js
-const { Client, Authorization, Actions, Helpers } = require('discord-slim');
+const { Client, Authorization, Events, Actions, Helpers } = require('discord-slim');
 
 // Basic setup to control client operation.
 // You probably want to use such code for every bot.
@@ -46,21 +46,23 @@ const requestOptions = {
     authorization,
 
     // Rate limit behavior configuration.
-    // This options is not required, but you probably want to care about rate limit.
+    // This options is not required, but you probably want to care about the rate limit.
     rateLimit: {
-        // Set how many times to retry after hitting rate limit. Default: 5.
-        retryCount: 1,
-        // Just fallback timeout option when server not provided 'retry_after' value. Default: 1000 ms.
-        retryTimeout: 1000,
+        // Set how many attempts to make due to the rate limit. Default: 5.
+        retryCount: 5,
         // Rate limit hit callback
         callback: (response, attempts) => console.log(`${response.message} Global: ${response.global}. Cooldown: ${response.retry_after} sec. Attempt: ${attempts}.`),
     },
 };
+
+...
+
+client.Connect(authorization, Helpers.Intents.GUILDS | Helpers.Intents.GUILD_MESSAGES);
 ```
 
 ### Basic message response
 ```js
-client.events.on(Helpers.Events.MESSAGE_CREATE, (message) => {
+client.events.on(Events.MESSAGE_CREATE, (message) => {
     if(message.author.id == client.user.id) return;
     if(message.content.toLowerCase().indexOf('hello bot') < 0) return;
     Actions.Message.Create(message.channel_id, {
@@ -71,15 +73,30 @@ client.events.on(Helpers.Events.MESSAGE_CREATE, (message) => {
         },
     }, requestOptions);
 });
+```
 
-client.Connect(authorization, Helpers.Intents.GUILDS | Helpers.Intents.GUILD_MESSAGES);
+### Set bot status
+```js
+client.events.on(Events.READY, () => {
+    client.UpdateStatus({
+        since: 0,
+        activities: [
+            {
+                name: 'YOU',
+                type: Helpers.ActivityTypes.WATCHING,
+            }
+        ],
+        afk: false,
+        status: 'online',
+    });
+});
 ```
 
 ### Using slash commands
 Note: slash commands requires `applications.commands` scope. Read details in [docs](https://discord.com/developers/docs/interactions/slash-commands).  
 ```js
 // Create a command in your guild(s).
-client.events.on(Helpers.Events.GUILD_CREATE, (guild) => {
+client.events.on(Events.GUILD_CREATE, (guild) => {
     Actions.Application.CreateGuildCommand(client.user.id, guild.id, {
         name: 'echo',
         description: 'Test slash command.',
@@ -95,7 +112,7 @@ client.events.on(Helpers.Events.GUILD_CREATE, (guild) => {
 });
 
 // Respond to interaction event.
-client.events.on(Helpers.Events.INTERACTION_CREATE, (interaction) => {
+client.events.on(Events.INTERACTION_CREATE, (interaction) => {
     if(!(interaction.data && interaction.data.name == 'echo')) return;
     Actions.Application.CreateInteractionResponse(interaction.id, interaction.token, {
         type: Helpers.InteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -105,8 +122,6 @@ client.events.on(Helpers.Events.INTERACTION_CREATE, (interaction) => {
         },
     }, requestOptions);
 });
-
-client.Connect(authorization, Helpers.Intents.GUILDS);
 ```
 
 ## Build from source
