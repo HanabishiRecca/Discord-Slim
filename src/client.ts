@@ -4,7 +4,7 @@ import * as helpers from './helpers';
 import { SafePromise, SafeJsonParse } from './util';
 import { Request, Authorization } from './request';
 import { EventHandler, GenericEvents } from './eventhandler';
-import type { User } from './types';
+import type { User, Activity } from './types';
 
 const enum OPCode {
     DISPATCH = 0,
@@ -178,6 +178,33 @@ export class Client extends EventEmitter {
 
     Disconnect = (code?: number) => {
         this._wsDisconnect(code);
+    };
+
+    RequestGuildMembers = (params: { guild_id: string; presences?: boolean; nonce?: string; } &
+        ({ query: string; limit: number; } | { user_ids: string | string[]; })
+    ) => {
+        if(!this._ws) throw 'No connection.';
+        this._send(OPCode.REQUEST_GUILD_MEMBERS, params);
+    };
+
+    UpdateVoiceState = (params: {
+        guild_id: string;
+        channel_id: string | null;
+        self_mute: boolean;
+        self_deaf: boolean;
+    }) => {
+        if(!this._ws) throw 'No connection.';
+        this._send(OPCode.VOICE_STATE_UPDATE, params);
+    };
+
+    UpdateStatus = (params: {
+        since: number | null;
+        activities: Activity[] | null;
+        status: 'online' | 'dnd' | 'idle' | 'invisible' | 'offline';
+        afk: boolean;
+    }) => {
+        if(!this._ws) throw 'No connection.';
+        this._send(OPCode.PRESENCE_UPDATE, params);
     };
 
     get events() { return this._eventHandler; }
