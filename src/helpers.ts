@@ -57,6 +57,7 @@ export enum Permissions {
     MANAGE_ROLES = 1 << 28,
     MANAGE_WEBHOOKS = 1 << 29,
     MANAGE_EMOJIS = 1 << 30,
+    REQUEST_TO_SPEAK = 0x100000000, // Can't use 1 << 31 because of overflow
 }
 
 export enum Intents {
@@ -124,6 +125,7 @@ export enum ChannelTypes {
     GUILD_CATEGORY = 4,
     GUILD_NEWS = 5,
     GUILD_STORE = 6,
+    GUILD_STAGE_VOICE = 13,
 }
 
 export enum MessageTypes {

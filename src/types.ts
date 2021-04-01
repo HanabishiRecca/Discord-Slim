@@ -551,6 +551,7 @@ export type VoiceState = {
     self_stream?: boolean;
     self_video: boolean;
     suppress: boolean;
+    request_to_speak_timestamp: string | null;
 };
 
 export type VoiceRegion = {

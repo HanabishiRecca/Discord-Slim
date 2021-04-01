@@ -51,6 +51,7 @@ const enum PATHS {
     interactions = '/interactions',
     callback = '/callback',
     original = '/@original',
+    voice_states = '/voice-states',
 }
 
 const enum PATHS_S {
@@ -74,6 +75,7 @@ const enum PATHS_S {
     applications = PATHS.applications + '/',
     commands = PATHS.commands + '/',
     interactions = PATHS.interactions + '/',
+    voice_states = PATHS.voice_states + '/',
 }
 
 const enum PATHS_Q {
@@ -314,9 +316,6 @@ export const Guild = {
     }, requestOptions?: RequestOptions): Promise<{ pruned: number | null; }> =>
         Request(METHODS.POST, PATHS_S.guilds + guild_id + PATHS.prune, requestOptions, params),
 
-    GetVoiceRegions: (guild_id: string, requestOptions?: RequestOptions): Promise<types.VoiceRegion[]> =>
-        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.regions, requestOptions),
-
     GetInvites: (guild_id: string, requestOptions?: RequestOptions): Promise<(types.Invite & types.InviteMetadata)[]> =>
         Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.invites, requestOptions),
 
@@ -538,9 +537,25 @@ export const User = {
         Request(METHODS.GET, PATHS.users + PATHS.me + PATHS.connections, requestOptions),
 };
 
-export const VoiceRegions = {
-    List: (requestOptions?: RequestOptions): Promise<types.VoiceRegion[]> =>
+export const Voice = {
+    GetRegions: (guild_id: string, requestOptions?: RequestOptions): Promise<types.VoiceRegion[]> =>
+        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.regions, requestOptions),
+
+    ListRegions: (requestOptions?: RequestOptions): Promise<types.VoiceRegion[]> =>
         Request(METHODS.GET, PATHS.voice + PATHS.regions, requestOptions),
+
+    UpdateSelfState: (guild_id: string, params: {
+        channel_id: string;
+        suppress?: boolean;
+        request_to_speak_timestamp?: string | null;
+    }, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.PATCH, PATHS_S.guilds + guild_id + PATHS.voice_states + PATHS.me, requestOptions, params),
+
+    UpdateOthersState: (guild_id: string, user_id: string, params: {
+        channel_id: string;
+        suppress?: boolean;
+    }, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.PATCH, PATHS_S.guilds + guild_id + PATHS_S.voice_states + user_id, requestOptions, params),
 };
 
 export const Webhook = {
