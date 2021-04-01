@@ -204,8 +204,12 @@ export class Client extends EventEmitter {
 
     UpdateStatus = (params: {
         since: number | null;
-        activities: Activity[] | null;
-        status: 'online' | 'dnd' | 'idle' | 'invisible' | 'offline';
+        activities: {
+            name: string;
+            type: helpers.ActivityTypes;
+            url?: string;
+        }[] | null;
+        status: helpers.StatusTypes;
         afk: boolean;
     }) => {
         if(!this._ws) throw 'No connection.';

@@ -237,6 +237,14 @@ export enum ActivityTypes {
     COMPETING = 5,
 }
 
+export enum StatusTypes {
+    ONLINE = 'online',
+    DO_NOT_DISTURB = 'dnd',
+    IDLE = 'idle',
+    INVISIBLE = 'invisible',
+    OFFLINE = 'offline',
+}
+
 export enum WidgetStyleOptions {
     SHIELD = 'shield',
     BANNER1 = 'banner1',

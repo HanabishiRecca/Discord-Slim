@@ -651,7 +651,7 @@ export type MessageInteraction = {
 export type Presence = {
     user: { id: string; };
     guild_id?: string;
-    status?: 'online' | 'dnd' | 'idle' | 'offline';
+    status?: helpers.StatusTypes;
     activities?: Activity[];
     client_status?: ClientStatus;
 };
