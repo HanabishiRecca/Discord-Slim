@@ -9,6 +9,7 @@ API is unfinished and may be changed with further updates.
 - Typed events API instead of manual packet handling.  
 - Actions is now independent from the client.  
 - Uses new Discord API version (v8) with slash commands support
+- Sharding support
 
 ### Support & suggestions server
 https://discord.gg/drsXkP8R4h  
