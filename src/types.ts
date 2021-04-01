@@ -602,6 +602,7 @@ export type ApplicationCommandOptionChoice = {
 
 export type Interaction = {
     id: string;
+    application_id: string;
     type: helpers.InteractionTypes;
     data?: ApplicationCommandInteractionData;
     guild_id?: string;

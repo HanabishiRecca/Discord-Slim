@@ -317,8 +317,6 @@ export enum InteractionTypes {
 
 export enum InteractionResponseTypes {
     PONG = 1,
-    ACKNOWLEDGE = 2,
-    CHANNEL_MESSAGE = 3,
     CHANNEL_MESSAGE_WITH_SOURCE = 4,
     DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE = 5,
 }
