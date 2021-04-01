@@ -1,6 +1,6 @@
 {
     "name": "discord-slim",
-    "version": "2.0.0-dev.7",
+    "version": "2.0.0-dev.8",
     "description": "Lightweight Discord bot API for Node.js.",
     "author": "Hanabishi",
     "repository": {
