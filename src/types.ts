@@ -524,7 +524,7 @@ export type Role = {
     color: number;
     hoist: boolean;
     position: number;
-    permissions: number;
+    permissions: string;
     managed: boolean;
     mentionable: boolean;
     tags?: RoleTags;

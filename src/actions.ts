@@ -134,8 +134,8 @@ export const Channel = {
         Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS.messages, requestOptions, params),
 
     EditPermissions: (channel_id: string, overwrite_id: string, params: {
-        allow: helpers.Permissions;
-        deny: helpers.Permissions;
+        allow: string;
+        deny: string;
         type: helpers.PermissionsOverwriteTypes,
     }, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.PUT, PATHS_S.channels + channel_id + PATHS_S.permissions + overwrite_id, requestOptions, params),
@@ -411,7 +411,7 @@ export const Ban = {
 export const Role = {
     Create: (guild_id: string, params?: {
         name?: string;
-        permissions?: helpers.Permissions;
+        permissions?: string;
         color?: number;
         hoist?: boolean;
         mentionable?: boolean;
@@ -420,7 +420,7 @@ export const Role = {
 
     Modify: (guild_id: string, role_id: string, params?: {
         name?: string;
-        permissions?: helpers.Permissions;
+        permissions?: string;
         color?: number;
         hoist?: boolean;
         mentionable?: boolean;
