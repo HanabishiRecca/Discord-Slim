@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import * as helpers from './helpers';
 import { SafePromise, SafeJsonParse, Sleep } from './util';
 import { Request, Authorization } from './request';
-import { EventHandler, GenericEvents } from './eventhandler';
+import { EventHandler, EventTypes } from './events';
 import type { User, Activity } from './types';
 
 const enum OPCode {
@@ -45,7 +45,7 @@ export class Client extends EventEmitter {
     private _ws?: WebSocket;
     private _auth?: { authorization: Authorization; };
     private _intents?: helpers.Intents;
-    private _eventHandler = new EventHandler<GenericEvents>();
+    private _eventHandler = new EventHandler<EventTypes>();
     private _user?: User;
 
     constructor() {

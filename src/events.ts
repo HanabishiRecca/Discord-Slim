@@ -45,7 +45,7 @@ export enum Events {
     WEBHOOKS_UPDATE = 'WEBHOOKS_UPDATE',
 }
 
-export type GenericEvents = {
+export type EventTypes = {
     [Events.READY]: {
         v: number;
         user: types.User;
