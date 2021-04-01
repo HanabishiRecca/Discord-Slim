@@ -5,11 +5,6 @@ export const
     API_PATH = `${API}/v${API_VERSION}` as const,
     CDN = 'https://cdn.discordapp.com';
 
-export enum TokenTypes {
-    Bot = 'Bot',
-    Bearer = 'Bearer',
-}
-
 export const Permissions = {
     NO_PERMISSIONS: 0x000000000n,
     CREATE_INSTANT_INVITE: 0x000000001n,
