@@ -622,7 +622,7 @@ export type ApplicationCommandInteractionData = {
 
 export type ApplicationCommandInteractionDataOption = {
     name: string;
-    value?: helpers.ApplicationCommandOptionTypes;
+    value?: string | number | boolean | User | Channel | Role;
     options?: ApplicationCommandInteractionDataOption[];
 };
 
