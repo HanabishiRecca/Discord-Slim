@@ -47,6 +47,7 @@ export class Client extends EventEmitter {
     private _intents?: helpers.Intents;
     private _eventHandler = new EventHandler<EventTypes>();
     private _user?: User;
+    private _shard?: [number, number];
 
     constructor() {
         super();
@@ -138,6 +139,7 @@ export class Client extends EventEmitter {
                 token: this._auth?.authorization.token,
                 properties: { $os: 'linux', $browser: 'bot', $device: 'bot' },
                 intents: this._intents ?? helpers.Intents.SYSTEM_ONLY,
+                shard: this._shard,
             });
     };
 
@@ -172,9 +174,10 @@ export class Client extends EventEmitter {
 
     private _onError = (error: Error) => this.emit('error', error);
 
-    Connect = (authorization: Authorization, intents?: helpers.Intents) => {
+    Connect = (authorization: Authorization, intents?: helpers.Intents, shard?: { id: number; total: number; }) => {
         this._auth = { authorization };
         this._intents = intents;
+        this._shard = shard ? [shard.id, shard.total] : undefined;
         this._wsConnect(true);
     };
 
