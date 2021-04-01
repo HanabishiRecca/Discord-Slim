@@ -1,4 +1,11 @@
 # Discord Slim
+[![npm](https://img.shields.io/npm/v/discord-slim/dev?style=for-the-badge)](https://www.npmjs.com/package/discord-slim/v/dev)  
+
+Lightweight **Discord** client for **Node.js**.  
+
+Provides access to Discord client gateway and API for bots.  
+Very minimalistic way without excessive abstractions and dependencies. Also with very low resources usage. 
+
 ### V2 IS UNDER DEVELOPMENT!  
 Contains breaking changes and incompatible with V1.  
 Dev version is unstable and can have bugs!  
@@ -15,7 +22,7 @@ API is unfinished and may be changed with further updates.
 https://discord.gg/drsXkP8R4h  
 
 ## Before you start
-### **Node.js** 12+ is required!
+### **Node.js** 14+ is required!
 Make sure you have some understaning of **[Discord API](https://discordapp.com/developers/docs)**.  
 
 ## Installation
@@ -27,16 +34,16 @@ npm i discord-slim@dev
 ## Usage example
 ### Initial setup
 ```js
-const { Client, Authorization, Events, Actions, Helpers } = require('discord-slim');
+const { Client, ClientEvents, Authorization, Events, Actions, Helpers } = require('discord-slim');
 
 // Basic setup to control client operation.
 // You probably want to use such code for every bot.
 const client = new Client();
-client.on('connect', () => console.log('Connection established.'));
-client.on('disconnect', (code) => console.error(`Disconnect. (${code})`));
-client.on('warn', console.warn);
-client.on('error', console.error);
-client.on('fatal', (e) => { console.error(e); process.exit(1); });
+client.on(ClientEvents.CONNECT, () => console.log('Connection established.'));
+client.on(ClientEvents.DISCONNECT, (code) => console.error(`Disconnect. (${code})`));
+client.on(ClientEvents.WARN, console.warn);
+client.on(ClientEvents.ERROR, console.error);
+client.on(ClientEvents.FATAL, (e) => { console.error(e); process.exit(1); });
 
 // Authorization object. Required for client and actions.
 const authorization = new Authorization('token');
@@ -58,14 +65,17 @@ const requestOptions = {
 
 ...
 
+// Start the client connection.
 client.Connect(authorization, Helpers.Intents.GUILDS | Helpers.Intents.GUILD_MESSAGES);
 ```
+You can read about intents [here](https://discordapp.com/developers/docs/topics/gateway#gateway-intents).  
 
 ### Basic message response
 ```js
 client.events.on(Events.MESSAGE_CREATE, (message) => {
     if(message.author.id == client.user.id) return;
-    if(message.content.toLowerCase().indexOf('hello bot') < 0) return;
+    // Check that the message contains phrases like "hello bot" or "hi bot"
+    if(message.content.search(/(^|\s)h(ello|i)(\s|\s.*\s)bot($|\s)/i) < 0) return;
     Actions.Message.Create(message.channel_id, {
         content: `Hi, <@${message.author.id}>!`,
         message_reference: {
@@ -88,7 +98,7 @@ client.events.on(Events.READY, () => {
             }
         ],
         afk: false,
-        status: 'online',
+        status: Helpers.StatusTypes.ONLINE,
     });
 });
 ```
