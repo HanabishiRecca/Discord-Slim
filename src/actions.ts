@@ -1,4 +1,4 @@
-import { Request, RequestOptions } from './request';
+import { Request, RequestOptions, TokenTypes } from './request';
 import querystring from 'querystring';
 import type * as helpers from './helpers';
 import type * as types from './types';
@@ -52,6 +52,8 @@ const enum PATHS {
     callback = '/callback',
     original = '/@original',
     voice_states = '/voice-states',
+    oauth2 = '/oauth2',
+    token = '/token',
 }
 
 const enum PATHS_S {
@@ -85,6 +87,7 @@ const enum PATHS_Q {
     guilds = PATHS.guilds + '?',
     slack = PATHS.slack + '?',
     github = PATHS.github + '?',
+    token = PATHS.token + '?',
 }
 
 export const Channel = {
@@ -696,4 +699,41 @@ export const Application = {
 
     DeleteFollowupMessage: (application_id: string, interaction_token: string, message_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, PATHS_S.webhooks + application_id + '/' + interaction_token + PATHS_S.messages + message_id, requestOptions),
+};
+
+export const OAuth2 = {
+    TokenExchange: (params: {
+        client_id: string;
+        client_secret: string;
+        redirect_uri: string;
+        scope: helpers.OAuth2Scopes | string;
+    } & (
+            {
+                grant_type: helpers.OAuth2GrantTypes.AUTHORIZATION_CODE;
+                code: string;
+            } |
+            {
+                grant_type: helpers.OAuth2GrantTypes.REFRESH_TOKEN;
+                refresh_token: string;
+            }
+        )
+    ): Promise<{
+        access_token: string;
+        token_type: TokenTypes.BEARER;
+        expires_in: number;
+        refresh_token: string;
+        scope: helpers.OAuth2Scopes | string;
+    }> =>
+        Request(METHODS.POST, PATHS.oauth2 + PATHS_Q.token + querystring.stringify(params)),
+
+    GetCurrentApplicationInformation: (requestOptions?: RequestOptions): Promise<types.Application> =>
+        Request(METHODS.GET, PATHS.oauth2 + PATHS.applications + PATHS.me, requestOptions),
+
+    GetCurrentAuthorizationInformation: (requestOptions?: RequestOptions): Promise<{
+        application: types.Application,
+        scopes: string[];
+        expires: string;
+        user?: types.User;
+    }> =>
+        Request(METHODS.GET, PATHS.oauth2 + PATHS.me, requestOptions),
 };

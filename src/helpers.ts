@@ -315,3 +315,37 @@ export enum InteractionResponseTypes {
 export enum InteractionResponseFlags {
     EPHEMERAL = 64,
 }
+
+export enum OAuth2Scopes {
+    BOT = 'bot',
+    CONNECTIONS = 'connections',
+    EMAIL = 'email',
+    IDENTIFY = 'identify',
+    GUILDS = 'guilds',
+    GUILDS_JOIN = 'guilds.join',
+    GDM_JOIN = 'gdm.join',
+    MESSAGES_READ = 'messages.read',
+    RPC = 'rpc',
+    RPC_API = 'rpc.api',
+    RPC_NOTIFICATIONS_READ = 'rpc.notifications.read',
+    WEBHOOK_INCOMING = 'webhook.incoming',
+    APPLICATIONS_BUILDS_UPLOAD = 'applications.builds.upload',
+    APPLICATIONS_BUILDS_READ = 'applications.builds.read',
+    APPLICATIONS_STORE_UPDATE = 'applications.store.update',
+    APPLICATIONS_ENTITLEMENTS = 'applications.entitlements',
+    RELATIONSHIPS_READ = 'relationships.read',
+    ACTIVITIES_READ = 'activities.read',
+    ACTIVITIES_WRITE = 'activities.write',
+    APPLICATIONS_COMMANDS = 'applications.commands',
+    APPLICATIONS_COMMANDS_UPDATE = 'applications.commands.update',
+}
+
+export enum OAuth2GrantTypes {
+    AUTHORIZATION_CODE = 'authorization_code',
+    REFRESH_TOKEN = 'refresh_token',
+}
+
+export enum MembershipStates {
+    INVITED = 1,
+    ACCEPTED = 2,
+}

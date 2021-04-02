@@ -707,3 +707,38 @@ export type ClientStatus = {
     mobile?: string;
     web?: string;
 };
+
+// OAuth2 types
+
+export type Application = {
+    id: string;
+    name: string;
+    icon: string | null;
+    description: string;
+    rpc_origins?: string[];
+    bot_public: boolean;
+    bot_require_code_grant: boolean;
+    owner: User;
+    summary?: string;
+    verify_key: string;
+    team?: Team;
+    guild_id?: string;
+    primary_sku_id?: string;
+    slug?: string;
+    cover_image?: string;
+    flags?: number;
+};
+
+export type Team = {
+    icon: string | null;
+    id: string;
+    members: TeamMember[];
+    owner_user_id: string;
+};
+
+export type TeamMember = {
+    membership_state: helpers.MembershipStates;
+    permissions: string[];
+    team_id: string;
+    user: User;
+};
