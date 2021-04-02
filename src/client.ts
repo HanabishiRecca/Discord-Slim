@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import * as helpers from './helpers';
 import { SafePromise, SafeJsonParse, Sleep } from './util';
 import { Request, Authorization } from './request';
-import { EventHandler, EventTypes } from './events';
+import { EventHandler } from './events';
 import type { User } from './types';
 
 const enum OPCode {
@@ -45,7 +45,7 @@ export class Client extends EventEmitter {
     private _ws?: WebSocket;
     private _auth?: { authorization: Authorization; };
     private _intents?: helpers.Intents;
-    private _eventHandler = new EventHandler<EventTypes>();
+    private _eventHandler = new EventEmitter() as EventHandler;
     private _user?: User;
     private _shard?: [number, number];
 
@@ -229,25 +229,17 @@ export enum ClientEvents {
     FATAL = 'fatal',
 }
 
-export interface Client {
-    on(event: ClientEvents.CONNECT, listener: (this: this) => void): this;
-    on(event: ClientEvents.DISCONNECT, listener: (this: this, code: number) => void): this;
-    on(event: ClientEvents.INTENT, listener: (this: this, intent: { op: 0; s: number; t: string; d: any; }) => void): this;
-    on(event: ClientEvents.WARN, listener: (this: this, message: string) => void): this;
-    on(event: ClientEvents.ERROR, listener: (this: this, error: Error) => void): this;
-    on(event: ClientEvents.FATAL, listener: (this: this, message: string) => void): this;
+type ClientEventTypes = {
+    [ClientEvents.CONNECT]: void;
+    [ClientEvents.DISCONNECT]: number;
+    [ClientEvents.INTENT]: { op: 0; s: number; t: string; d: any; };
+    [ClientEvents.WARN]: string;
+    [ClientEvents.ERROR]: Error;
+    [ClientEvents.FATAL]: string;
+};
 
-    off(event: ClientEvents.CONNECT, listener: (this: this) => void): this;
-    off(event: ClientEvents.DISCONNECT, listener: (this: this, code: number) => void): this;
-    off(event: ClientEvents.INTENT, listener: (this: this, intent: { op: 0; s: number; t: string; d: any; }) => void): this;
-    off(event: ClientEvents.WARN, listener: (this: this, message: string) => void): this;
-    off(event: ClientEvents.ERROR, listener: (this: this, error: Error) => void): this;
-    off(event: ClientEvents.FATAL, listener: (this: this, message: string) => void): this;
-
-    once(event: ClientEvents.CONNECT, listener: (this: this) => void): this;
-    once(event: ClientEvents.DISCONNECT, listener: (this: this, code: number) => void): this;
-    once(event: ClientEvents.INTENT, listener: (this: this, intent: { op: 0; s: number; t: string; d: any; }) => void): this;
-    once(event: ClientEvents.WARN, listener: (this: this, message: string) => void): this;
-    once(event: ClientEvents.ERROR, listener: (this: this, error: Error) => void): this;
-    once(event: ClientEvents.FATAL, listener: (this: this, message: string) => void): this;
+export interface Client extends EventEmitter {
+    on<K extends ClientEvents>(event: K, callback: (data: ClientEventTypes[K]) => void): this;
+    once<K extends ClientEvents>(event: K, callback: (data: ClientEventTypes[K]) => void): this;
+    off<K extends ClientEvents>(event: K, callback: (data: ClientEventTypes[K]) => void): this;
 }

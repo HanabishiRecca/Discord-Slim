@@ -45,7 +45,7 @@ export enum Events {
     WEBHOOKS_UPDATE = 'WEBHOOKS_UPDATE',
 }
 
-export type EventTypes = {
+type EventTypes = {
     [Events.READY]: {
         v: number;
         user: types.User;
@@ -58,7 +58,7 @@ export type EventTypes = {
             flags: number;
         };
     };
-    [Events.RESUMED]: null;
+    [Events.RESUMED]: {};
     [Events.APPLICATION_COMMAND_CREATE]: types.ApplicationCommand & { guild_id?: string; };
     [Events.APPLICATION_COMMAND_UPDATE]: types.ApplicationCommand & { guild_id?: string; };
     [Events.APPLICATION_COMMAND_DELETE]: types.ApplicationCommand & { guild_id?: string; };
@@ -199,14 +199,8 @@ export type EventTypes = {
     };
 };
 
-type EventMap = Record<string, any>;
-type EventKey<T extends EventMap> = string & keyof T;
-type EventReceiver<T> = (params: T) => void;
-
-export class EventHandler<T extends EventMap> {
-    private _em = new EventEmitter();
-    on = <K extends EventKey<T>>(event: K, callback: EventReceiver<T[K]>) => this._em.on(event, callback);
-    once = <K extends EventKey<T>>(event: K, callback: EventReceiver<T[K]>) => this._em.once(event, callback);
-    off = <K extends EventKey<T>>(event: K, callback: EventReceiver<T[K]>) => this._em.off(event, callback);
-    emit = <K extends EventKey<T>>(event: K | string, params: T[K] | any) => this._em.emit(event, params);
+export interface EventHandler extends EventEmitter {
+    on<K extends Events>(event: K, callback: (data: EventTypes[K]) => void): this;
+    once<K extends Events>(event: K, callback: (data: EventTypes[K]) => void): this;
+    off<K extends Events>(event: K, callback: (data: EventTypes[K]) => void): this;
 }
