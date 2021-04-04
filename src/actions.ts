@@ -90,7 +90,6 @@ const enum PATHS_Q {
     guilds = PATHS.guilds + '?',
     slack = PATHS.slack + '?',
     github = PATHS.github + '?',
-    token = PATHS.token + '?',
 }
 
 export const Channel = {
@@ -705,7 +704,7 @@ export const Application = {
 };
 
 export const OAuth2 = {
-    TokenExchange: (params: {
+    TokenExchange: (params: ({
         client_id: string;
         client_secret: string;
         redirect_uri: string;
@@ -720,14 +719,14 @@ export const OAuth2 = {
                 refresh_token: string;
             }
         )
-    ): Promise<{
+    ), requestOptions?: RequestOptions): Promise<{
         access_token: string;
         token_type: TokenTypes.BEARER;
         expires_in: number;
         refresh_token: string;
         scope: helpers.OAuth2Scopes | string;
     }> =>
-        Request(METHODS.POST, PATHS.oauth2 + PATHS_Q.token + querystring.stringify(params)),
+        Request(METHODS.POST, PATHS.oauth2 + PATHS.token, requestOptions ?? defaultRequestOptions, querystring.stringify(params)),
 
     GetCurrentApplicationInformation: (requestOptions?: RequestOptions): Promise<types.Application> =>
         Request(METHODS.GET, PATHS.oauth2 + PATHS.applications + PATHS.me, requestOptions ?? defaultRequestOptions),
