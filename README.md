@@ -48,8 +48,10 @@ client.on(ClientEvents.FATAL, (e) => { console.error(e); process.exit(1); });
 // Authorization object. Required for client and actions.
 const authorization = new Authorization('token');
 
-// Request options for actions
-const requestOptions = {
+// Request options for actions.
+// By design every action can use it's own options. But for convinience you сan set default options globally for all actions.
+// Default options can be overridden in any time by passing `requestOptions` argument to individual action.
+Actions.setDefaultRequestOptions({
     // Include authorization, it is required for most actions.
     authorization,
 
@@ -61,7 +63,7 @@ const requestOptions = {
         // Rate limit hit callback
         callback: (response, attempts) => console.log(`${response.message} Global: ${response.global}. Cooldown: ${response.retry_after} sec. Attempt: ${attempts}.`),
     },
-};
+});
 
 ...
 
@@ -82,7 +84,7 @@ client.events.on(Events.MESSAGE_CREATE, (message) => {
             channel_id: message.channel_id,
             message_id: message.id,
         },
-    }, requestOptions);
+    });
 });
 ```
 
@@ -119,7 +121,7 @@ client.events.on(Events.GUILD_CREATE, (guild) => {
                 required: true,
             },
         ],
-    }, requestOptions);
+    });
 });
 
 // Respond to interaction event.
@@ -131,7 +133,7 @@ client.events.on(Events.INTERACTION_CREATE, (interaction) => {
             content: interaction.data.options[0].value,
             flags: Helpers.InteractionResponseFlags.EPHEMERAL,
         },
-    }, requestOptions);
+    });
 });
 ```
 
