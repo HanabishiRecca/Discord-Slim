@@ -79,7 +79,7 @@ client.events.on(Events.MESSAGE_CREATE, (message) => {
     // Check that the message contains phrases like "hello bot" or "hi bot"
     if(message.content.search(/(^|\s)h(ello|i)(\s|\s.*\s)bot($|\s)/i) < 0) return;
     Actions.Message.Create(message.channel_id, {
-        content: `Hi, <@${message.author.id}>!`,
+        content: `Hi, ${Tools.Mentions.User(message.author.id)}!`,
         message_reference: {
             channel_id: message.channel_id,
             message_id: message.id,
@@ -130,7 +130,7 @@ client.events.on(Events.INTERACTION_CREATE, (interaction) => {
     Actions.Application.CreateInteractionResponse(interaction.id, interaction.token, {
         type: Helpers.InteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-            content: interaction.data.options[0].value,
+            content: interaction.data.options[0].value.toString(),
             flags: Helpers.InteractionResponseFlags.EPHEMERAL,
         },
     });
