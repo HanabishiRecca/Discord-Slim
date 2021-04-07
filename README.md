@@ -34,7 +34,7 @@ npm i discord-slim@dev
 ## Usage example
 ### Initial setup
 ```js
-const { Client, ClientEvents, Authorization, Events, Actions, Helpers } = require('discord-slim');
+const { Client, ClientEvents, Authorization, Events, Actions, Helpers, Tools } = require('discord-slim');
 
 // Basic setup to control client operation.
 // You probably want to use such code for every bot.
@@ -59,9 +59,11 @@ Actions.setDefaultRequestOptions({
     // This options is not required, but you probably want to care about the rate limit.
     rateLimit: {
         // Set how many attempts to make due to the rate limit. Default: 5.
+        // This includes the first try, so values 1 and below will be treated as "no retries".
         retryCount: 5,
         // Rate limit hit callback
-        callback: (response, attempts) => console.log(`${response.message} Global: ${response.global}. Cooldown: ${response.retry_after} sec. Attempt: ${attempts}.`),
+        callback: (response, attempts) =>
+            console.log(`${response.message} Global: ${response.global}. Cooldown: ${response.retry_after} sec. Attempt: ${attempts}.`),
     },
 });
 
@@ -75,9 +77,11 @@ You can read about intents [here](https://discordapp.com/developers/docs/topics/
 ### Basic message response
 ```js
 client.events.on(Events.MESSAGE_CREATE, (message) => {
+    // Filter out own messages
     if(message.author.id == client.user.id) return;
     // Check that the message contains phrases like "hello bot" or "hi bot"
     if(message.content.search(/(^|\s)h(ello|i)(\s|\s.*\s)bot($|\s)/i) < 0) return;
+    // Using both reply and mention just for demo
     Actions.Message.Create(message.channel_id, {
         content: `Hi, ${Tools.Mentions.User(message.author.id)}!`,
         message_reference: {
@@ -92,15 +96,10 @@ client.events.on(Events.MESSAGE_CREATE, (message) => {
 ```js
 client.events.on(Events.READY, () => {
     client.UpdateStatus({
-        since: 0,
-        activities: [
-            {
-                name: 'YOU',
-                type: Helpers.ActivityTypes.WATCHING,
-            }
-        ],
-        afk: false,
         status: Helpers.StatusTypes.ONLINE,
+        activities: [{ type: Helpers.ActivityTypes.WATCHING, name: 'YOU' }],
+        afk: false,
+        since: 0,
     });
 });
 ```
@@ -126,7 +125,7 @@ client.events.on(Events.GUILD_CREATE, (guild) => {
 
 // Respond to interaction event.
 client.events.on(Events.INTERACTION_CREATE, (interaction) => {
-    if(!(interaction.data && interaction.data.name == 'echo')) return;
+    if(interaction.data?.name != 'echo') return;
     Actions.Application.CreateInteractionResponse(interaction.id, interaction.token, {
         type: Helpers.InteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
