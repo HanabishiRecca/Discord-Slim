@@ -17,6 +17,7 @@ API is unfinished and may be changed with further updates.
 - Actions is now independent from the client.  
 - Uses new Discord API version (v8) with slash commands support
 - Sharding support
+- Voice connection support
 
 ### Support & suggestions server
 https://discord.gg/drsXkP8R4h  

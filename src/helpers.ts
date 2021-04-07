@@ -349,3 +349,16 @@ export enum MembershipStates {
     INVITED = 1,
     ACCEPTED = 2,
 }
+
+export enum VoiceEncryptionModes {
+    XSALSA20_POLY1305 = 'xsalsa20_poly1305',
+    XSALSA20_POLY1305_SUFFIX = 'xsalsa20_poly1305_suffix',
+    XSALSA20_POLY1305_LITE = 'xsalsa20_poly1305_lite',
+}
+
+export enum SpeakingStates {
+    NONE = 0,
+    MICROPHONE = 1 << 0,
+    SOUNDSHARE = 1 << 1,
+    PRIORITY = 1 << 2,
+}

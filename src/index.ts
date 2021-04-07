@@ -8,3 +8,4 @@ import type * as Types from './types';
 export { Types };
 
 export * as Tools from './tools';
+export { Voice, VoiceEvents } from './voice';
