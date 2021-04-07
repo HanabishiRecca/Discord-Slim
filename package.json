@@ -1,11 +1,11 @@
 {
     "name": "discord-slim",
-    "version": "2.0.0-dev.15",
+    "version": "2.0.0",
     "description": "Lightweight Discord bot API for Node.js.",
     "author": "Hanabishi",
     "repository": {
         "type": "git",
-        "url": "https://github.com/HanabishiRecca/Discord-Slim/dev"
+        "url": "https://github.com/HanabishiRecca/Discord-Slim"
     },
     "homepage": "https://discord.gg/drsXkP8R4h",
     "keywords": [

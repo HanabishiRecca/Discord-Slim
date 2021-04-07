@@ -1,35 +1,32 @@
 # Discord Slim
-[![npm](https://img.shields.io/npm/v/discord-slim/dev?style=for-the-badge)](https://www.npmjs.com/package/discord-slim/v/dev)  
+[![npm](https://img.shields.io/npm/v/discord-slim?style=for-the-badge)](https://www.npmjs.com/package/discord-slim)  
 
-Lightweight **Discord** client for **Node.js**.  
+Lightweight **Discord** bot API for **Node.js**.  
 
-Provides access to Discord client gateway and API for bots.  
-Very minimalistic way without excessive abstractions and dependencies. Also with very low resources usage. 
-
-### V2 IS UNDER DEVELOPMENT!  
+## V2 IS NOW RELEASED!  
 Contains breaking changes and incompatible with V1.  
-Dev version is unstable and can have bugs!  
-API is unfinished and may be changed with further updates.  
 
-### V2 main features
-- Typed actions API instead of manual requests.  
-- Typed events API instead of manual packet handling.  
-- Actions is now independent from the client.  
-- Uses new Discord API version (v8) with slash commands support
-- Sharding support
-- Voice connection support
+### New features
+- Typed actions instead of manual requests.
+- Typed events instead of manual packet handling.
+- Uses new Discord API version (v8) with all new features support.
+- Sharding.
+- Voice connection.
 
-### Support & suggestions server
-https://discord.gg/drsXkP8R4h  
+### Support & suggestions
+[![discord](https://user-images.githubusercontent.com/13597663/113933123-a1b62e00-980d-11eb-8bdb-8ff439358010.png)](https://discord.gg/drsXkP8R4h)  
 
 ## Before you start
 ### **Node.js** 14+ is required!
 Make sure you have some understaning of **[Discord API](https://discordapp.com/developers/docs)**.  
 
+## Docs
+**TODO.**  
+For now use e.g. VS Code for types completition. If you have any questions join our discord server.  
+
 ## Installation
-### Note: NPM version may be out-of-date and not contain latest repo commits.
-```
-npm i discord-slim@dev
+```sh
+npm i discord-slim
 ```
 
 ## Usage example
