@@ -1,9 +1,9 @@
 import WebSocket from 'ws';
 import { EventEmitter } from 'events';
-import * as helpers from './helpers';
+import { API_VERSION, Intents, ActivityTypes, StatusTypes } from './helpers';
 import { SafePromise, SafeJsonParse, Sleep } from './util';
 import { Request, Authorization } from './request';
-import { EventHandler } from './events';
+import type { EventHandler } from './events';
 import type { User } from './types';
 
 const enum OPCode {
@@ -37,6 +37,10 @@ type Intent = (
     )
 );
 
+const
+    fatalCodes = [4004, 4010, 4011, 4012, 4013, 4014],
+    dropCodes = [4007, 4009];
+
 export class Client extends EventEmitter {
     private _sessionId?: string;
     private _lastSequence = 0;
@@ -44,7 +48,7 @@ export class Client extends EventEmitter {
     private _heartbeatTimer?: NodeJS.Timeout;
     private _ws?: WebSocket;
     private _auth?: { authorization: Authorization; };
-    private _intents?: helpers.Intents;
+    private _intents?: Intents;
     private _eventHandler = new EventEmitter() as EventHandler;
     private _user?: User;
     private _shard?: [number, number];
@@ -63,13 +67,17 @@ export class Client extends EventEmitter {
         }
 
         const response = await SafePromise(Request('GET', '/gateway/bot', this._auth));
+
+        if(this._ws)
+            return this.emit(ClientEvents.WARN, 'Client already connected.');
+
         if(!response)
-            return this.emit('fatal', 'Unable to retrieve a gateway.');
+            return this.emit(ClientEvents.FATAL, 'Unable to retrieve a gateway.');
 
         if(typeof response.url != 'string')
-            return this.emit('fatal', 'Unexpected gateway API response.');
+            return this.emit(ClientEvents.FATAL, 'Unexpected gateway API response.');
 
-        this._ws = new WebSocket(`${response.url}?v=${helpers.API_VERSION}`);
+        this._ws = new WebSocket(`${response.url}?v=${API_VERSION}`);
         this._ws.on('message', this._onMessage);
         this._ws.on('close', this._onClose);
         this._ws.on('error', this._onError);
@@ -77,58 +85,63 @@ export class Client extends EventEmitter {
 
     private _wsDisconnect = (code = 1012) => {
         if(!this._ws) return;
-        this.emit('disconnect', code);
+        this.emit(ClientEvents.DISCONNECT, code);
         this._setHeartbeatTimer();
         this._ws.removeAllListeners();
         this._ws.close(code);
         this._ws = undefined;
     };
 
-    private _send = (op: OPCode, d: any) => this._ws && this._ws.send(JSON.stringify({ op, d }));
+    private _send = (op: OPCode, d: any) =>
+        this._ws && this._ws.send(JSON.stringify({ op, d }));
 
     private _onMessage = (data: WebSocket.Data) => {
-        if(typeof data != 'string')
-            data = data.toString();
-
-        const intent = SafeJsonParse(data) as Intent | null;
+        const intent = SafeJsonParse(data.toString()) as Intent | null;
         if(!intent) return;
 
-        if(intent.op == OPCode.DISPATCH) {
-            if(intent.s && (intent.s > this._lastSequence))
-                this._lastSequence = intent.s;
+        switch(intent.op) {
+            case OPCode.DISPATCH:
+                if(intent.s && (intent.s > this._lastSequence))
+                    this._lastSequence = intent.s;
 
-            if(intent.t == Events.READY) {
-                this._user = intent.d.user;
-                this._sessionId = intent.d.session_id;
-                this._lastHeartbeatAck = true;
-                this._sendHeartbeat();
-                this.emit('connect');
-            } else if(intent.t == Events.RESUMED) {
-                this._lastHeartbeatAck = true;
-                this._sendHeartbeat();
-                this.emit('connect');
-            }
+                switch(intent.t) {
+                    case Events.READY:
+                        this._user = intent.d.user;
+                        this._sessionId = intent.d.session_id;
+                        this.emit(ClientEvents.CONNECT);
+                        break;
+                    case Events.RESUMED:
+                        this.emit(ClientEvents.CONNECT);
+                        break;
+                }
 
-            this.emit('intent', intent);
-            this._eventHandler.emit(intent.t, intent.d);
-        } else if(intent.op == OPCode.HELLO) {
-            this._identify();
-            this._lastHeartbeatAck = true;
-            this._setHeartbeatTimer(intent.d.heartbeat_interval);
-        } else if(intent.op == OPCode.HEARTBEAT_ACK) {
-            this._lastHeartbeatAck = true;
-        } else if(intent.op == OPCode.HEARTBEAT) {
-            this._sendHeartbeat();
-        } else if(intent.op == OPCode.INVALID_SESSION) {
-            this.emit('warn', `Invalid session. Resumable: ${intent.d}`);
-            this._wsConnect(intent.d);
-        } else if(intent.op == OPCode.RECONNECT) {
-            this.emit('warn', 'Server forced reconnect.');
-            this._wsConnect(true);
+                this.emit(ClientEvents.INTENT, intent);
+                this._eventHandler.emit(intent.t, intent.d);
+                break;
+            case OPCode.HELLO:
+                this._identify();
+                this._lastHeartbeatAck = true;
+                this._setHeartbeatTimer(intent.d.heartbeat_interval);
+                this._sendHeartbeat();
+                break;
+            case OPCode.HEARTBEAT_ACK:
+                this._lastHeartbeatAck = true;
+                break;
+            case OPCode.HEARTBEAT:
+                this._sendHeartbeat();
+                break;
+            case OPCode.INVALID_SESSION:
+                this.emit(ClientEvents.WARN, `Invalid session. Resumable: ${intent.d}`);
+                this._wsConnect(intent.d);
+                break;
+            case OPCode.RECONNECT:
+                this.emit(ClientEvents.WARN, 'Server forced reconnect.');
+                this._wsConnect(true);
+                break;
         }
     };
 
-    private _identify = () => {
+    private _identify = () =>
         this._sessionId ?
             this._send(OPCode.RESUME, {
                 token: this._auth?.authorization.token,
@@ -138,10 +151,9 @@ export class Client extends EventEmitter {
             this._send(OPCode.IDENTIFY, {
                 token: this._auth?.authorization.token,
                 properties: { $os: 'linux', $browser: 'bot', $device: 'bot' },
-                intents: this._intents ?? helpers.Intents.SYSTEM_ONLY,
+                intents: this._intents ?? Intents.SYSTEM,
                 shard: this._shard,
             });
-    };
 
     private _sendHeartbeat = () => {
         if(this._lastHeartbeatAck) {
@@ -150,7 +162,7 @@ export class Client extends EventEmitter {
                 this._send(OPCode.HEARTBEAT, this._lastSequence);
             }
         } else {
-            this.emit('warn', 'Heartbeat timeout.');
+            this.emit(ClientEvents.WARN, 'Heartbeat timeout.');
             this._wsConnect(true);
         }
     };
@@ -166,24 +178,23 @@ export class Client extends EventEmitter {
 
     private _onClose = (code: number) => {
         this._wsDisconnect(code);
-        if(code < 4000)
-            this._wsConnect(true);
-        else
-            this.emit('fatal', `Fatal gateway error. Code: ${code}`);
+        fatalCodes.includes(code) ?
+            this.emit(ClientEvents.FATAL, `Fatal error. Code: ${code}`) :
+            this._wsConnect(!dropCodes.includes(code));
     };
 
-    private _onError = (error: Error) => this.emit('error', error);
+    private _onError = (error: Error) =>
+        this.emit(ClientEvents.ERROR, error);
 
-    Connect = (authorization: Authorization, intents?: helpers.Intents, shard?: { id: number; total: number; }) => {
+    Connect = (authorization: Authorization, intents?: Intents, shard?: { id: number; total: number; }) => {
         this._auth = { authorization };
         this._intents = intents;
         this._shard = shard ? [shard.id, shard.total] : undefined;
         this._wsConnect(true);
     };
 
-    Disconnect = (code?: number) => {
+    Disconnect = (code?: number) =>
         this._wsDisconnect(code);
-    };
 
     RequestGuildMembers = (params: { guild_id: string; presences?: boolean; nonce?: string; } &
         ({ query: string; limit: number; } | { user_ids: string | string[]; })
@@ -206,10 +217,10 @@ export class Client extends EventEmitter {
         since: number | null;
         activities: {
             name: string;
-            type: helpers.ActivityTypes;
+            type: ActivityTypes;
             url?: string;
         }[] | null;
-        status: helpers.StatusTypes;
+        status: StatusTypes;
         afk: boolean;
     }) => {
         if(!this._ws) throw 'No connection.';

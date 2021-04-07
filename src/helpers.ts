@@ -42,7 +42,7 @@ export const Permissions = {
 } as const;
 
 export enum Intents {
-    SYSTEM_ONLY = 0,
+    SYSTEM = 0,
     GUILDS = 1 << 0,
     GUILD_MEMBERS = 1 << 1,
     GUILD_BANS = 1 << 2,

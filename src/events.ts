@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import type * as types from './types';
-import type * as helpers from './helpers';
+import { TargetUserTypes } from './helpers';
 
 export enum Events {
     READY = 'READY',
@@ -131,7 +131,7 @@ type EventTypes = {
         max_age: number;
         max_uses: number;
         target_user?: types.User;
-        target_user_type?: helpers.TargetUserTypes;
+        target_user_type?: TargetUserTypes;
         temporary: boolean;
         uses: number;
     };
