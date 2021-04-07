@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import { EventEmitter } from 'events';
 import { API_VERSION, Intents, ActivityTypes, StatusTypes } from './helpers';
-import { SafePromise, SafeJsonParse, Sleep } from './util';
+import { SafeJsonParse, Sleep } from './util';
 import { Request, Authorization } from './request';
 import type { EventHandler } from './events';
 import type { User } from './types';
@@ -66,7 +66,7 @@ export class Client extends EventEmitter {
             await Sleep(5000);
         }
 
-        const response = await SafePromise(Request('GET', '/gateway/bot', this._auth));
+        const response = await Request('GET', '/gateway/bot', this._auth).catch(() => {});
 
         if(this._ws)
             return this.emit(ClientEvents.WARN, 'Client already connected.');
