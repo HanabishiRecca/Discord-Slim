@@ -16,20 +16,13 @@ Contains breaking changes and incompatible with V1.
 ### Support & suggestions
 [![discord](https://user-images.githubusercontent.com/13597663/113933123-a1b62e00-980d-11eb-8bdb-8ff439358010.png)](https://discord.gg/drsXkP8R4h)  
 
-### Note
-New version (V2) is under development.  
-This version (V1) is now legacy and will be deprecated.  
-
-### Support & suggestions server
-https://discord.gg/drsXkP8R4h  
-
 ## Before you start
 ### **Node.js** 14+ is required!
 Make sure you have some understaning of **[Discord API](https://discordapp.com/developers/docs)**.  
 
 ## Docs
 **TODO.**  
-For now use e.g. VS Code for types completition. If you have any questions join our discord server.  
+For now use e.g. VS Code for types completion. If you have any questions join our discord server.  
 
 ## Installation
 ```sh
