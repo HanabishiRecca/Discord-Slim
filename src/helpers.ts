@@ -301,6 +301,11 @@ export enum ApplicationCommandOptionTypes {
     ROLE = 8,
 }
 
+export enum ApplicationCommandPermissionType {
+    ROLE = 1,
+    USER = 2,
+}
+
 export enum InteractionTypes {
     PING = 1,
     APPLICATION_COMMAND = 2,

@@ -585,6 +585,7 @@ export type ApplicationCommand = {
     name: string;
     description: string;
     options?: ApplicationCommandOption[];
+    default_permission?: boolean;
 };
 
 export type ApplicationCommandOption = {
@@ -599,6 +600,19 @@ export type ApplicationCommandOption = {
 export type ApplicationCommandOptionChoice = {
     name: string;
     value: string | number;
+};
+
+export type GuildApplicationCommandPermissions = {
+    id: string;
+    application_id: string;
+    guild_id: string;
+    permissions: ApplicationCommandPermissions[];
+};
+
+export type ApplicationCommandPermissions = {
+    id: string;
+    type: helpers.ApplicationCommandPermissionType;
+    permission: boolean;
 };
 
 export type Interaction = {

@@ -701,6 +701,23 @@ export const Application = {
 
     DeleteFollowupMessage: (application_id: string, interaction_token: string, message_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, PATHS_S.webhooks + application_id + '/' + interaction_token + PATHS_S.messages + message_id, requestOptions ?? defaultRequestOptions),
+
+    GetGuildCommandPermissions: (application_id: string, guild_id: string, requestOptions?: RequestOptions): Promise<types.GuildApplicationCommandPermissions[]> =>
+        Request(METHODS.GET, PATHS_S.applications + application_id + PATHS_S.guilds + guild_id + PATHS.commands + PATHS.permissions, requestOptions ?? defaultRequestOptions),
+
+    GetCommandPermissions: (application_id: string, guild_id: string, command_id: string, requestOptions?: RequestOptions): Promise<types.GuildApplicationCommandPermissions> =>
+        Request(METHODS.GET, PATHS_S.applications + application_id + PATHS_S.guilds + guild_id + PATHS_S.commands + command_id + PATHS.permissions, requestOptions ?? defaultRequestOptions),
+
+    EditCommandPermissions: (application_id: string, guild_id: string, command_id: string, params: {
+        permissions: types.ApplicationCommandPermissions[];
+    }, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.PUT, PATHS_S.applications + application_id + PATHS_S.guilds + guild_id + PATHS_S.commands + command_id + PATHS.permissions, requestOptions ?? defaultRequestOptions, params),
+
+    BatchEditCommandPermissions: (application_id: string, guild_id: string, params: {
+        id: string;
+        permissions: types.ApplicationCommandPermissions[];
+    }[], requestOptions?: RequestOptions): Promise<types.GuildApplicationCommandPermissions[]> =>
+        Request(METHODS.PUT, PATHS_S.applications + application_id + PATHS_S.guilds + guild_id + PATHS.commands + PATHS.permissions, requestOptions ?? defaultRequestOptions, params),
 };
 
 export const OAuth2 = {
