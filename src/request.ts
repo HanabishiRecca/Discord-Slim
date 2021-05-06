@@ -10,6 +10,7 @@ const
 export enum TokenTypes {
     BOT = 'Bot',
     BEARER = 'Bearer',
+    NONE = '',
 }
 
 export class Authorization {
@@ -23,7 +24,10 @@ export class Authorization {
         this._update();
     }
 
-    _update = () => this._cache = `${this._type} ${this._token}`;
+    _update = () =>
+        this._cache = this._type ?
+            `${this._type} ${this._token}` :
+            this._token;
 
     get type() { return this._type; };
     set type(value: TokenTypes) { this._type = value; this._update(); };

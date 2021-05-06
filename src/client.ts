@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import { EventEmitter } from 'events';
 import { API_VERSION, Intents, ActivityTypes, StatusTypes } from './helpers';
 import { SafeJsonParse, Sleep } from './util';
-import { Request, Authorization } from './request';
+import { Request, Authorization, TokenTypes } from './request';
 import type { EventHandler } from './events';
 import type { User } from './types';
 
@@ -52,6 +52,7 @@ export class Client extends EventEmitter {
     private _eventHandler = new EventEmitter() as EventHandler;
     private _user?: User;
     private _shard?: [number, number];
+    private _props?: object | null = { $os: 'linux', $browser: 'bot', $device: 'bot' };
 
     constructor() {
         super();
@@ -66,7 +67,12 @@ export class Client extends EventEmitter {
             await Sleep(5000);
         }
 
-        const response = await Request('GET', '/gateway/bot', this._auth).catch(() => {});
+        const response = await Request('GET',
+            this._auth?.authorization.type == TokenTypes.BOT ?
+                '/gateway/bot' :
+                '/gateway',
+            this._auth
+        ).catch(() => {});
 
         if(this._ws)
             return this.emit(ClientEvents.WARN, 'Client already connected.');
@@ -150,7 +156,7 @@ export class Client extends EventEmitter {
             }) :
             this._send(OPCode.IDENTIFY, {
                 token: this._auth?.authorization.token,
-                properties: { $os: 'linux', $browser: 'bot', $device: 'bot' },
+                properties: this._props,
                 intents: this._intents ?? Intents.SYSTEM,
                 shard: this._shard,
             });
@@ -229,6 +235,9 @@ export class Client extends EventEmitter {
 
     get events() { return this._eventHandler; }
     get user() { return this._user; }
+
+    get props() { return this._props; }
+    set props(value) { this._props = value; }
 }
 
 export enum ClientEvents {

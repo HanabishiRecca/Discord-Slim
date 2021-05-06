@@ -12,6 +12,7 @@ Contains breaking changes and incompatible with V1.
 - Uses new Discord API version (v8) with all new features support.
 - Sharding.
 - Voice connection.
+- Ability to auth as user (at your own risk!).
 
 ### Support & suggestions
 [![discord](https://user-images.githubusercontent.com/13597663/113933123-a1b62e00-980d-11eb-8bdb-8ff439358010.png)](https://discord.gg/drsXkP8R4h)  
