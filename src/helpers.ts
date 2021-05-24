@@ -39,6 +39,9 @@ export const Permissions = {
     MANAGE_WEBHOOKS: 0x020000000n,
     MANAGE_EMOJIS: 0x040000000n,
     REQUEST_TO_SPEAK: 0x100000000n,
+    MANAGE_THREADS: 0x0400000000n,
+    USE_PUBLIC_THREADS: 0x0800000000n,
+    USE_PRIVATE_THREADS: 0x1000000000n,
 } as const;
 
 export enum Intents {
@@ -106,6 +109,9 @@ export enum ChannelTypes {
     GUILD_CATEGORY = 4,
     GUILD_NEWS = 5,
     GUILD_STORE = 6,
+    GUILD_NEWS_THREAD = 10,
+    GUILD_PUBLIC_THREAD = 11,
+    GUILD_PRIVATE_THREAD = 12,
     GUILD_STAGE_VOICE = 13,
 }
 
@@ -125,8 +131,13 @@ export enum MessageTypes {
     CHANNEL_FOLLOW_ADD = 12,
     GUILD_DISCOVERY_DISQUALIFIED = 14,
     GUILD_DISCOVERY_REQUALIFIED = 15,
+    GUILD_DISCOVERY_GRACE_PERIOD_INITIAL_WARNING = 16,
+    GUILD_DISCOVERY_GRACE_PERIOD_FINAL_WARNING = 17,
+    THREAD_CREATED = 18,
     REPLY = 19,
     APPLICATION_COMMAND = 20,
+    THREAD_STARTER_MESSAGE = 21,
+    GUILD_INVITE_REMINDER = 22,
 }
 
 export enum MessageActivityTypes {
@@ -143,6 +154,9 @@ export enum MessageFlags {
     SUPPRESS_EMBEDS = 1 << 2,
     SOURCE_MESSAGE_DELETED = 1 << 3,
     URGENT = 1 << 4,
+    HAS_THREAD = 1 << 5,
+    EPHEMERAL = 1 << 6,
+    LOADING = 1 << 7,
 }
 
 export enum MessageStickerFormatTypes {
@@ -299,6 +313,7 @@ export enum ApplicationCommandOptionTypes {
     USER = 6,
     CHANNEL = 7,
     ROLE = 8,
+    MENTIONABLE = 9,
 }
 
 export enum ApplicationCommandPermissionType {
@@ -366,4 +381,9 @@ export enum SpeakingStates {
     MICROPHONE = 1 << 0,
     SOUNDSHARE = 1 << 1,
     PRIORITY = 1 << 2,
+}
+
+export enum VideoQualityModes {
+    AUTO = 1,
+    FULL = 2,
 }

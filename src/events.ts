@@ -38,6 +38,12 @@ export enum Events {
     MESSAGE_REACTION_REMOVE_ALL = 'MESSAGE_REACTION_REMOVE_ALL',
     MESSAGE_REACTION_REMOVE_EMOJI = 'MESSAGE_REACTION_REMOVE_EMOJI',
     PRESENCE_UPDATE = 'PRESENCE_UPDATE',
+    THREAD_CREATE = 'THREAD_CREATE',
+    THREAD_UPDATE = 'THREAD_UPDATE',
+    THREAD_DELETE = 'THREAD_DELETE',
+    THREAD_LIST_SYNC = 'THREAD_LIST_SYNC',
+    THREAD_MEMBER_UPDATE = 'THREAD_MEMBER_UPDATE',
+    THREAD_MEMBERS_UPDATE = 'THREAD_MEMBERS_UPDATE',
     TYPING_START = 'TYPING_START',
     USER_UPDATE = 'USER_UPDATE',
     VOICE_STATE_UPDATE = 'VOICE_STATE_UPDATE',
@@ -69,6 +75,23 @@ type EventTypes = {
         guild_id?: string;
         channel_id: string;
         last_pin_timestamp?: string | null;
+    };
+    [Events.THREAD_CREATE]: types.Channel;
+    [Events.THREAD_UPDATE]: types.Channel;
+    [Events.THREAD_DELETE]: types.Channel;
+    [Events.THREAD_LIST_SYNC]: {
+        guild_id: string;
+        channel_ids?: string[];
+        threads: types.Channel[];
+        members: types.ThreadMember[];
+    };
+    [Events.THREAD_MEMBER_UPDATE]: types.ThreadMember;
+    [Events.THREAD_MEMBERS_UPDATE]: {
+        id: string;
+        guild_id: string;
+        member_count: number;
+        added_members?: types.ThreadMember[];
+        removed_member_ids?: string[];
     };
     [Events.GUILD_CREATE]: types.Guild;
     [Events.GUILD_UPDATE]: types.Guild;

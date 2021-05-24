@@ -151,6 +151,12 @@ export type Channel = {
     application_id?: string;
     parent_id?: string | null;
     last_pin_timestamp?: string | null;
+    rtc_region?: string | null;
+    video_quality_mode?: helpers.VideoQualityModes;
+    message_count?: number;
+    member_count?: number;
+    thread_metadata?: ThreadMetadata;
+    member?: ThreadMember;
 };
 
 export type Message = {
@@ -229,6 +235,21 @@ export type PermissionsOverwrite = {
     type: helpers.PermissionsOverwriteTypes;
     allow: string;
     deny: string;
+};
+
+export type ThreadMetadata = {
+    archived: boolean;
+    archiver_id?: string;
+    auto_archive_duration: 60 | 1440 | 4320 | 10080;
+    archive_timestamp: string;
+    locked?: boolean;
+};
+
+export type ThreadMember = {
+    id: string;
+    user_id: string;
+    join_timestamp: string;
+    flags: number;
 };
 
 export type Embed = {
@@ -363,6 +384,7 @@ export type Guild = {
     voice_states?: VoiceState[];
     members?: Member[];
     channels?: Channel[];
+    threads?: Channel[];
     presences?: Presence[];
     max_presences?: number | null;
     max_members?: number;

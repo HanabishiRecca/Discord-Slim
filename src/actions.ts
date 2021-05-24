@@ -57,6 +57,12 @@ const enum PATHS {
     voice_states = '/voice-states',
     oauth2 = '/oauth2',
     token = '/token',
+    threads = '/threads',
+    active = '/active',
+    archived = '/archived',
+    private = '/private',
+    public = '/public',
+    thread_members = '/thread-members',
 }
 
 const enum PATHS_S {
@@ -81,6 +87,8 @@ const enum PATHS_S {
     commands = PATHS.commands + '/',
     interactions = PATHS.interactions + '/',
     voice_states = PATHS.voice_states + '/',
+    threads = PATHS.threads + '/',
+    archived = PATHS.archived + '/',
 }
 
 const enum PATHS_Q {
@@ -162,6 +170,18 @@ export const Channel = {
 
     GetWebhooks: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Webhook[]> =>
         Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.webhooks, requestOptions ?? defaultRequestOptions),
+
+    GetActiveThreads: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Channel[]> =>
+        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.threads + PATHS.active, requestOptions ?? defaultRequestOptions),
+
+    GetSelfArchivedPrivateThreads: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Channel[]> =>
+        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.users + PATHS.me + PATHS.threads + PATHS.archived + PATHS.private, requestOptions ?? defaultRequestOptions),
+
+    GetArchivedPublicThreads: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Channel[]> =>
+        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.threads + PATHS.archived + PATHS.public, requestOptions ?? defaultRequestOptions),
+
+    GetArchivedPrivateThreads: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Channel[]> =>
+        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.threads + PATHS.archived + PATHS.private, requestOptions ?? defaultRequestOptions),
 };
 
 export const Message = {
@@ -602,7 +622,10 @@ export const Webhook = {
         tts?: string;
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
-    }, params2?: { wait?: boolean; }, requestOptions?: RequestOptions): Promise<types.Message | null> =>
+    }, params2?: {
+        wait?: boolean;
+        thread_id?: string;
+    }, requestOptions?: RequestOptions): Promise<types.Message | null> =>
         Request(METHODS.POST, PATHS_S.webhooks + webhook_id + '/' + webhook_token + '?' + querystring.stringify(params2), requestOptions ?? defaultRequestOptions, params1),
 
     ExecuteSlack: (webhook_id: string, webhook_token: string, params?: { wait?: boolean; }, requestOptions?: RequestOptions): Promise<null> =>
@@ -755,4 +778,9 @@ export const OAuth2 = {
         user?: types.User;
     }> =>
         Request(METHODS.GET, PATHS.oauth2 + PATHS.me, requestOptions ?? defaultRequestOptions),
+};
+
+export const Thread = {
+    GetMembers: (channel_id: string, requestOptions?: RequestOptions): Promise<types.ThreadMember[]> =>
+        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.thread_members, requestOptions ?? defaultRequestOptions),
 };
