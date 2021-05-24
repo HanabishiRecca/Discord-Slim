@@ -3,17 +3,6 @@
 
 Lightweight **Discord** bot API for **Node.js**.  
 
-## V2 IS NOW RELEASED!  
-Contains breaking changes and incompatible with V1.  
-
-### New features
-- Typed actions instead of manual requests.
-- Typed events instead of manual packet handling.
-- Uses new Discord API version (v8) with all new features support.
-- Sharding.
-- Voice connection.
-- Ability to auth as user (at your own risk!).
-
 ### Support & suggestions
 [![discord](https://user-images.githubusercontent.com/13597663/113933123-a1b62e00-980d-11eb-8bdb-8ff439358010.png)](https://discord.gg/drsXkP8R4h)  
 
