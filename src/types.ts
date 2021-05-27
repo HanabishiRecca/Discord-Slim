@@ -474,6 +474,18 @@ export type Ban = {
     user: User;
 };
 
+export type WelcomeScreen = {
+    description: string | null;
+    welcome_channels: [];
+};
+
+export type WelcomeScreenChannel = {
+    channel_id: string;
+    description: string;
+    emoji_id: string | null;
+    emoji_name: string | null;
+};
+
 // Invite types
 
 export type Invite = {

@@ -63,6 +63,7 @@ const enum PATHS {
     private = '/private',
     public = '/public',
     thread_members = '/thread-members',
+    welcome_screen = '/welcome-screen',
 }
 
 const enum PATHS_S {
@@ -523,6 +524,18 @@ export const Widget = {
 
     GetImage: (guild_id: string, params?: { style?: helpers.WidgetStyleOptions; }, requestOptions?: RequestOptions): Promise<Buffer> =>
         Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS_Q.widget_png + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+};
+
+export const WelcomeScreen = {
+    Get: (guild_id: string, requestOptions?: RequestOptions): Promise<types.WelcomeScreen> =>
+        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.welcome_screen, requestOptions ?? defaultRequestOptions),
+
+    Modify: (guild_id: string, params: {
+        enabled?: boolean | null;
+        welcome_channels?: types.WelcomeScreenChannel[] | null;
+        description?: string | null;
+    }, requestOptions?: RequestOptions): Promise<types.WelcomeScreen> =>
+        Request(METHODS.PATCH, PATHS_S.guilds + guild_id + PATHS.welcome_screen, requestOptions ?? defaultRequestOptions, params),
 };
 
 export const Invite = {
