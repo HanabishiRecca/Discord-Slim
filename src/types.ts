@@ -187,6 +187,7 @@ export type Message = {
     stickers?: MessageSticker[];
     referenced_message?: Message | null;
     interaction?: MessageInteraction;
+    thread?: Channel;
 };
 
 export type MessageActivity = {
@@ -237,10 +238,12 @@ export type PermissionsOverwrite = {
     deny: string;
 };
 
+export type ThreadArchiveDuration = 60 | 1440 | 4320 | 10080;
+
 export type ThreadMetadata = {
     archived: boolean;
     archiver_id?: string;
-    auto_archive_duration: 60 | 1440 | 4320 | 10080;
+    auto_archive_duration: ThreadArchiveDuration;
     archive_timestamp: string;
     locked?: boolean;
 };

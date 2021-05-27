@@ -89,6 +89,7 @@ const enum PATHS_S {
     voice_states = PATHS.voice_states + '/',
     threads = PATHS.threads + '/',
     archived = PATHS.archived + '/',
+    thread_members = PATHS.thread_members + '/',
 }
 
 const enum PATHS_Q {
@@ -98,6 +99,8 @@ const enum PATHS_Q {
     guilds = PATHS.guilds + '?',
     slack = PATHS.slack + '?',
     github = PATHS.github + '?',
+    public = PATHS.public + '?',
+    private = PATHS.private + '?',
 }
 
 export const Channel = {
@@ -171,17 +174,42 @@ export const Channel = {
     GetWebhooks: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Webhook[]> =>
         Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.webhooks, requestOptions ?? defaultRequestOptions),
 
-    GetActiveThreads: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Channel[]> =>
+    ListActiveThreads: (channel_id: string, requestOptions?: RequestOptions): Promise<{
+        threads: types.Channel[];
+        members: types.ThreadMember[];
+        has_more: boolean;
+    }> =>
         Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.threads + PATHS.active, requestOptions ?? defaultRequestOptions),
 
-    GetSelfArchivedPrivateThreads: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Channel[]> =>
-        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.users + PATHS.me + PATHS.threads + PATHS.archived + PATHS.private, requestOptions ?? defaultRequestOptions),
+    ListPublicArchivedThreads: (channel_id: string, params?: {
+        before?: string;
+        limit?: number;
+    }, requestOptions?: RequestOptions): Promise<{
+        threads: types.Channel[];
+        members: types.ThreadMember[];
+        has_more: boolean;
+    }> =>
+        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.threads + PATHS.archived + PATHS_Q.public + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
 
-    GetArchivedPublicThreads: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Channel[]> =>
-        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.threads + PATHS.archived + PATHS.public, requestOptions ?? defaultRequestOptions),
+    ListPrivateArchivedThreads: (channel_id: string, params?: {
+        before?: string;
+        limit?: number;
+    }, requestOptions?: RequestOptions): Promise<{
+        threads: types.Channel[];
+        members: types.ThreadMember[];
+        has_more: boolean;
+    }> =>
+        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.threads + PATHS.archived + PATHS_Q.private + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
 
-    GetArchivedPrivateThreads: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Channel[]> =>
-        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.threads + PATHS.archived + PATHS.private, requestOptions ?? defaultRequestOptions),
+    ListJoinedPrivateArchivedThreads: (channel_id: string, params?: {
+        before?: string;
+        limit?: number;
+    }, requestOptions?: RequestOptions): Promise<{
+        threads: types.Channel[];
+        members: types.ThreadMember[];
+        has_more: boolean;
+    }> =>
+        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.users + PATHS.me + PATHS.threads + PATHS.archived + PATHS_Q.private + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
 };
 
 export const Message = {
@@ -254,6 +282,12 @@ export const GroupDM = {
 
     RemoveRecipient: (channel_id: string, user_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, PATHS_S.channels + channel_id + PATHS_S.recipients + user_id, requestOptions ?? defaultRequestOptions),
+
+    Modify: (id: string, params: {
+        name?: string;
+        icon?: string;
+    }, requestOptions?: RequestOptions): Promise<types.Channel> =>
+        Request(METHODS.PATCH, PATHS_S.channels + id, requestOptions ?? defaultRequestOptions, params),
 };
 
 export const Guild = {
@@ -781,6 +815,39 @@ export const OAuth2 = {
 };
 
 export const Thread = {
-    GetMembers: (channel_id: string, requestOptions?: RequestOptions): Promise<types.ThreadMember[]> =>
+    Modify: (id: string, params: {
+        name?: string;
+        archived?: boolean;
+        auto_archive_duration?: types.ThreadArchiveDuration;
+        locked?: boolean;
+        rate_limit_per_user?: number | null;
+    }, requestOptions?: RequestOptions): Promise<types.Channel> =>
+        Request(METHODS.PATCH, PATHS_S.channels + id, requestOptions ?? defaultRequestOptions, params),
+
+    StartWithMessage: (channel_id: string, message_id: string, params: {
+        name: string;
+        auto_archive_duration: types.ThreadArchiveDuration;
+    }, requestOptions?: RequestOptions): Promise<types.Channel> =>
+        Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS_S.messages + message_id + PATHS.threads, requestOptions ?? defaultRequestOptions, params),
+
+    Start: (channel_id: string, params: {
+        name: string;
+        auto_archive_duration: types.ThreadArchiveDuration;
+    }, requestOptions?: RequestOptions): Promise<types.Channel> =>
+        Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS.threads, requestOptions ?? defaultRequestOptions, params),
+
+    Join: (channel_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.PUT, PATHS_S.channels + channel_id + PATHS.thread_members + PATHS.me, requestOptions ?? defaultRequestOptions),
+
+    AddMember: (channel_id: string, user_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.PUT, PATHS_S.channels + channel_id + PATHS_S.thread_members + user_id, requestOptions ?? defaultRequestOptions),
+
+    Leave: (channel_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.DELETE, PATHS_S.channels + channel_id + PATHS.thread_members + PATHS.me, requestOptions ?? defaultRequestOptions),
+
+    RemoveMember: (channel_id: string, user_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.DELETE, PATHS_S.channels + channel_id + PATHS_S.thread_members + user_id, requestOptions ?? defaultRequestOptions),
+
+    ListMembers: (channel_id: string, requestOptions?: RequestOptions): Promise<types.ThreadMember[]> =>
         Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.thread_members, requestOptions ?? defaultRequestOptions),
 };
