@@ -188,6 +188,7 @@ export type Message = {
     referenced_message?: Message | null;
     interaction?: MessageInteraction;
     thread?: Channel;
+    components?: Component[];
 };
 
 export type MessageActivity = {
@@ -663,16 +664,28 @@ export type Interaction = {
     user?: User;
     token: string;
     version: number;
+    message?: Message;
 };
 
 export type ApplicationCommandInteractionData = {
     id: string;
     name: string;
+    resolved?: ApplicationCommandInteractionDataResolved;
     options?: ApplicationCommandInteractionDataOption[];
+    custom_id?: string;
+    component_type?: helpers.ComponentTypes;
+};
+
+export type ApplicationCommandInteractionDataResolved = {
+    users?: { [id: string]: User; };
+    members?: { [id: string]: Member; };
+    roles?: { [id: string]: Role; };
+    channels?: { [id: string]: Channel; };
 };
 
 export type ApplicationCommandInteractionDataOption = {
     name: string;
+    type: helpers.ApplicationCommandOptionTypes;
     value?: string | number | boolean;
     options?: ApplicationCommandInteractionDataOption[];
 };
@@ -792,4 +805,17 @@ export type TeamMember = {
     permissions: string[];
     team_id: string;
     user: User;
+};
+
+// Message Components types
+
+export type Component = {
+    type: helpers.ComponentTypes;
+    style?: helpers.ButtonStyles;
+    label?: string;
+    emoji?: Emoji;
+    custom_id?: string;
+    url?: string;
+    disabled?: boolean;
+    components?: Component[];
 };

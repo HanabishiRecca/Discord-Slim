@@ -324,12 +324,15 @@ export enum ApplicationCommandPermissionType {
 export enum InteractionTypes {
     PING = 1,
     APPLICATION_COMMAND = 2,
+    MESSAGE_COMPONENT = 3,
 }
 
 export enum InteractionResponseTypes {
     PONG = 1,
     CHANNEL_MESSAGE_WITH_SOURCE = 4,
     DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE = 5,
+    DEFERRED_UPDATE_MESSAGE = 6,
+    UPDATE_MESSAGE = 7,
 }
 
 export enum InteractionResponseFlags {
@@ -386,4 +389,17 @@ export enum SpeakingStates {
 export enum VideoQualityModes {
     AUTO = 1,
     FULL = 2,
+}
+
+export enum ComponentTypes {
+    ACTION_ROW = 1,
+    BUTTON = 2,
+}
+
+export enum ButtonStyles {
+    PRIMARY = 1,
+    SECONDARY = 2,
+    SUCCESS = 3,
+    DANGER = 4,
+    LINK = 5,
 }
