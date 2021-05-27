@@ -1,5 +1,5 @@
-import { Permissions as Flags, CDN } from './helpers';
-import { Guild, User, Application, Team } from './types';
+import { Permissions as Flags, CDN, HOST } from './helpers';
+import { Guild, User, Application, Team, Emoji, Message } from './types';
 
 type Permission = typeof Flags[keyof typeof Flags];
 type PermissionSet = string | number | bigint;
@@ -32,6 +32,14 @@ export const Mentions = {
     User: (user_id: string) => `<@${user_id}>`,
     Channel: (channel_id: string) => `<#${channel_id}>`,
     Role: (role_id: string) => `<@&${role_id}>`,
+};
+
+export const Format = {
+    Emoji: (emoji: Emoji) => `<${emoji.animated ? 'a' : ''}:${emoji.name}:${emoji.id}>`,
+};
+
+export const Link = {
+    Message: (message: Message) => `${HOST}/channels/${message.guild_id ?? '@me'}/${message.channel_id}/${message.id}`,
 };
 
 const SizeExtOpt = (size?: number, ext?: string) => (ext ? `.${ext}` : '') + (size ? `?size=${size}` : '');
