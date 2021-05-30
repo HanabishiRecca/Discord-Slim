@@ -224,6 +224,7 @@ export const Message = {
         embed?: types.Embed;
         allowed_mentions?: types.AllowedMentions;
         message_reference?: types.MessageReference;
+        components?: types.Component[];
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS.messages, requestOptions ?? defaultRequestOptions, params),
 
@@ -238,6 +239,7 @@ export const Message = {
         embed?: types.Embed;
         flags?: helpers.MessageFlags;
         allowed_mentions?: types.AllowedMentions;
+        components?: types.Component[];
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.PATCH, PATHS_S.channels + channel_id + PATHS_S.messages + message_id, requestOptions ?? defaultRequestOptions, params),
 
@@ -669,6 +671,7 @@ export const Webhook = {
         tts?: string;
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
+        components?: types.Component[];
     }, params2?: {
         wait?: boolean;
         thread_id?: string;
@@ -685,6 +688,7 @@ export const Webhook = {
         content?: string;
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
+        components?: types.Component[];
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.PATCH, PATHS_S.webhooks + webhook_id + '/' + webhook_token + PATHS_S.messages + message_id, requestOptions ?? defaultRequestOptions, params),
 
