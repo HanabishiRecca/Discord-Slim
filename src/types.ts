@@ -821,3 +821,14 @@ export type Component = {
     disabled?: boolean;
     components?: Component[];
 };
+
+// Stage Instance types
+
+export type StageInstance = {
+    id: string;
+    guild_id: string;
+    channel_id: string;
+    topic: string;
+    privacy_level: helpers.PrivacyLevel;
+    discoverable_disabled: boolean;
+};

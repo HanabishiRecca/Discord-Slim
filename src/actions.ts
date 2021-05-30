@@ -64,6 +64,7 @@ const enum PATHS {
     public = '/public',
     thread_members = '/thread-members',
     welcome_screen = '/welcome-screen',
+    stage_instances = '/stage-instances',
 }
 
 const enum PATHS_S {
@@ -91,6 +92,7 @@ const enum PATHS_S {
     threads = PATHS.threads + '/',
     archived = PATHS.archived + '/',
     thread_members = PATHS.thread_members + '/',
+    stage_instances = PATHS.stage_instances + '/',
 }
 
 const enum PATHS_Q {
@@ -871,4 +873,25 @@ export const Thread = {
 
     ListMembers: (channel_id: string, requestOptions?: RequestOptions): Promise<types.ThreadMember[]> =>
         Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.thread_members, requestOptions ?? defaultRequestOptions),
+};
+
+export const StageInstance = {
+    Create: (params: {
+        channel_id: string;
+        topic: string;
+        privacy_level?: helpers.PrivacyLevel;
+    }, requestOptions?: RequestOptions): Promise<types.StageInstance> =>
+        Request(METHODS.POST, PATHS.stage_instances, requestOptions ?? defaultRequestOptions, params),
+
+    Get: (channel_id: string, requestOptions?: RequestOptions): Promise<types.StageInstance> =>
+        Request(METHODS.GET, PATHS_S.stage_instances + channel_id, requestOptions ?? defaultRequestOptions),
+
+    Update: (channel_id: string, params: {
+        topic?: string;
+        privacy_level?: helpers.PrivacyLevel;
+    }, requestOptions?: RequestOptions): Promise<types.StageInstance> =>
+        Request(METHODS.PATCH, PATHS_S.stage_instances + channel_id, requestOptions ?? defaultRequestOptions, params),
+
+    Delete: (channel_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.DELETE, PATHS_S.stage_instances + channel_id, requestOptions ?? defaultRequestOptions),
 };

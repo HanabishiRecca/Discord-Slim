@@ -404,3 +404,8 @@ export enum ButtonStyles {
     DANGER = 4,
     LINK = 5,
 }
+
+export enum PrivacyLevel {
+    PUBLIC = 1,
+    GUILD_ONLY = 2,
+}

@@ -38,6 +38,9 @@ export enum Events {
     MESSAGE_REACTION_REMOVE_ALL = 'MESSAGE_REACTION_REMOVE_ALL',
     MESSAGE_REACTION_REMOVE_EMOJI = 'MESSAGE_REACTION_REMOVE_EMOJI',
     PRESENCE_UPDATE = 'PRESENCE_UPDATE',
+    STAGE_INSTANCE_CREATE = 'STAGE_INSTANCE_CREATE',
+    STAGE_INSTANCE_UPDATE = 'STAGE_INSTANCE_UPDATE',
+    STAGE_INSTANCE_DELETE = 'STAGE_INSTANCE_DELETE',
     THREAD_CREATE = 'THREAD_CREATE',
     THREAD_UPDATE = 'THREAD_UPDATE',
     THREAD_DELETE = 'THREAD_DELETE',
@@ -220,6 +223,9 @@ type EventTypes = {
         guild_id: string;
         channel_id: string;
     };
+    [Events.STAGE_INSTANCE_CREATE]: types.StageInstance;
+    [Events.STAGE_INSTANCE_UPDATE]: types.StageInstance;
+    [Events.STAGE_INSTANCE_DELETE]: types.StageInstance;
 };
 
 export interface EventHandler extends EventEmitter {
