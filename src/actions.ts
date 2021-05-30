@@ -750,6 +750,7 @@ export const Application = {
         content?: string;
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
+        components?: types.Component[];
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.PATCH, PATHS_S.webhooks + application_id + '/' + interaction_token + PATHS.messages + PATHS.original, requestOptions ?? defaultRequestOptions, params),
 
@@ -763,6 +764,8 @@ export const Application = {
         tts?: string;
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
+        flags?: helpers.InteractionResponseFlags;
+        components?: types.Component[];
     }, requestOptions?: RequestOptions): Promise<types.Message | null> =>
         Request(METHODS.POST, PATHS_S.webhooks + application_id + '/' + interaction_token, requestOptions ?? defaultRequestOptions, params),
 
@@ -770,6 +773,7 @@ export const Application = {
         content?: string;
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
+        components?: types.Component[];
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.PATCH, PATHS_S.webhooks + application_id + '/' + interaction_token + PATHS_S.messages + message_id, requestOptions ?? defaultRequestOptions, params),
 

@@ -702,6 +702,7 @@ export type InteractionApplicationCommandCallbackData = {
     embeds?: Embed[];
     allowed_mentions?: AllowedMentions;
     flags?: helpers.InteractionResponseFlags;
+    components?: Component[];
 };
 
 export type MessageInteraction = {
