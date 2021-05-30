@@ -293,6 +293,7 @@ export enum VisibilityTypes {
 export enum WebhookTypes {
     INCOMING = 1,
     CHANNEL_FOLLOWER = 2,
+    APPLICATION = 3,
 }
 
 export enum ActivityFlags {
