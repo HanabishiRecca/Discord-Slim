@@ -1,7 +1,8 @@
 # Discord Slim
 [![npm](https://img.shields.io/npm/v/discord-slim?style=for-the-badge)](https://www.npmjs.com/package/discord-slim)  
 
-Lightweight **Discord** bot API for **Node.js**.  
+Lightweight **Discord API** library for **Node.js**.  
+Provides pure interaction with the API with type definitions and some helper tools, without excessive abstractions.  
 
 ## Before you start
 ### **Node.js** 14+ is required!
