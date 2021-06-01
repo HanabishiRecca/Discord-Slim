@@ -1,5 +1,5 @@
 export { Client, ClientEvents } from './client';
-export { Authorization, TokenTypes } from './request';
+export { Authorization } from './request';
 export { Events } from './events';
 export * as Actions from './actions';
 export * as Helpers from './helpers';

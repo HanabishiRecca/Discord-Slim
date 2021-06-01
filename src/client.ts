@@ -1,8 +1,8 @@
 import WebSocket from 'ws';
 import { EventEmitter } from 'events';
-import { API_VERSION, Intents, ActivityTypes, StatusTypes } from './helpers';
+import { API_VERSION, Intents, ActivityTypes, StatusTypes, TokenTypes } from './helpers';
 import { SafeJsonParse, Sleep } from './util';
-import { Request, Authorization, TokenTypes } from './request';
+import { Request, Authorization } from './request';
 import type { EventHandler } from './events';
 import type { User } from './types';
 

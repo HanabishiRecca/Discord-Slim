@@ -1,4 +1,4 @@
-import { Request, RequestOptions, TokenTypes } from './request';
+import { Request, RequestOptions } from './request';
 import querystring from 'querystring';
 import type * as helpers from './helpers';
 import type * as types from './types';
@@ -857,7 +857,7 @@ export const OAuth2 = {
         )
     ), requestOptions?: RequestOptions): Promise<{
         access_token: string;
-        token_type: TokenTypes.BEARER;
+        token_type: helpers.TokenTypes.BEARER;
         expires_in: number;
         refresh_token: string;
         scope: helpers.OAuth2Scopes | string;

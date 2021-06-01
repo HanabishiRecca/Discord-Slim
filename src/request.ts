@@ -1,17 +1,11 @@
 import https from 'https';
 import type { OutgoingHttpHeaders } from 'http';
 import { SafeJsonParse } from './util';
-import { API_PATH } from './helpers';
+import { TokenTypes, API_PATH } from './helpers';
 
 const
     DEFAULT_CONNECTION_TIMEOUT = 5000,
     DEFAULT_RETRY_COUNT = 5;
-
-export enum TokenTypes {
-    BOT = 'Bot',
-    BEARER = 'Bearer',
-    NONE = '',
-}
 
 export class Authorization {
     private _type: TokenTypes;
