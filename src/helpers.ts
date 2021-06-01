@@ -233,10 +233,6 @@ export enum PremiumTier {
     TIER_3 = 3,
 }
 
-export enum TargetUserTypes {
-    STREAM = 1,
-}
-
 export enum ActivityTypes {
     PLAYING = 0,
     STREAMING = 1,
@@ -418,4 +414,9 @@ export enum GuildNSFWLevel {
     EXPLICIT = 1,
     SAFE = 2,
     AGE_RESTRICTED = 3,
+}
+
+export enum InviteTargetTypes {
+    STREAM = 1,
+    EMBEDDED_APPLICATION = 2,
 }

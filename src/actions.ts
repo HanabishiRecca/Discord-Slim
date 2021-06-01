@@ -548,12 +548,16 @@ export const Invite = {
         max_uses?: number;
         temporary?: boolean;
         unique?: boolean;
-        target_user?: string;
-        target_user_type?: helpers.TargetUserTypes;
+        target_type?: helpers.InviteTargetTypes;
+        target_user_id?: string;
+        target_application_id?: string;
     }, requestOptions?: RequestOptions): Promise<types.Invite> =>
         Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS.invites, requestOptions ?? defaultRequestOptions, params),
 
-    Get: (invite_code: string, params?: { with_counts?: boolean; }, requestOptions?: RequestOptions): Promise<types.Invite> =>
+    Get: (invite_code: string, params?: {
+        with_counts?: boolean;
+        with_expiration?: boolean;
+    }, requestOptions?: RequestOptions): Promise<types.Invite> =>
         Request(METHODS.GET, PATHS_S.invites + invite_code + '?' + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
 
     Delete: (invite_code: string, requestOptions?: RequestOptions): Promise<types.Invite> =>

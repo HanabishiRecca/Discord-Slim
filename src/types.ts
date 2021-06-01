@@ -499,10 +499,12 @@ export type Invite = {
     guild?: Guild;
     channel: Channel;
     inviter?: User;
+    target_type?: helpers.InviteTargetTypes;
     target_user?: User;
-    target_user_type?: helpers.TargetUserTypes;
+    target_application?: Application;
     approximate_presence_count?: number;
     approximate_member_count?: number;
+    expires_at?: string | null;
 };
 
 export type InviteMetadata = {
