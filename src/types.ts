@@ -12,7 +12,7 @@ export type AuditLog = {
 export type AuditLogEntry = {
     target_id: string | null;
     changes?: AuditLogChange[];
-    user_id: string;
+    user_id: string | null;
     id: string;
     action_type: helpers.AuditLogEvents;
     options?: AuditEntryInfo[];
