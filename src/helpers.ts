@@ -203,6 +203,7 @@ export enum VerificationLevel {
 export enum SystemChannelFlags {
     SUPPRESS_JOIN_NOTIFICATIONS = 1 << 0,
     SUPPRESS_PREMIUM_SUBSCRIPTIONS = 1 << 1,
+    SUPPRESS_GUILD_REMINDER_NOTIFICATIONS = 1 << 2,
 }
 
 export enum GuildFeatures {
