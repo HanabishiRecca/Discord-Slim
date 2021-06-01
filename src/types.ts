@@ -403,6 +403,9 @@ export type Guild = {
     max_video_channel_users?: number;
     approximate_member_count?: number;
     approximate_presence_count?: number;
+    welcome_screen?: WelcomeScreen;
+    nsfw_level: helpers.GuildNSFWLevel;
+    stage_instances?: StageInstance[];
 };
 
 export type UnavailableGuild = {
