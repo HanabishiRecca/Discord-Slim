@@ -225,7 +225,7 @@ export class Client extends EventEmitter {
             name: string;
             type: ActivityTypes;
             url?: string;
-        }[] | null;
+        }[];
         status: StatusTypes;
         afk: boolean;
     }) => {
