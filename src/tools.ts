@@ -45,7 +45,7 @@ export const Link = {
 const SizeExtOpt = (size?: number, ext?: string) => (ext ? `.${ext}` : '') + (size ? `?size=${size}` : '');
 
 export const CdnImages = {
-    CustomEmoji: (emoji_id: string, size?: number, ext?: 'png' | 'gif') =>
+    CustomEmoji: (emoji_id: string, size?: number, ext?: 'png' | 'jpg' | 'webp' | 'gif') =>
         `${CDN}/emojis/${emoji_id}${SizeExtOpt(size, ext)}`,
 
     GuildIcon: (guild: Guild, size?: number, ext?: 'png' | 'jpg' | 'webp' | 'gif') => guild.icon ?
