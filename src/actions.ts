@@ -692,6 +692,9 @@ export const Webhook = {
     ExecuteGitHub: (webhook_id: string, webhook_token: string, params?: { wait?: boolean; }, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.POST, PATHS_S.webhooks + webhook_id + '/' + webhook_token + PATHS_Q.github + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
 
+    GetMessage: (webhook_id: string, webhook_token: string, message_id: string, requestOptions?: RequestOptions): Promise<types.Message> =>
+        Request(METHODS.GET, PATHS_S.webhooks + webhook_id + '/' + webhook_token + PATHS_S.messages + message_id, requestOptions ?? defaultRequestOptions),
+
     EditMessage: (webhook_id: string, webhook_token: string, message_id: string, params: {
         content?: string;
         embeds?: types.Embed[];
@@ -754,6 +757,9 @@ export const Application = {
 
     CreateInteractionResponse: (interaction_id: string, interaction_token: string, params: types.InteractionResponse, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.POST, PATHS_S.interactions + interaction_id + '/' + interaction_token + PATHS.callback, requestOptions ?? defaultRequestOptions, params),
+
+    GetOriginalInteractionResponse: (application_id: string, interaction_token: string, requestOptions?: RequestOptions): Promise<types.Message> =>
+        Request(METHODS.GET, PATHS_S.webhooks + application_id + '/' + interaction_token + PATHS.messages + PATHS.original, requestOptions ?? defaultRequestOptions),
 
     EditOriginalInteractionResponse: (application_id: string, interaction_token: string, params: {
         content?: string;
