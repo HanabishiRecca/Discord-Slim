@@ -2,13 +2,26 @@
 [![npm](https://img.shields.io/npm/v/discord-slim?style=for-the-badge)](https://www.npmjs.com/package/discord-slim)  
 
 Lightweight **Discord API** library for **Node.js**.  
-Provides pure interaction with the API with type definitions and some helper tools, without excessive abstractions.  
+Provides pure API interaction via type definitions and some helper tools, without excessive abstractions.  
 
 ## Before you start
 ### **Node.js** 14+ is required!
 Make sure you have some understaning of **[Discord API](https://discordapp.com/developers/docs)**.  
 
 ## Docs
+
+### Main exports
+**Client** - client for connecting to the Discord API gateway.  
+**ClientEvents** - set of possible client events.  
+**Authorization** - authorization class for client and actions.  
+**Events** - set of possible gateway API events.  
+**Actions** - access to API requests.  
+**Helpers** - objects and constants for API.  
+**Tools** - additional tools for convinience.  
+**Voice** - client for connecting to voice channels.  
+**VoiceEvents** - set of possible voice client events.  
+**Types** - type definitions export for TypeScript.  
+
 **TODO.**  
 For now use e.g. VS Code for types completion.  
 
