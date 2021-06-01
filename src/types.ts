@@ -793,15 +793,17 @@ export type Application = {
     rpc_origins?: string[];
     bot_public: boolean;
     bot_require_code_grant: boolean;
+    terms_of_service_url?: string;
+    privacy_policy_url?: string;
     owner: User;
-    summary?: string;
+    summary: string;
     verify_key: string;
-    team?: Team;
+    team: Team | null;
     guild_id?: string;
     primary_sku_id?: string;
     slug?: string;
     cover_image?: string;
-    flags?: number;
+    flags: helpers.ApplicationFlags;
 };
 
 export type Team = {
