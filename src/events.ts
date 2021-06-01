@@ -123,6 +123,8 @@ type EventTypes = {
         nick?: string | null;
         joined_at: string | null;
         premium_since?: string | null;
+        deaf?: boolean;
+        mute?: boolean;
         pending?: boolean;
     };
     [Events.GUILD_MEMBERS_CHUNK]: {
