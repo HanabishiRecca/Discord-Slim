@@ -320,6 +320,7 @@ export type EmbedField = {
 export type Attachment = {
     id: string;
     filename: string;
+    content_type?: string;
     size: number;
     url: string;
     proxy_url: string;
