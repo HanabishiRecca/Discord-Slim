@@ -219,7 +219,6 @@ export type MessageSticker = {
     description: string;
     tags?: string;
     asset: string;
-    preview_asset: string | null;
     format_type: helpers.MessageStickerFormatTypes;
 };
 
