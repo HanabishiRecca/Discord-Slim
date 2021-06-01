@@ -274,6 +274,7 @@ export type EmbedThumbnail = {
 
 export type EmbedVideo = {
     url?: string;
+    proxy_url?: string;
     height?: number;
     width?: number;
 };
