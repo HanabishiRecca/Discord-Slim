@@ -482,7 +482,7 @@ export type Ban = {
 
 export type WelcomeScreen = {
     description: string | null;
-    welcome_channels: [];
+    welcome_channels: WelcomeScreenChannel[];
 };
 
 export type WelcomeScreenChannel = {
