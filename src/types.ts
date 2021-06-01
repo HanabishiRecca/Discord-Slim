@@ -426,13 +426,14 @@ export type GuildWidget = {
 
 export type Member = {
     user?: User;
-    nick: string | null;
+    nick?: string | null;
     roles: string[];
     joined_at: string;
     premium_since?: string | null;
     deaf: boolean;
     mute: boolean;
     pending?: boolean;
+    permissions?: string;
 };
 
 export type Integration = {

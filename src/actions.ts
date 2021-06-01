@@ -467,10 +467,10 @@ export const Member = {
 
     Add: (guild_id: string, user_id: string, params: {
         access_token: string;
-        nick?: string | null;
-        roles?: string[] | null;
-        mute?: boolean | null;
-        deaf?: boolean | null;
+        nick?: string;
+        roles?: string[];
+        mute?: boolean;
+        deaf?: boolean;
     }, requestOptions?: RequestOptions): Promise<types.Member | null> =>
         Request(METHODS.PUT, PATHS_S.guilds + guild_id + PATHS_S.members + user_id, requestOptions ?? defaultRequestOptions, params),
 
@@ -480,10 +480,10 @@ export const Member = {
         mute?: boolean | null;
         deaf?: boolean | null;
         channel_id?: string | null;
-    }, requestOptions?: RequestOptions): Promise<types.Member | null> =>
+    }, requestOptions?: RequestOptions): Promise<types.Member> =>
         Request(METHODS.PATCH, PATHS_S.guilds + guild_id + PATHS_S.members + user_id, requestOptions ?? defaultRequestOptions, params),
 
-    ModifyOwnNick: (guild_id: string, params: {
+    ModifyCurrentNick: (guild_id: string, params: {
         nick?: string | null;
     }, requestOptions?: RequestOptions): Promise<string | null> =>
         Request(METHODS.PATCH, PATHS_S.guilds + guild_id + PATHS.members + PATHS.me + PATHS.nick, requestOptions ?? defaultRequestOptions, params),
