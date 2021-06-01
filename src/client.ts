@@ -219,7 +219,7 @@ export class Client extends EventEmitter {
         this._send(OPCode.VOICE_STATE_UPDATE, params);
     };
 
-    UpdateStatus = (params: {
+    UpdatePresence = (params: {
         since: number | null;
         activities: {
             name: string;
