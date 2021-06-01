@@ -94,7 +94,7 @@ client.events.on(Events.MESSAGE_CREATE, (message) => {
 ### Set bot status
 ```js
 client.events.on(Events.READY, () => {
-    client.UpdateStatus({
+    client.UpdatePresence({
         status: Helpers.StatusTypes.ONLINE,
         activities: [{ type: Helpers.ActivityTypes.WATCHING, name: 'YOU' }],
         afk: false,
