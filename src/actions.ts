@@ -319,6 +319,7 @@ export const Guild = {
         afk_channel_id?: string;
         afk_timeout?: number;
         system_channel_id?: string;
+        system_channel_flags?: helpers.SystemChannelFlags;
     }, requestOptions?: RequestOptions): Promise<types.Guild> =>
         Request(METHODS.POST, PATHS.guilds, requestOptions ?? defaultRequestOptions, params),
 
