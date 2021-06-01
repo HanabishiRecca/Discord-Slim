@@ -20,6 +20,7 @@ const enum PATHS {
     channels = '/channels',
     auditLogs = '/audit-logs',
     messages = '/messages',
+    bulk_delete = '/bulk-delete',
     crosspost = '/crosspost',
     reactions = '/reactions',
     permissions = '/permissions',
@@ -31,6 +32,7 @@ const enum PATHS {
     emojis = '/emojis',
     preview = '/preview',
     members = '/members',
+    search = '/search',
     nick = '/nick',
     roles = '/roles',
     bans = '/bans',
@@ -100,6 +102,8 @@ const enum PATHS_Q {
     prune = PATHS.prune + '?',
     widget_png = PATHS.widget_png + '?',
     guilds = PATHS.guilds + '?',
+    members = PATHS.members + '?',
+    search = PATHS.search + '?',
     slack = PATHS.slack + '?',
     github = PATHS.github + '?',
     public = PATHS.public + '?',
@@ -135,6 +139,8 @@ export const Channel = {
         user_limit?: number | null;
         permission_overwrites?: types.PermissionsOverwrite[] | null;
         parent_id?: string | null;
+        rtc_region?: string | null;
+        video_quality_mode?: helpers.VideoQualityModes;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
         Request(METHODS.PATCH, PATHS_S.channels + id, requestOptions ?? defaultRequestOptions, params),
 
@@ -142,15 +148,17 @@ export const Channel = {
         Request(METHODS.DELETE, PATHS_S.channels + channel_id, requestOptions ?? defaultRequestOptions),
 
     GetMessages: (channel_id: string, params?: {
-        around: string;
-        before: string;
-        after: string;
-        limit: number;
+        around?: string;
+        before?: string;
+        after?: string;
+        limit?: number;
     }, requestOptions?: RequestOptions): Promise<types.Message[]> =>
         Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.messages, requestOptions ?? defaultRequestOptions, params),
 
-    BulkDeleteMessages: (channel_id: string, params: { messages: string[]; }, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS.messages, requestOptions ?? defaultRequestOptions, params),
+    BulkDeleteMessages: (channel_id: string, params: {
+        messages: string[];
+    }, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS.messages + PATHS.bulk_delete, requestOptions ?? defaultRequestOptions, params),
 
     EditPermissions: (channel_id: string, overwrite_id: string, params: {
         allow: string;
@@ -165,7 +173,9 @@ export const Channel = {
     DeletePermission: (channel_id: string, overwrite_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, PATHS_S.channels + channel_id + PATHS_S.permissions + overwrite_id, requestOptions ?? defaultRequestOptions),
 
-    FollowNews: (channel_id: string, params: { webhook_channel_id: string; }, requestOptions?: RequestOptions): Promise<types.FollowedChannel> =>
+    FollowNews: (channel_id: string, params: {
+        webhook_channel_id: string;
+    }, requestOptions?: RequestOptions): Promise<types.FollowedChannel> =>
         Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS.followers, requestOptions ?? defaultRequestOptions, params),
 
     TriggerTypingIndicator: (channel_id: string, requestOptions?: RequestOptions): Promise<null> =>
@@ -241,10 +251,16 @@ export const Message = {
         embed?: types.Embed;
         flags?: helpers.MessageFlags;
         allowed_mentions?: types.AllowedMentions;
-        components?: types.Component[];
         attachments?: types.Attachment[];
+        components?: types.Component[];
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.PATCH, PATHS_S.channels + channel_id + PATHS_S.messages + message_id, requestOptions ?? defaultRequestOptions, params),
+
+    Pin: (channel_id: string, message_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.PUT, PATHS_S.channels + channel_id + PATHS_S.pins + message_id, requestOptions ?? defaultRequestOptions),
+
+    Unpin: (channel_id: string, message_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.DELETE, PATHS_S.channels + channel_id + PATHS_S.pins + message_id, requestOptions ?? defaultRequestOptions),
 
     GetReactions: (channel_id: string, message_id: string, emoji: string, params?: {
         after?: string;
@@ -268,14 +284,6 @@ export const Reaction = {
 
     Delete: (channel_id: string, message_id: string, user_id: string, emoji: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, PATHS_S.channels + channel_id + PATHS_S.messages + message_id + PATHS_S.reactions + encodeURIComponent(emoji) + '/' + user_id, requestOptions ?? defaultRequestOptions),
-};
-
-export const PinnedMessage = {
-    Add: (channel_id: string, message_id: string, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.PUT, PATHS_S.channels + channel_id + PATHS_S.pins + message_id, requestOptions ?? defaultRequestOptions),
-
-    Delete: (channel_id: string, message_id: string, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.DELETE, PATHS_S.channels + channel_id + PATHS_S.pins + message_id, requestOptions ?? defaultRequestOptions),
 };
 
 export const GroupDM = {
@@ -357,11 +365,26 @@ export const Guild = {
     Delete: (guild_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, PATHS_S.guilds + guild_id, requestOptions ?? defaultRequestOptions),
 
-    ModifyChannelPositions: (guild_id: string, params: ({ id: string; position: number | null; })[], requestOptions?: RequestOptions): Promise<null> =>
+    GetChannels: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Channel[]> =>
+        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.channels, requestOptions ?? defaultRequestOptions),
+
+    ModifyChannelPositions: (guild_id: string, params: ({
+        id: string;
+        position: number | null;
+    })[], requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.PATCH, PATHS_S.guilds + guild_id + PATHS.channels, requestOptions ?? defaultRequestOptions, params),
 
-    ListMembers: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Member[]> =>
-        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.members, requestOptions ?? defaultRequestOptions),
+    ListMembers: (guild_id: string, params?: {
+        limit?: number;
+        after?: string;
+    }, requestOptions?: RequestOptions): Promise<types.Member[]> =>
+        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS_Q.members + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+
+    SearchMembers: (guild_id: string, params: {
+        query: number;
+        limit?: number;
+    }, requestOptions?: RequestOptions): Promise<types.Member[]> =>
+        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.members + PATHS_Q.search + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
 
     GetBans: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Ban[]> =>
         Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.bans, requestOptions ?? defaultRequestOptions),
@@ -369,7 +392,10 @@ export const Guild = {
     GetRoles: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Role[]> =>
         Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.roles, requestOptions ?? defaultRequestOptions),
 
-    ModifyRolePositions: (guild_id: string, params: ({ id: string; position: number | null; })[], requestOptions?: RequestOptions): Promise<types.Role[]> =>
+    ModifyRolePositions: (guild_id: string, params: ({
+        id: string;
+        position: number | null;
+    })[], requestOptions?: RequestOptions): Promise<types.Role[]> =>
         Request(METHODS.PATCH, PATHS_S.guilds + guild_id + PATHS.roles, requestOptions ?? defaultRequestOptions, params),
 
     GetPruneCount: (guild_id: string, params?: {
@@ -385,6 +411,9 @@ export const Guild = {
         reason?: string;
     }, requestOptions?: RequestOptions): Promise<{ pruned: number | null; }> =>
         Request(METHODS.POST, PATHS_S.guilds + guild_id + PATHS.prune, requestOptions ?? defaultRequestOptions, params),
+
+    GetVoiceRegions: (guild_id: string, requestOptions?: RequestOptions): Promise<types.VoiceRegion[]> =>
+        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.regions, requestOptions ?? defaultRequestOptions),
 
     GetInvites: (guild_id: string, requestOptions?: RequestOptions): Promise<(types.Invite & types.InviteMetadata)[]> =>
         Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.invites, requestOptions ?? defaultRequestOptions),
@@ -420,8 +449,8 @@ export const Emoji = {
         Request(METHODS.POST, PATHS_S.guilds + guild_id + PATHS.emojis, requestOptions ?? defaultRequestOptions, params),
 
     Modify: (guild_id: string, emoji_id: string, params: {
-        name: string;
-        roles?: string[];
+        name?: string;
+        roles?: string[] | null;
     }, requestOptions?: RequestOptions): Promise<types.Emoji> =>
         Request(METHODS.PATCH, PATHS_S.guilds + guild_id + PATHS_S.emojis + emoji_id, requestOptions ?? defaultRequestOptions, params),
 
@@ -451,7 +480,9 @@ export const Member = {
     }, requestOptions?: RequestOptions): Promise<types.Member | null> =>
         Request(METHODS.PATCH, PATHS_S.guilds + guild_id + PATHS_S.members + user_id, requestOptions ?? defaultRequestOptions, params),
 
-    ModifyOwnNick: (guild_id: string, params: { nick?: string | null; }, requestOptions?: RequestOptions): Promise<string | null> =>
+    ModifyOwnNick: (guild_id: string, params: {
+        nick?: string | null;
+    }, requestOptions?: RequestOptions): Promise<string | null> =>
         Request(METHODS.PATCH, PATHS_S.guilds + guild_id + PATHS.members + PATHS.me + PATHS.nick, requestOptions ?? defaultRequestOptions, params),
 
     AddRole: (guild_id: string, user_id: string, role_id: string, requestOptions?: RequestOptions): Promise<null> =>
@@ -489,11 +520,11 @@ export const Role = {
         Request(METHODS.POST, PATHS_S.guilds + guild_id + PATHS.roles, requestOptions ?? defaultRequestOptions, params),
 
     Modify: (guild_id: string, role_id: string, params?: {
-        name?: string;
-        permissions?: string;
-        color?: number;
-        hoist?: boolean;
-        mentionable?: boolean;
+        name?: string | null;
+        permissions?: string | null;
+        color?: number | null;
+        hoist?: boolean | null;
+        mentionable?: boolean | null;
     }, requestOptions?: RequestOptions): Promise<types.Role> =>
         Request(METHODS.PATCH, PATHS_S.guilds + guild_id + PATHS_S.roles + role_id, requestOptions ?? defaultRequestOptions, params),
 
@@ -532,7 +563,9 @@ export const Widget = {
     Get: (guild_id: string, requestOptions?: RequestOptions): Promise<object> =>
         Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.widget_json, requestOptions ?? defaultRequestOptions),
 
-    GetImage: (guild_id: string, params?: { style?: helpers.WidgetStyleOptions; }, requestOptions?: RequestOptions): Promise<Buffer> =>
+    GetImage: (guild_id: string, params?: {
+        style?: helpers.WidgetStyleOptions;
+    }, requestOptions?: RequestOptions): Promise<Buffer> =>
         Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS_Q.widget_png + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
 };
 
@@ -616,7 +649,9 @@ export const User = {
     LeaveGuild: (guild_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, PATHS.users + PATHS.me + PATHS_S.guilds + guild_id, requestOptions ?? defaultRequestOptions),
 
-    CreateDM: (params: { recipient_id: string; }, requestOptions?: RequestOptions): Promise<types.Channel> =>
+    CreateDM: (params: {
+        recipient_id: string;
+    }, requestOptions?: RequestOptions): Promise<types.Channel> =>
         Request(METHODS.POST, PATHS.users + PATHS.me + PATHS.channels, requestOptions ?? defaultRequestOptions, params),
 
     GetConnections: (requestOptions?: RequestOptions): Promise<types.Connection[]> =>
@@ -624,20 +659,17 @@ export const User = {
 };
 
 export const Voice = {
-    GetRegions: (guild_id: string, requestOptions?: RequestOptions): Promise<types.VoiceRegion[]> =>
-        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.regions, requestOptions ?? defaultRequestOptions),
-
     ListRegions: (requestOptions?: RequestOptions): Promise<types.VoiceRegion[]> =>
         Request(METHODS.GET, PATHS.voice + PATHS.regions, requestOptions ?? defaultRequestOptions),
 
-    UpdateSelfState: (guild_id: string, params: {
+    UpdateCurrentState: (guild_id: string, params: {
         channel_id: string;
         suppress?: boolean;
         request_to_speak_timestamp?: string | null;
     }, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.PATCH, PATHS_S.guilds + guild_id + PATHS.voice_states + PATHS.me, requestOptions ?? defaultRequestOptions, params),
 
-    UpdateOthersState: (guild_id: string, user_id: string, params: {
+    UpdateUserState: (guild_id: string, user_id: string, params: {
         channel_id: string;
         suppress?: boolean;
     }, requestOptions?: RequestOptions): Promise<null> =>
@@ -690,10 +722,14 @@ export const Webhook = {
     }, requestOptions?: RequestOptions): Promise<types.Message | null> =>
         Request(METHODS.POST, PATHS_S.webhooks + webhook_id + '/' + webhook_token + '?' + querystring.stringify(params2), requestOptions ?? defaultRequestOptions, params1),
 
-    ExecuteSlack: (webhook_id: string, webhook_token: string, params?: { wait?: boolean; }, requestOptions?: RequestOptions): Promise<null> =>
+    ExecuteSlack: (webhook_id: string, webhook_token: string, params?: {
+        wait?: boolean;
+    }, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.POST, PATHS_S.webhooks + webhook_id + '/' + webhook_token + PATHS_Q.slack + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
 
-    ExecuteGitHub: (webhook_id: string, webhook_token: string, params?: { wait?: boolean; }, requestOptions?: RequestOptions): Promise<null> =>
+    ExecuteGitHub: (webhook_id: string, webhook_token: string, params?: {
+        wait?: boolean;
+    }, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.POST, PATHS_S.webhooks + webhook_id + '/' + webhook_token + PATHS_Q.github + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
 
     GetMessage: (webhook_id: string, webhook_token: string, message_id: string, requestOptions?: RequestOptions): Promise<types.Message> =>
@@ -703,8 +739,8 @@ export const Webhook = {
         content?: string;
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
-        components?: types.Component[];
         attachments?: types.Attachment[];
+        components?: types.Component[];
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.PATCH, PATHS_S.webhooks + webhook_id + '/' + webhook_token + PATHS_S.messages + message_id, requestOptions ?? defaultRequestOptions, params),
 
@@ -859,14 +895,17 @@ export const OAuth2 = {
 };
 
 export const Thread = {
-    Modify: (id: string, params: {
+    Modify: (channel_id: string, params: {
         name?: string;
         archived?: boolean;
         auto_archive_duration?: types.ThreadArchiveDuration;
         locked?: boolean;
         rate_limit_per_user?: number | null;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
-        Request(METHODS.PATCH, PATHS_S.channels + id, requestOptions ?? defaultRequestOptions, params),
+        Request(METHODS.PATCH, PATHS_S.channels + channel_id, requestOptions ?? defaultRequestOptions, params),
+
+    Delete: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Channel> =>
+        Request(METHODS.DELETE, PATHS_S.channels + channel_id, requestOptions ?? defaultRequestOptions),
 
     StartWithMessage: (channel_id: string, message_id: string, params: {
         name: string;
