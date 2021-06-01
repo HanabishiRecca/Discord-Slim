@@ -421,6 +421,9 @@ export const Guild = {
     GetIntegrations: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Integration[]> =>
         Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.integrations, requestOptions ?? defaultRequestOptions),
 
+    DeleteIntegration: (guild_id: string, integration_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.DELETE, PATHS_S.guilds + guild_id + PATHS_S.integrations + integration_id, requestOptions ?? defaultRequestOptions),
+
     GetVanityURL: (guild_id: string, requestOptions?: RequestOptions): Promise<{ code: string; uses: number; }> =>
         Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.vanity_url, requestOptions ?? defaultRequestOptions),
 
@@ -530,27 +533,6 @@ export const Role = {
 
     Delete: (guild_id: string, role_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, PATHS_S.guilds + guild_id + PATHS_S.roles + role_id, requestOptions ?? defaultRequestOptions),
-};
-
-export const Integration = {
-    Create: (guild_id: string, params: {
-        type: string;
-        id: string;
-    }, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.POST, PATHS_S.guilds + guild_id + PATHS.integrations, requestOptions ?? defaultRequestOptions, params),
-
-    Modify: (guild_id: string, integration_id: string, params: {
-        expire_behavior?: helpers.IntegrationExpireBehaviors | null;
-        expire_grace_period?: number | null;
-        enable_emoticons?: boolean | null;
-    }, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.PATCH, PATHS_S.guilds + guild_id + PATHS_S.integrations + integration_id, requestOptions ?? defaultRequestOptions, params),
-
-    Delete: (guild_id: string, integration_id: string, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.DELETE, PATHS_S.guilds + guild_id + PATHS_S.integrations + integration_id, requestOptions ?? defaultRequestOptions),
-
-    Sync: (guild_id: string, integration_id: string, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.POST, PATHS_S.guilds + guild_id + PATHS_S.integrations + integration_id + PATHS.sync, requestOptions ?? defaultRequestOptions),
 };
 
 export const Widget = {
