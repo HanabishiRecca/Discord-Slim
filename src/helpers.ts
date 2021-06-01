@@ -202,6 +202,7 @@ export enum VerificationLevel {
 }
 
 export enum SystemChannelFlags {
+    NO_FLAGS = 0,
     SUPPRESS_JOIN_NOTIFICATIONS = 1 << 0,
     SUPPRESS_PREMIUM_SUBSCRIPTIONS = 1 << 1,
     SUPPRESS_GUILD_REMINDER_NOTIFICATIONS = 1 << 2,
@@ -263,7 +264,7 @@ export enum WidgetStyleOptions {
 }
 
 export enum UserFlags {
-    NONE = 0,
+    NO_FLAGS = 0,
     DISCORD_EMPLOYEE = 1 << 0,
     PARTNERED_SERVER_OWNER = 1 << 1,
     HYPESQUAD_EVENTS = 1 << 2,
@@ -297,6 +298,7 @@ export enum WebhookTypes {
 }
 
 export enum ActivityFlags {
+    NO_FLAGS = 0,
     INSTANCE = 1 << 0,
     JOIN = 1 << 1,
     SPECTATE = 1 << 2,
@@ -383,7 +385,7 @@ export enum VoiceEncryptionModes {
 }
 
 export enum SpeakingStates {
-    NONE = 0,
+    NO_FLAGS = 0,
     MICROPHONE = 1 << 0,
     SOUNDSHARE = 1 << 1,
     PRIORITY = 1 << 2,
@@ -425,6 +427,7 @@ export enum InviteTargetTypes {
 }
 
 export enum ApplicationFlags {
+    NO_FLAGS = 0,
     GATEWAY_PRESENCE = 1 << 12,
     GATEWAY_PRESENCE_LIMITED = 1 << 13,
     GATEWAY_GUILD_MEMBERS = 1 << 14,
