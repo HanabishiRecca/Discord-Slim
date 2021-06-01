@@ -58,7 +58,6 @@ type EventTypes = {
     [Events.READY]: {
         v: number;
         user: types.User;
-        private_channels: [];
         guilds: types.UnavailableGuild[];
         session_id: string;
         shard?: [shard_id: number, num_shards: number];
