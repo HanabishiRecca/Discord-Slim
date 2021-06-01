@@ -378,6 +378,7 @@ export const Guild = {
         days?: number;
         compute_prune_count?: boolean;
         include_roles?: string;
+        reason?: string;
     }, requestOptions?: RequestOptions): Promise<{ pruned: number | null; }> =>
         Request(METHODS.POST, PATHS_S.guilds + guild_id + PATHS.prune, requestOptions ?? defaultRequestOptions, params),
 
