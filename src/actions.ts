@@ -716,6 +716,7 @@ export const Application = {
         name: string;
         description: string;
         options?: types.ApplicationCommandOption[];
+        default_permission?: boolean;
     }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
         Request(METHODS.POST, PATHS_S.applications + application_id + PATHS.commands, requestOptions ?? defaultRequestOptions, params),
 
@@ -726,6 +727,7 @@ export const Application = {
         name?: string;
         description?: string;
         options?: types.ApplicationCommandOption[];
+        default_permission?: boolean;
     }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
         Request(METHODS.PATCH, PATHS_S.applications + application_id + PATHS_S.commands + command_id, requestOptions ?? defaultRequestOptions, params),
 
@@ -739,6 +741,7 @@ export const Application = {
         name: string;
         description: string;
         options?: types.ApplicationCommandOption[];
+        default_permission?: boolean;
     }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
         Request(METHODS.POST, PATHS_S.applications + application_id + PATHS_S.guilds + guild_id + PATHS.commands, requestOptions ?? defaultRequestOptions, params),
 
@@ -749,6 +752,7 @@ export const Application = {
         name?: string;
         description?: string;
         options?: types.ApplicationCommandOption[];
+        default_permission?: boolean;
     }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
         Request(METHODS.PATCH, PATHS_S.applications + application_id + PATHS_S.guilds + guild_id + PATHS_S.commands + command_id, requestOptions ?? defaultRequestOptions, params),
 
