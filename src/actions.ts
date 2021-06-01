@@ -342,11 +342,15 @@ export const Guild = {
         icon?: string | null;
         owner_id?: string;
         splash?: string | null;
+        discovery_splash?: string | null;
         banner?: string | null;
         system_channel_id?: string | null;
+        system_channel_flags?: helpers.SystemChannelFlags;
         rules_channel_id?: string | null;
         public_updates_channel_id?: string | null;
         preferred_locale?: string | null;
+        features?: helpers.GuildFeatures[];
+        description?: string | null;
     }, requestOptions?: RequestOptions): Promise<types.Guild> =>
         Request(METHODS.PATCH, PATHS_S.guilds + guild_id, requestOptions ?? defaultRequestOptions, params),
 
