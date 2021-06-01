@@ -637,7 +637,7 @@ export const Voice = {
 export const Webhook = {
     Create: (channel_id: string, params: {
         name: string;
-        avatar: string | null;
+        avatar?: string | null;
     }, requestOptions?: RequestOptions): Promise<types.Webhook> =>
         Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS.webhooks, requestOptions ?? defaultRequestOptions, params),
 
