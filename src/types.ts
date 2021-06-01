@@ -181,10 +181,10 @@ export type Message = {
     webhook_id?: string;
     type: helpers.MessageTypes;
     activity?: MessageActivity;
-    application?: MessageApplication;
+    application?: Application;
     application_id?: string;
     message_reference?: MessageReference;
-    flags?: number;
+    flags?: helpers.MessageFlags;
     stickers?: MessageSticker[];
     referenced_message?: Message | null;
     interaction?: MessageInteraction;
@@ -195,14 +195,6 @@ export type Message = {
 export type MessageActivity = {
     type: helpers.MessageActivityTypes;
     party_id?: string;
-};
-
-export type MessageApplication = {
-    id: string;
-    cover_image?: string;
-    description: string;
-    icon: string | null;
-    name: string;
 };
 
 export type MessageReference = {
