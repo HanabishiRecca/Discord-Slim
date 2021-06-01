@@ -619,6 +619,9 @@ export type Webhook = {
     avatar: string | null;
     token?: string;
     application_id: string | null;
+    source_guild?: Guild;
+    source_channel?: Channel;
+    url?: string;
 };
 
 // Slash commands types
