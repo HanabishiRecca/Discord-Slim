@@ -277,6 +277,7 @@ export enum UserFlags {
     BUG_HUNTER_LEVEL_2 = 1 << 14,
     VERIFIED_BOT = 1 << 16,
     EARLY_VERIFIED_BOT_DEVELOPER = 1 << 17,
+    DISCORD_CERTIFIED_MODERATOR = 1 << 18,
 }
 
 export enum PremiumTypes {
