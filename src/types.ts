@@ -182,6 +182,7 @@ export type Message = {
     type: helpers.MessageTypes;
     activity?: MessageActivity;
     application?: MessageApplication;
+    application_id?: string;
     message_reference?: MessageReference;
     flags?: number;
     stickers?: MessageSticker[];
