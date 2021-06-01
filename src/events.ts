@@ -122,7 +122,7 @@ type EventTypes = {
         roles: string[];
         user: types.User;
         nick?: string | null;
-        joined_at: string;
+        joined_at: string | null;
         premium_since?: string | null;
         pending?: boolean;
     };
