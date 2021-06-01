@@ -36,6 +36,7 @@ export const Mentions = {
 
 export const Format = {
     Emoji: (emoji: Emoji) => `<${emoji.animated ? 'a' : ''}:${emoji.name}:${emoji.id}>`,
+    Reaction: (emoji: Emoji) => `${emoji.name}:${emoji.id}`,
 };
 
 export const Link = {
