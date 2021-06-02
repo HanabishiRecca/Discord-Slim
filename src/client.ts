@@ -102,7 +102,7 @@ export class Client extends EventEmitter {
         this._ws && this._ws.send(JSON.stringify({ op, d }));
 
     private _onMessage = (data: WebSocket.Data) => {
-        const intent = SafeJsonParse(data.toString()) as Intent | null;
+        const intent = SafeJsonParse(String(data)) as Intent | null;
         if(!intent) return;
 
         switch(intent.op) {

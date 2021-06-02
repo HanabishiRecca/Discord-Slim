@@ -68,8 +68,8 @@ export const Request = (method: string, endpoint: string, options?: RequestOptio
         }
     }
 
-    if(options?.authorization)
-        headers[Headers.Authorization] = options.authorization.toString();
+    if(options?.authorization instanceof Authorization)
+        headers[Headers.Authorization] = String(options.authorization);
 
     const requestOptions: https.RequestOptions = {
         method,
@@ -136,9 +136,9 @@ const HttpsRequest = (url: string, options: https.RequestOptions, data?: string 
                     return ReturnResult();
 
                 if(chunks.length == 1)
-                    return ReturnResult(chunks[0].toString());
+                    return ReturnResult(String(chunks[0]));
 
-                return ReturnResult(Buffer.concat(chunks, totalLength).toString());
+                return ReturnResult(String(Buffer.concat(chunks, totalLength)));
             });
         });
 

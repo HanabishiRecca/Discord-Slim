@@ -12,7 +12,7 @@ export const Permissions = {
         let result = 0n;
         for(const p of permissions)
             result |= BigInt(p);
-        return result.toString();
+        return String(result);
     },
 
     check: (source: PermissionSet, permission: Permission) =>
@@ -22,10 +22,10 @@ export const Permissions = {
         Permissions.check(source, Flags.ADMINISTRATOR) || Permissions.check(source, permission),
 
     add: (source: PermissionSet, permission: Permission) =>
-        (BigInt(source) | BigInt(permission)).toString(),
+        String(BigInt(source) | BigInt(permission)),
 
     remove: (source: PermissionSet, permission: Permission) =>
-        (BigInt(source) & ~BigInt(permission)).toString(),
+        String(BigInt(source) & ~BigInt(permission)),
 };
 
 export const Mentions = {
