@@ -789,7 +789,7 @@ export type Application = {
     bot_require_code_grant: boolean;
     terms_of_service_url?: string;
     privacy_policy_url?: string;
-    owner: User;
+    owner?: User;
     summary: string;
     verify_key: string;
     team: Team | null;
