@@ -12,7 +12,9 @@
         "bot",
         "api",
         "client",
-        "library"
+        "library",
+        "framework",
+        "backend"
     ],
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
