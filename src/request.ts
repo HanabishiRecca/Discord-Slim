@@ -77,17 +77,16 @@ export const Request = (method: string, endpoint: string, options?: RequestOptio
         timeout: options?.connectionTimeout ?? DEFAULT_CONNECTION_TIMEOUT,
     };
 
-    return new Promise<any>((resolve, reject) => {
-        const
-            URL = API_PATH + endpoint,
-            retryCount = options?.rateLimit?.retryCount ?? DEFAULT_RETRY_COUNT;
+    const
+        URL = API_PATH + endpoint,
+        retryCount = options?.rateLimit?.retryCount ?? DEFAULT_RETRY_COUNT,
+        rateLimitCallback = options?.rateLimit?.callback;
 
+    return new Promise<any>((resolve, reject) => {
         let attempts = 0;
 
-        const TryRequest = async () => {
-            const
-                result = await HttpsRequest(URL, requestOptions, content),
-                code = result.code;
+        const TryRequest = () => HttpsRequest(URL, requestOptions, content).then((result) => {
+            const code = result.code;
 
             if((code >= 200) && (code < 300))
                 return resolve(SafeJsonParse(result.data));
@@ -98,7 +97,7 @@ export const Request = (method: string, endpoint: string, options?: RequestOptio
                     return reject({ code, response });
 
                 attempts++;
-                options?.rateLimit?.callback?.(response, attempts);
+                rateLimitCallback?.(response, attempts);
 
                 return (response.retry_after && (attempts < retryCount)) ?
                     setTimeout(TryRequest, Math.ceil(Number(response.retry_after) * 1000)) :
@@ -106,19 +105,19 @@ export const Request = (method: string, endpoint: string, options?: RequestOptio
             }
 
             reject({ code });
-        };
+        }).catch(reject);
 
         TryRequest();
     });
 };
 
-const HttpsRequest = (url: string, options: https.RequestOptions, data?: string | Buffer) => {
-    return new Promise<{ code: number; data?: string; }>((resolve, reject) => {
+const HttpsRequest = (url: string, options: https.RequestOptions, content?: string | Buffer) =>
+    new Promise<{ code: number; data?: string; }>((resolve, reject) => {
         const request = https.request(url, options, (response) => {
-            if(!response.statusCode)
-                return reject('Unknown response.');
+            const code = response.statusCode;
+            if(!code) return reject('Unknown response.');
 
-            const ReturnResult = (result?: string) => resolve({ code: response.statusCode!, data: result });
+            const ReturnResult = (data?: string) => resolve({ code, data });
 
             const chunks: Buffer[] = [];
             let totalLength = 0;
@@ -145,6 +144,5 @@ const HttpsRequest = (url: string, options: https.RequestOptions, data?: string 
         request.on('error', reject);
         request.on('timeout', () => reject('Request timeout.'));
 
-        request.end(data);
+        request.end(content);
     });
-};
