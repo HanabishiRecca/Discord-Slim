@@ -360,7 +360,6 @@ export type Guild = {
     owner?: boolean;
     owner_id: string;
     permissions?: string;
-    region: string;
     afk_channel_id: string | null;
     afk_timeout: number;
     widget_enabled?: boolean;
