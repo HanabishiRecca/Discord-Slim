@@ -1,5 +1,5 @@
 import { Permissions as Flags, CDN, HOST } from './helpers';
-import { Guild, User, Application, Team, Emoji, Message } from './types';
+import type { Guild, User, Application, Team, Emoji, Message, Channel, Role } from './types';
 
 type Permission = typeof Flags[keyof typeof Flags];
 type PermissionSet = string | number | bigint;
@@ -28,10 +28,12 @@ export const Permissions = {
         String(BigInt(source) & ~BigInt(permission)),
 };
 
+const EID = (value: any) => (typeof value == 'object') ? value.id : value;
+
 export const Mentions = {
-    User: (user_id: string) => `<@${user_id}>`,
-    Channel: (channel_id: string) => `<#${channel_id}>`,
-    Role: (role_id: string) => `<@&${role_id}>`,
+    User: (user: User | { id: string; } | string) => `<@${EID(user)}>`,
+    Channel: (channel: Channel | { id: string; } | string) => `<#${EID(channel)}>`,
+    Role: (role: Role | { id: string; } | string) => `<@&${EID(role)}>`,
 };
 
 export const Format = {
@@ -40,46 +42,74 @@ export const Format = {
 };
 
 export const Link = {
-    Message: (message: Message) => `${HOST}/channels/${message.guild_id ?? '@me'}/${message.channel_id}/${message.id}`,
+    Message: (message: Message | {
+        id: string;
+        channel_id: string;
+        guild_id?: string;
+    }) =>
+        `${HOST}/channels/${message.guild_id ?? '@me'}/${message.channel_id}/${message.id}`,
 };
 
 const SizeExtOpt = (size?: number, ext?: string) => (ext ? `.${ext}` : '') + (size ? `?size=${size}` : '');
 
 export const CdnImages = {
-    CustomEmoji: (emoji_id: string, size?: number, ext?: 'png' | 'jpg' | 'webp' | 'gif') =>
-        `${CDN}/emojis/${emoji_id}${SizeExtOpt(size, ext)}`,
+    CustomEmoji: (emoji: Emoji | {
+        id: string;
+    } | string, size?: number, ext?: 'png' | 'jpg' | 'webp' | 'gif') =>
+        `${CDN}/emojis/${EID(emoji)}${SizeExtOpt(size, ext)}`,
 
-    GuildIcon: (guild: Guild, size?: number, ext?: 'png' | 'jpg' | 'webp' | 'gif') => guild.icon ?
-        `${CDN}/icons/${guild.id}/${guild.icon}${SizeExtOpt(size, ext)}` :
-        null,
+    GuildIcon: (guild: Guild | {
+        id: string;
+        icon: string;
+    }, size?: number, ext?: 'png' | 'jpg' | 'webp' | 'gif') =>
+        guild.icon ? `${CDN}/icons/${guild.id}/${guild.icon}${SizeExtOpt(size, ext)}` : null,
 
-    GuildSplash: (guild: Guild, size?: number, ext?: 'png' | 'jpg' | 'webp') => guild.splash ?
-        `${CDN}/splashes/${guild.id}/${guild.splash}${SizeExtOpt(size, ext)}` :
-        null,
+    GuildSplash: (guild: Guild | {
+        id: string;
+        splash: string;
+    }, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
+        guild.splash ? `${CDN}/splashes/${guild.id}/${guild.splash}${SizeExtOpt(size, ext)}` : null,
 
-    GuildDiscoverySplash: (guild: Guild, size?: number, ext?: 'png' | 'jpg' | 'webp') => guild.discovery_splash ?
-        `${CDN}/discovery-splashes/${guild.id}/${guild.discovery_splash}${SizeExtOpt(size, ext)}` :
-        null,
+    GuildDiscoverySplash: (guild: Guild | {
+        id: string;
+        discovery_splash: string;
+    }, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
+        guild.discovery_splash ? `${CDN}/discovery-splashes/${guild.id}/${guild.discovery_splash}${SizeExtOpt(size, ext)}` : null,
 
-    GuildBanner: (guild: Guild, size?: number, ext?: 'png' | 'jpg' | 'webp') => guild.banner ?
-        `${CDN}/banners/${guild.id}/${guild.banner}${SizeExtOpt(size, ext)}` :
-        null,
+    GuildBanner: (guild: Guild | {
+        id: string;
+        banner: string;
+    }, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
+        guild.banner ? `${CDN}/banners/${guild.id}/${guild.banner}${SizeExtOpt(size, ext)}` : null,
 
-    UserAvatar: (user: User, size?: number, ext?: 'png' | 'jpg' | 'webp' | 'gif') => user.avatar ?
-        `${CDN}/avatars/${user.id}/${user.avatar}${SizeExtOpt(size, ext)}` :
-        `${CDN}/embed/avatars/${Number(user.discriminator) % 5}.png`,
+    UserAvatar: (user: User | {
+        id: string;
+        discriminator: string | number;
+        avatar?: string;
+    }, size?: number, ext?: 'png' | 'jpg' | 'webp' | 'gif') =>
+        user.avatar ?
+            `${CDN}/avatars/${user.id}/${user.avatar}${SizeExtOpt(size, ext)}` :
+            `${CDN}/embed/avatars/${Number(user.discriminator) % 5}.png`,
 
-    ApplicationIcon: (application: Application, size?: number, ext?: 'png' | 'jpg' | 'webp') => application.icon ?
-        `${CDN}/app-icons/${application.id}/${application.icon}${SizeExtOpt(size, ext)}` :
-        null,
+    ApplicationIcon: (application: Application | {
+        id: string;
+        icon: string;
+    }, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
+        application.icon ? `${CDN}/app-icons/${application.id}/${application.icon}${SizeExtOpt(size, ext)}` : null,
 
-    ApplicationAsset: (application: Application, asset_id: string, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
-        `${CDN}/app-assets/${application.id}/${asset_id}${SizeExtOpt(size, ext)}`,
+    ApplicationAsset: (application: Application | {
+        id: string;
+    } | string, asset_id: string, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
+        `${CDN}/app-assets/${EID(application)}/${asset_id}${SizeExtOpt(size, ext)}`,
 
-    AchievementIcon: (application: Application, achievement_id: string, icon_hash: string, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
-        `${CDN}/app-assets/${application.id}/achievements/${achievement_id}/icons/${icon_hash}${SizeExtOpt(size, ext)}`,
+    AchievementIcon: (application: Application | {
+        id: string;
+    } | string, achievement_id: string, icon_hash: string, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
+        `${CDN}/app-assets/${EID(application)}/achievements/${achievement_id}/icons/${icon_hash}${SizeExtOpt(size, ext)}`,
 
-    TeamIcon: (team: Team, size?: number, ext?: 'png' | 'jpg' | 'webp') => team.icon ?
-        `${CDN}/team-icons/${team.id}/${team.icon}${SizeExtOpt(size, ext)}` :
-        null,
+    TeamIcon: (team: Team | {
+        id: string;
+        icon: string;
+    }, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
+        team.icon ? `${CDN}/team-icons/${team.id}/${team.icon}${SizeExtOpt(size, ext)}` : null,
 };
