@@ -307,7 +307,7 @@ export type EmbedFooter = {
 export type EmbedField = {
     name: string;
     value: string;
-    icon_url?: boolean;
+    inline?: boolean;
 };
 
 export type Attachment = {
