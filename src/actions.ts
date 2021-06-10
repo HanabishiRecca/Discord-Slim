@@ -179,7 +179,7 @@ export const Channel = {
         Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS.followers, requestOptions ?? defaultRequestOptions, params),
 
     TriggerTypingIndicator: (channel_id: string, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS.followers, requestOptions ?? defaultRequestOptions),
+        Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS.typing, requestOptions ?? defaultRequestOptions),
 
     GetPinnedMessages: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Message[]> =>
         Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.pins, requestOptions ?? defaultRequestOptions),
