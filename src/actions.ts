@@ -233,6 +233,7 @@ export const Message = {
         content?: string;
         nonce?: number | string;
         tts?: string;
+        embeds?: types.Embed[];
         embed?: types.Embed;
         allowed_mentions?: types.AllowedMentions;
         message_reference?: types.MessageReference;
@@ -248,6 +249,7 @@ export const Message = {
 
     Edit: (channel_id: string, message_id: string, params: {
         content?: string;
+        embeds?: types.Embed[];
         embed?: types.Embed;
         flags?: helpers.MessageFlags;
         allowed_mentions?: types.AllowedMentions;
