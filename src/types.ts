@@ -497,6 +497,7 @@ export type Invite = {
     approximate_presence_count?: number;
     approximate_member_count?: number;
     expires_at?: string | null;
+    stage_instance?: InviteStageInstance;
 };
 
 export type InviteMetadata = {
@@ -505,6 +506,13 @@ export type InviteMetadata = {
     max_age: number;
     temporary: boolean;
     created_at: string;
+};
+
+export type InviteStageInstance = {
+    members: Member[];
+    participant_count: number;
+    speaker_count: number;
+    topic: string;
 };
 
 // Template types
