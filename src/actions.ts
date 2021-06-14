@@ -930,7 +930,7 @@ export const StageInstance = {
     Get: (channel_id: string, requestOptions?: RequestOptions): Promise<types.StageInstance> =>
         Request(METHODS.GET, PATHS_S.stage_instances + channel_id, requestOptions ?? defaultRequestOptions),
 
-    Update: (channel_id: string, params: {
+    Modify: (channel_id: string, params: {
         topic?: string;
         privacy_level?: helpers.PrivacyLevel;
     }, requestOptions?: RequestOptions): Promise<types.StageInstance> =>
