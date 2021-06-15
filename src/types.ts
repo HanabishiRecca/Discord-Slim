@@ -803,7 +803,7 @@ export type Application = {
     primary_sku_id?: string;
     slug?: string;
     cover_image?: string;
-    flags: helpers.ApplicationFlags;
+    flags?: helpers.ApplicationFlags;
 };
 
 export type Team = {
