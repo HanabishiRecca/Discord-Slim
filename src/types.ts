@@ -206,12 +206,15 @@ export type MessageReference = {
 
 export type MessageSticker = {
     id: string;
-    pack_id: string;
+    pack_id?: string;
     name: string;
     description: string;
-    tags?: string;
-    asset: string;
+    tags: string;
     format_type: helpers.MessageStickerFormatTypes;
+    available?: boolean;
+    guild_id?: string;
+    user?: User;
+    sort_value?: number;
 };
 
 export type FollowedChannel = {
