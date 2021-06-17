@@ -141,6 +141,7 @@ export const Channel = {
         parent_id?: string | null;
         rtc_region?: string | null;
         video_quality_mode?: helpers.VideoQualityModes;
+        default_auto_archive_duration?: number | null;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
         Request(METHODS.PATCH, PATHS_S.channels + id, requestOptions ?? defaultRequestOptions, params),
 
