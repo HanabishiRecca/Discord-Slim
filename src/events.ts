@@ -152,7 +152,7 @@ type EventTypes = {
     [Events.INVITE_CREATE]: {
         channel_id: string;
         code: string;
-        created_at: number;
+        created_at: string;
         guild_id?: string;
         inviter?: types.User;
         max_age: number;
