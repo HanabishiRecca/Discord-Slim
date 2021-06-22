@@ -444,3 +444,13 @@ export enum ApplicationFlags {
     VERIFICATION_PENDING_GUILD_LIMIT = 1 << 16,
     EMBEDDED = 1 << 17,
 }
+
+export enum TimestampStyles {
+    SHORT_TIME = 't',
+    LONG_TIME = 'T',
+    SHORT_DATE = 'd',
+    LONG_DATE = 'D',
+    SHORT_DATE_TIME = 'f',
+    LONG_DATE_TIME = 'F',
+    RELATIVE_TIME = 'R',
+};

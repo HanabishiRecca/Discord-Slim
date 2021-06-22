@@ -1,4 +1,4 @@
-import { Permissions as Flags, CDN, HOST } from './helpers';
+import { Permissions as Flags, TimestampStyles, CDN, HOST } from './helpers';
 import type { Guild, User, Application, Team, Emoji, Message, Channel, Role } from './types';
 
 type Permission = typeof Flags[keyof typeof Flags];
@@ -39,6 +39,20 @@ export const Mentions = {
 export const Format = {
     Emoji: (emoji: Emoji) => `<${emoji.animated ? 'a' : ''}:${emoji.name}:${emoji.id}>`,
     Reaction: (emoji: Emoji) => `${emoji.name}:${emoji.id}`,
+    Timestamp: (timestamp: number | string | Date, style?: TimestampStyles) => {
+        let value;
+
+        if(timestamp instanceof Date)
+            value = Math.trunc(timestamp.getTime() / 1000);
+        else if(typeof timestamp == 'string')
+            value = Math.trunc(new Date(timestamp).getTime() / 1000);
+        else
+            value = timestamp;
+
+        return style ?
+            `<t:${value}:${style}>` :
+            `<t:${value}>`;
+    },
 };
 
 export const Link = {
