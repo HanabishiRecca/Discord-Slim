@@ -185,11 +185,12 @@ export type Message = {
     application_id?: string;
     message_reference?: MessageReference;
     flags?: helpers.MessageFlags;
-    stickers?: MessageSticker[];
     referenced_message?: Message | null;
     interaction?: MessageInteraction;
     thread?: Channel;
     components?: Component[];
+    sticker_items?: MessageStickerItem[];
+    stickers?: MessageSticker[];
 };
 
 export type MessageActivity = {
@@ -202,6 +203,12 @@ export type MessageReference = {
     channel_id?: string;
     guild_id?: string;
     fail_if_not_exists?: boolean;
+};
+
+export type MessageStickerItem = {
+    id: string;
+    name: string;
+    format_type: helpers.MessageStickerFormatTypes;
 };
 
 export type MessageSticker = {
