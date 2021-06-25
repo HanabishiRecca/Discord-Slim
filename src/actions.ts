@@ -901,6 +901,7 @@ export const Thread = {
     Start: (channel_id: string, params: {
         name: string;
         auto_archive_duration: types.ThreadArchiveDuration;
+        type?: helpers.ChannelTypes.GUILD_PRIVATE_THREAD | helpers.ChannelTypes.GUILD_PUBLIC_THREAD | helpers.ChannelTypes.GUILD_NEWS_THREAD;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
         Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS.threads, requestOptions ?? defaultRequestOptions, params),
 
