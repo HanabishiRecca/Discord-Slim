@@ -411,6 +411,7 @@ export enum VideoQualityModes {
 export enum ComponentTypes {
     ACTION_ROW = 1,
     BUTTON = 2,
+    SELECT_MENU = 3,
 }
 
 export enum ButtonStyles {

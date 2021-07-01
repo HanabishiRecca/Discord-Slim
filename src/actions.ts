@@ -238,7 +238,7 @@ export const Message = {
         embed?: types.Embed;
         allowed_mentions?: types.AllowedMentions;
         message_reference?: types.MessageReference;
-        components?: types.Component[];
+        components?: types.ActionRow[];
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS.messages, requestOptions ?? defaultRequestOptions, params),
 
@@ -255,7 +255,7 @@ export const Message = {
         flags?: helpers.MessageFlags;
         allowed_mentions?: types.AllowedMentions;
         attachments?: types.Attachment[];
-        components?: types.Component[];
+        components?: types.ActionRow[];
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.PATCH, PATHS_S.channels + channel_id + PATHS_S.messages + message_id, requestOptions ?? defaultRequestOptions, params),
 
@@ -700,7 +700,7 @@ export const Webhook = {
         tts?: string;
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
-        components?: types.Component[];
+        components?: types.ActionRow[];
     }, params2?: {
         wait?: boolean;
         thread_id?: string;
@@ -725,7 +725,7 @@ export const Webhook = {
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
         attachments?: types.Attachment[];
-        components?: types.Component[];
+        components?: types.ActionRow[];
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.PATCH, PATHS_S.webhooks + webhook_id + '/' + webhook_token + PATHS_S.messages + message_id, requestOptions ?? defaultRequestOptions, params),
 
@@ -794,7 +794,7 @@ export const Application = {
         content?: string;
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
-        components?: types.Component[];
+        components?: types.ActionRow[];
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.PATCH, PATHS_S.webhooks + application_id + '/' + interaction_token + PATHS.messages + PATHS.original, requestOptions ?? defaultRequestOptions, params),
 
@@ -809,7 +809,7 @@ export const Application = {
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
         flags?: helpers.InteractionResponseFlags;
-        components?: types.Component[];
+        components?: types.ActionRow[];
     }, requestOptions?: RequestOptions): Promise<types.Message | null> =>
         Request(METHODS.POST, PATHS_S.webhooks + application_id + '/' + interaction_token, requestOptions ?? defaultRequestOptions, params),
 
@@ -817,7 +817,7 @@ export const Application = {
         content?: string;
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
-        components?: types.Component[];
+        components?: types.ActionRow[];
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.PATCH, PATHS_S.webhooks + application_id + '/' + interaction_token + PATHS_S.messages + message_id, requestOptions ?? defaultRequestOptions, params),
 

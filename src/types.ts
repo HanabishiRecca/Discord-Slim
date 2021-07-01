@@ -188,7 +188,7 @@ export type Message = {
     referenced_message?: Message | null;
     interaction?: MessageInteraction;
     thread?: Channel;
-    components?: Component[];
+    components?: ActionRow[];
     sticker_items?: MessageStickerItem[];
     stickers?: MessageSticker[];
 };
@@ -721,7 +721,7 @@ export type InteractionApplicationCommandCallbackData = {
     embeds?: Embed[];
     allowed_mentions?: AllowedMentions;
     flags?: helpers.InteractionResponseFlags;
-    components?: Component[];
+    components?: ActionRow[];
 };
 
 export type MessageInteraction = {
@@ -832,15 +832,36 @@ export type TeamMember = {
 
 // Message Components types
 
-export type Component = {
-    type: helpers.ComponentTypes;
-    style?: helpers.ButtonStyles;
+export type ActionRow = {
+    type: helpers.ComponentTypes.ACTION_ROW;
+    components: (Button | SelectMenu)[];
+};
+
+export type Button = {
+    type: helpers.ComponentTypes.BUTTON;
+    style: helpers.ButtonStyles;
     label?: string;
     emoji?: Emoji;
     custom_id?: string;
     url?: string;
     disabled?: boolean;
-    components?: Component[];
+};
+
+export type SelectMenu = {
+    type: helpers.ComponentTypes.SELECT_MENU;
+    custom_id: string;
+    options: SelectOption[];
+    placeholder?: string;
+    min_values: number;
+    max_values: number;
+};
+
+export type SelectOption = {
+    label: string;
+    value: string;
+    description?: string;
+    emoji?: Emoji;
+    default?: boolean;
 };
 
 // Stage Instance types
