@@ -854,6 +854,7 @@ export type SelectMenu = {
     placeholder?: string;
     min_values: number;
     max_values: number;
+    disabled?: boolean;
 };
 
 export type SelectOption = {
