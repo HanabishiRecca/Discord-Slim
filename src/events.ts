@@ -92,7 +92,7 @@ type EventTypes = {
         id: string;
         guild_id: string;
         member_count: number;
-        added_members?: types.ThreadMember[];
+        added_members?: (types.ThreadMember & types.Member & types.Presence)[];
         removed_member_ids?: string[];
     };
     [Events.GUILD_CREATE]: types.Guild;

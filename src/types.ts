@@ -193,6 +193,8 @@ export type Channel = {
     member_count?: number;
     thread_metadata?: ThreadMetadata;
     member?: ThreadMember;
+    default_auto_archive_duration?: ThreadArchiveDuration;
+    permissions?: string;
 };
 
 export type Message = {

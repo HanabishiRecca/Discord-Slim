@@ -377,6 +377,12 @@ export const Guild = {
     })[], requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.PATCH, PATHS_S.guilds + guild_id + PATHS.channels, requestOptions ?? defaultRequestOptions, params),
 
+    ListActiveThreads: (guild_id: string, requestOptions?: RequestOptions): Promise<{
+        threads: types.Channel[];
+        members: types.ThreadMember[];
+    }> =>
+        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.threads + PATHS.active, requestOptions ?? defaultRequestOptions),
+
     ListMembers: (guild_id: string, params?: {
         limit?: number;
         after?: string;
