@@ -7,4 +7,4 @@ export const SafeJsonParse = (data?: string) => {
 };
 
 export const Sleep = (time: number) =>
-    new Promise<undefined>((resolve) => setTimeout(resolve, time));
+    new Promise((resolve) => setTimeout(resolve, time));

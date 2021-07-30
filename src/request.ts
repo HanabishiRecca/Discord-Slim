@@ -85,27 +85,29 @@ export const Request = (method: string, endpoint: string, options?: RequestOptio
     return new Promise<any>((resolve, reject) => {
         let attempts = 0;
 
-        const TryRequest = () => HttpsRequest(URL, requestOptions, content).then((result) => {
-            const code = result.code;
+        const TryRequest = () => {
+            HttpsRequest(URL, requestOptions, content).then((result) => {
+                const code = result.code;
 
-            if((code >= 200) && (code < 300))
-                return resolve(SafeJsonParse(result.data));
+                if((code >= 200) && (code < 300))
+                    return resolve(SafeJsonParse(result.data));
 
-            if((code >= 400) && (code < 500)) {
-                const response = SafeJsonParse(result.data);
-                if(code != 429)
-                    return reject({ code, response });
+                if((code >= 400) && (code < 500)) {
+                    const response = SafeJsonParse(result.data);
+                    if(code != 429)
+                        return reject({ code, response });
 
-                attempts++;
-                rateLimitCallback?.(response, attempts);
+                    attempts++;
+                    rateLimitCallback?.(response, attempts);
 
-                return (response.retry_after && (attempts < retryCount)) ?
-                    setTimeout(TryRequest, Math.ceil(Number(response.retry_after) * 1000)) :
-                    reject({ code, response });
-            }
+                    return (response.retry_after && (attempts < retryCount)) ?
+                        setTimeout(TryRequest, Math.ceil(Number(response.retry_after) * 1000)) :
+                        reject({ code, response });
+                }
 
-            reject({ code });
-        }).catch(reject);
+                reject({ code });
+            }).catch(reject);
+        };
 
         TryRequest();
     });
