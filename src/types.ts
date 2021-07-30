@@ -7,6 +7,7 @@ export type AuditLog = {
     users: User[];
     audit_log_entries: AuditLogEntry[];
     integrations: Integration[];
+    threads: Channel[];
 };
 
 export type AuditLogEntry = {
@@ -31,35 +32,39 @@ export type AuditEntryInfo = {
 };
 
 export type AuditLogChange = {
-    new_value?: (
-        | AuditLogChangeKeyGuild
-        | AuditLogChangeKeyChannel
-        | AuditLogChangeKeyRole
-        | AuditLogChangeKeyInvite
-        | AuditLogChangeKeyUser
-        | AuditLogChangeKeyIntegration
-    );
-    old_value?: (
-        | AuditLogChangeKeyGuild
-        | AuditLogChangeKeyChannel
-        | AuditLogChangeKeyRole
-        | AuditLogChangeKeyInvite
-        | AuditLogChangeKeyUser
-        | AuditLogChangeKeyIntegration
-    );
+    new_value?: AuditLogChangeKey;
+    old_value?: AuditLogChangeKey;
     key: string;
 };
+
+export type AuditLogChangeKey = (
+    | AuditLogChangeKeyGuild
+    | AuditLogChangeKeyChannel
+    | AuditLogChangeKeyRole
+    | AuditLogChangeKeyInvite
+    | AuditLogChangeKeyUser
+    | AuditLogChangeKeyIntegration
+    | AuditLogChangeKeyVoiceChannel
+    | AuditLogChangeKeySticker
+    | AuditLogChangeStageInstance
+);
 
 export type AuditLogChangeKeyGuild = {
     id: string;
     type: string;
     name: string;
+    description: string;
     icon_hash: string;
     splash_hash: string;
+    discovery_splash_hash: string;
+    banner_hash: string;
     owner_id: string;
     region: string;
+    preferred_locale: string;
     afk_channel_id: string;
     afk_timeout: number;
+    rules_channel_id: string;
+    public_updates_channel_id: string;
     mfa_level: number;
     verification_level: number;
     explicit_content_filter: helpers.ExplicitContentFilterLevel;
@@ -81,6 +86,7 @@ export type AuditLogPartialRole = {
 export type AuditLogChangeKeyChannel = {
     id: string;
     type: helpers.ChannelTypes;
+    name: string;
     position: number;
     topic: string;
     bitrate: number;
@@ -93,6 +99,7 @@ export type AuditLogChangeKeyChannel = {
 export type AuditLogChangeKeyRole = {
     id: string;
     type: string;
+    name: string;
     permissions: string;
     color: number;
     hoist: boolean;
@@ -104,6 +111,7 @@ export type AuditLogChangeKeyRole = {
 export type AuditLogChangeKeyInvite = {
     id: string;
     type: string;
+    name: string;
     code: string;
     channel_id: string;
     inviter_id: string;
@@ -116,6 +124,7 @@ export type AuditLogChangeKeyInvite = {
 export type AuditLogChangeKeyUser = {
     id: string;
     type: string;
+    name: string;
     deaf: boolean;
     mute: boolean;
     nick: string;
@@ -125,9 +134,36 @@ export type AuditLogChangeKeyUser = {
 export type AuditLogChangeKeyIntegration = {
     id: string;
     type: string;
+    name: string;
     enable_emoticons: boolean;
     expire_behavior: number;
     expire_grace_period: number;
+};
+
+export type AuditLogChangeKeyVoiceChannel = {
+    id: string;
+    type: string;
+    name: string;
+    user_limit: number;
+};
+
+export type AuditLogChangeKeySticker = {
+    id: string;
+    type: string;
+    name: string;
+    description: string;
+    tags: string;
+    format_type: helpers.MessageStickerFormatTypes;
+    available: boolean;
+    guild_id: string;
+};
+
+export type AuditLogChangeStageInstance = {
+    id: string;
+    type: helpers.ChannelTypes;
+    name: string;
+    topic: string;
+    privacy_level: helpers.PrivacyLevel;
 };
 
 // Channel types

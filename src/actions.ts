@@ -308,10 +308,10 @@ export const GroupDM = {
 
 export const Guild = {
     GetAuditLog: (guild_id: string, params?: {
-        user_id: string;
-        action_type: number;
-        before: string;
-        limit: number;
+        user_id?: string;
+        action_type?: number;
+        before?: string;
+        limit?: number;
     }, requestOptions?: RequestOptions): Promise<types.AuditLog> =>
         Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS_Q.auditLogs + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
 
