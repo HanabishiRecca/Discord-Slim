@@ -83,7 +83,12 @@ export class Client extends EventEmitter {
         if(typeof response.url != 'string')
             return this.emit(ClientEvents.FATAL, 'Unexpected gateway API response.');
 
-        this._ws = new WebSocket(`${response.url}?v=${API_VERSION}`);
+        try {
+            this._ws = new WebSocket(`${response.url}?v=${API_VERSION}`);
+        } catch {
+            return this.emit(ClientEvents.FATAL, 'Unable to create a socket.');
+        }
+
         this._ws.on('message', this._onMessage);
         this._ws.on('close', this._onClose);
         this._ws.on('error', this._onError);

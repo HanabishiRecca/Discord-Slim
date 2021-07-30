@@ -26,7 +26,7 @@
         "dist/**/*"
     ],
     "dependencies": {
-        "ws": "7.5.*"
+        "ws": "8.0.*"
     },
     "devDependencies": {
         "@types/node": "latest",
