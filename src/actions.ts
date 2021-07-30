@@ -819,6 +819,9 @@ export const Application = {
     }, requestOptions?: RequestOptions): Promise<types.Message | null> =>
         Request(METHODS.POST, PATHS_S.webhooks + application_id + '/' + interaction_token, requestOptions ?? defaultRequestOptions, params),
 
+    GetFollowupMessage: (application_id: string, interaction_token: string, message_id: string, requestOptions?: RequestOptions): Promise<types.Message> =>
+        Request(METHODS.GET, PATHS_S.webhooks + application_id + '/' + interaction_token + PATHS_S.messages + message_id, requestOptions ?? defaultRequestOptions),
+
     EditFollowupMessage: (application_id: string, interaction_token: string, message_id: string, params: {
         content?: string;
         embeds?: types.Embed[];
