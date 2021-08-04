@@ -1,7 +1,10 @@
 import { Request, RequestOptions } from './request';
-import querystring from 'querystring';
+import { URLSearchParams } from 'url';
 import type * as helpers from './helpers';
 import type * as types from './types';
+
+const QueryString = (params: any) =>
+    params ? '?' + String(new URLSearchParams(params)) : '';
 
 let defaultRequestOptions: RequestOptions | undefined;
 export const setDefaultRequestOptions = (requestOptions?: RequestOptions) => defaultRequestOptions = requestOptions;
@@ -97,19 +100,6 @@ const enum PATHS_S {
     stage_instances = PATHS.stage_instances + '/',
 }
 
-const enum PATHS_Q {
-    auditLogs = PATHS.auditLogs + '?',
-    prune = PATHS.prune + '?',
-    widget_png = PATHS.widget_png + '?',
-    guilds = PATHS.guilds + '?',
-    members = PATHS.members + '?',
-    search = PATHS.search + '?',
-    slack = PATHS.slack + '?',
-    github = PATHS.github + '?',
-    public = PATHS.public + '?',
-    private = PATHS.private + '?',
-}
-
 export const Channel = {
     Create: (guild_id: string, params: {
         name: string;
@@ -203,7 +193,7 @@ export const Channel = {
         members: types.ThreadMember[];
         has_more: boolean;
     }> =>
-        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.threads + PATHS.archived + PATHS_Q.public + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.threads + PATHS.archived + PATHS.public + QueryString(params), requestOptions ?? defaultRequestOptions),
 
     ListPrivateArchivedThreads: (channel_id: string, params?: {
         before?: string;
@@ -213,7 +203,7 @@ export const Channel = {
         members: types.ThreadMember[];
         has_more: boolean;
     }> =>
-        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.threads + PATHS.archived + PATHS_Q.private + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.threads + PATHS.archived + PATHS.private + QueryString(params), requestOptions ?? defaultRequestOptions),
 
     ListJoinedPrivateArchivedThreads: (channel_id: string, params?: {
         before?: string;
@@ -223,7 +213,7 @@ export const Channel = {
         members: types.ThreadMember[];
         has_more: boolean;
     }> =>
-        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.users + PATHS.me + PATHS.threads + PATHS.archived + PATHS_Q.private + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS.users + PATHS.me + PATHS.threads + PATHS.archived + PATHS.private + QueryString(params), requestOptions ?? defaultRequestOptions),
 };
 
 export const Message = {
@@ -269,7 +259,7 @@ export const Message = {
         after?: string;
         limit?: number;
     }, requestOptions?: RequestOptions): Promise<types.User[]> =>
-        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS_S.messages + message_id + PATHS_S.reactions + encodeURIComponent(emoji) + '?' + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+        Request(METHODS.GET, PATHS_S.channels + channel_id + PATHS_S.messages + message_id + PATHS_S.reactions + encodeURIComponent(emoji) + QueryString(params), requestOptions ?? defaultRequestOptions),
 
     DeleteAllReactions: (channel_id: string, message_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, PATHS_S.channels + channel_id + PATHS_S.messages + message_id + PATHS.reactions, requestOptions ?? defaultRequestOptions),
@@ -313,7 +303,7 @@ export const Guild = {
         before?: string;
         limit?: number;
     }, requestOptions?: RequestOptions): Promise<types.AuditLog> =>
-        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS_Q.auditLogs + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.auditLogs + QueryString(params), requestOptions ?? defaultRequestOptions),
 
     ListEmojis: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Emoji[]> =>
         Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.emojis, requestOptions ?? defaultRequestOptions),
@@ -337,7 +327,7 @@ export const Guild = {
     Get: (guild_id: string, params?: {
         with_counts?: boolean;
     }, requestOptions?: RequestOptions): Promise<types.Guild> =>
-        Request(METHODS.GET, PATHS_S.guilds + guild_id + '?' + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+        Request(METHODS.GET, PATHS_S.guilds + guild_id + QueryString(params), requestOptions ?? defaultRequestOptions),
 
     GetPreview: (guild_id: string, requestOptions?: RequestOptions): Promise<types.GuildPreview> =>
         Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.preview, requestOptions ?? defaultRequestOptions),
@@ -387,13 +377,13 @@ export const Guild = {
         limit?: number;
         after?: string;
     }, requestOptions?: RequestOptions): Promise<types.Member[]> =>
-        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS_Q.members + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.members + QueryString(params), requestOptions ?? defaultRequestOptions),
 
     SearchMembers: (guild_id: string, params: {
         query: number;
         limit?: number;
     }, requestOptions?: RequestOptions): Promise<types.Member[]> =>
-        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.members + PATHS_Q.search + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.members + PATHS.search + QueryString(params), requestOptions ?? defaultRequestOptions),
 
     GetBans: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Ban[]> =>
         Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.bans, requestOptions ?? defaultRequestOptions),
@@ -411,7 +401,7 @@ export const Guild = {
         days?: number;
         include_roles?: string;
     }, requestOptions?: RequestOptions): Promise<{ pruned: number; }> =>
-        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS_Q.prune + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.prune + QueryString(params), requestOptions ?? defaultRequestOptions),
 
     Prune: (guild_id: string, params?: {
         days?: number;
@@ -557,7 +547,7 @@ export const Widget = {
     GetImage: (guild_id: string, params?: {
         style?: helpers.WidgetStyleOptions;
     }, requestOptions?: RequestOptions): Promise<Buffer> =>
-        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS_Q.widget_png + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+        Request(METHODS.GET, PATHS_S.guilds + guild_id + PATHS.widget_png + QueryString(params), requestOptions ?? defaultRequestOptions),
 };
 
 export const WelcomeScreen = {
@@ -588,7 +578,7 @@ export const Invite = {
         with_counts?: boolean;
         with_expiration?: boolean;
     }, requestOptions?: RequestOptions): Promise<types.Invite> =>
-        Request(METHODS.GET, PATHS_S.invites + invite_code + '?' + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+        Request(METHODS.GET, PATHS_S.invites + invite_code + QueryString(params), requestOptions ?? defaultRequestOptions),
 
     Delete: (invite_code: string, requestOptions?: RequestOptions): Promise<types.Invite> =>
         Request(METHODS.DELETE, PATHS_S.invites + invite_code, requestOptions ?? defaultRequestOptions),
@@ -635,7 +625,7 @@ export const User = {
         after?: string;
         limit?: number;
     }, requestOptions?: RequestOptions): Promise<types.Guild[]> =>
-        Request(METHODS.GET, PATHS_S.users + PATHS_S.me + PATHS_Q.guilds + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+        Request(METHODS.GET, PATHS_S.users + PATHS_S.me + PATHS.guilds + QueryString(params), requestOptions ?? defaultRequestOptions),
 
     LeaveGuild: (guild_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, PATHS.users + PATHS.me + PATHS_S.guilds + guild_id, requestOptions ?? defaultRequestOptions),
@@ -711,17 +701,17 @@ export const Webhook = {
         wait?: boolean;
         thread_id?: string;
     }, requestOptions?: RequestOptions): Promise<types.Message | null> =>
-        Request(METHODS.POST, PATHS_S.webhooks + webhook_id + '/' + webhook_token + '?' + querystring.stringify(params2), requestOptions ?? defaultRequestOptions, params1),
+        Request(METHODS.POST, PATHS_S.webhooks + webhook_id + '/' + webhook_token + QueryString(params2), requestOptions ?? defaultRequestOptions, params1),
 
     ExecuteSlack: (webhook_id: string, webhook_token: string, params?: {
         wait?: boolean;
     }, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.POST, PATHS_S.webhooks + webhook_id + '/' + webhook_token + PATHS_Q.slack + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+        Request(METHODS.POST, PATHS_S.webhooks + webhook_id + '/' + webhook_token + PATHS.slack + QueryString(params), requestOptions ?? defaultRequestOptions),
 
     ExecuteGitHub: (webhook_id: string, webhook_token: string, params?: {
         wait?: boolean;
     }, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.POST, PATHS_S.webhooks + webhook_id + '/' + webhook_token + PATHS_Q.github + querystring.stringify(params), requestOptions ?? defaultRequestOptions),
+        Request(METHODS.POST, PATHS_S.webhooks + webhook_id + '/' + webhook_token + PATHS.github + QueryString(params), requestOptions ?? defaultRequestOptions),
 
     GetMessage: (webhook_id: string, webhook_token: string, message_id: string, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.GET, PATHS_S.webhooks + webhook_id + '/' + webhook_token + PATHS_S.messages + message_id, requestOptions ?? defaultRequestOptions),
@@ -874,7 +864,7 @@ export const OAuth2 = {
         refresh_token: string;
         scope: helpers.OAuth2Scopes | string;
     }> =>
-        Request(METHODS.POST, PATHS.oauth2 + PATHS.token, requestOptions ?? defaultRequestOptions, querystring.stringify(params)),
+        Request(METHODS.POST, PATHS.oauth2 + PATHS.token, requestOptions ?? defaultRequestOptions, QueryString(params)),
 
     GetCurrentApplicationInformation: (requestOptions?: RequestOptions): Promise<types.Application> =>
         Request(METHODS.GET, PATHS.oauth2 + PATHS.applications + PATHS.me, requestOptions ?? defaultRequestOptions),
