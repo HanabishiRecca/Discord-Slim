@@ -141,7 +141,7 @@ export const Channel = {
         parent_id?: string | null;
         rtc_region?: string | null;
         video_quality_mode?: helpers.VideoQualityModes;
-        default_auto_archive_duration?: number | null;
+        default_auto_archive_duration?: helpers.ThreadArchiveDuration | null;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
         Request(METHODS.PATCH, PATHS_S.channels + id, requestOptions ?? defaultRequestOptions, params),
 
@@ -892,7 +892,7 @@ export const Thread = {
     Modify: (channel_id: string, params: {
         name?: string;
         archived?: boolean;
-        auto_archive_duration?: types.ThreadArchiveDuration;
+        auto_archive_duration?: helpers.ThreadArchiveDuration;
         locked?: boolean;
         rate_limit_per_user?: number | null;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
@@ -903,13 +903,13 @@ export const Thread = {
 
     StartWithMessage: (channel_id: string, message_id: string, params: {
         name: string;
-        auto_archive_duration: types.ThreadArchiveDuration;
+        auto_archive_duration: helpers.ThreadArchiveDuration;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
         Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS_S.messages + message_id + PATHS.threads, requestOptions ?? defaultRequestOptions, params),
 
     Start: (channel_id: string, params: {
         name: string;
-        auto_archive_duration: types.ThreadArchiveDuration;
+        auto_archive_duration: helpers.ThreadArchiveDuration;
         type?: helpers.ChannelTypes.GUILD_PRIVATE_THREAD | helpers.ChannelTypes.GUILD_PUBLIC_THREAD | helpers.ChannelTypes.GUILD_NEWS_THREAD;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
         Request(METHODS.POST, PATHS_S.channels + channel_id + PATHS.threads, requestOptions ?? defaultRequestOptions, params),

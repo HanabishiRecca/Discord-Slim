@@ -193,7 +193,7 @@ export type Channel = {
     member_count?: number;
     thread_metadata?: ThreadMetadata;
     member?: ThreadMember;
-    default_auto_archive_duration?: ThreadArchiveDuration;
+    default_auto_archive_duration?: helpers.ThreadArchiveDuration;
     permissions?: string;
 };
 
@@ -280,11 +280,9 @@ export type PermissionsOverwrite = {
     deny: string;
 };
 
-export type ThreadArchiveDuration = 60 | 1440 | 4320 | 10080;
-
 export type ThreadMetadata = {
     archived: boolean;
-    auto_archive_duration: ThreadArchiveDuration;
+    auto_archive_duration: helpers.ThreadArchiveDuration;
     archive_timestamp: string;
     locked?: boolean;
 };

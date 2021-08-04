@@ -468,3 +468,10 @@ export enum TimestampStyles {
     LONG_DATE_TIME = 'F',
     RELATIVE_TIME = 'R',
 };
+
+export enum ThreadArchiveDuration {
+    _1_HOUR = 60,
+    _24_HOURS = 1440,
+    _3_DAYS = 4320,
+    _1_WEEK = 10080,
+}
