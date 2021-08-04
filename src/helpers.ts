@@ -467,7 +467,7 @@ export enum TimestampStyles {
     SHORT_DATE_TIME = 'f',
     LONG_DATE_TIME = 'F',
     RELATIVE_TIME = 'R',
-};
+}
 
 export enum ThreadArchiveDuration {
     _1_HOUR = 60,

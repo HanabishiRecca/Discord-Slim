@@ -29,7 +29,7 @@
         "ws": "8.0.*"
     },
     "devDependencies": {
-        "@types/node": "latest",
-        "@types/ws": "latest"
+        "@types/node": "*",
+        "@types/ws": "*"
     }
 }

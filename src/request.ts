@@ -18,7 +18,7 @@ export class Authorization {
         this._update();
     }
 
-    _update = () =>
+    private _update = () =>
         this._cache = this._type ?
             `${this._type} ${this._token}` :
             this._token;
