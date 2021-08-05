@@ -3,8 +3,9 @@ import { URLSearchParams } from 'url';
 import type * as helpers from './helpers';
 import type * as types from './types';
 
-const QueryString = (params: any) =>
-    params ? '?' + String(new URLSearchParams(params)) : '';
+const
+    ParamString = (params: any) => String(new URLSearchParams(params)),
+    QueryString = (params: any) => params ? '?' + ParamString(params) : '';
 
 let defaultRequestOptions: RequestOptions | undefined;
 export const setDefaultRequestOptions = (requestOptions?: RequestOptions) => defaultRequestOptions = requestOptions;
@@ -864,7 +865,7 @@ export const OAuth2 = {
         refresh_token: string;
         scope: helpers.OAuth2Scopes | string;
     }> =>
-        Request(METHODS.POST, PATHS.oauth2 + PATHS.token, requestOptions ?? defaultRequestOptions, QueryString(params)),
+        Request(METHODS.POST, PATHS.oauth2 + PATHS.token, requestOptions ?? defaultRequestOptions, ParamString(params)),
 
     GetCurrentApplicationInformation: (requestOptions?: RequestOptions): Promise<types.Application> =>
         Request(METHODS.GET, PATHS.oauth2 + PATHS.applications + PATHS.me, requestOptions ?? defaultRequestOptions),
