@@ -53,7 +53,10 @@ export type RequestOptions = {
     };
 };
 
-export const Request = (method: string, endpoint: string, options?: RequestOptions, data?: object | string | null) => {
+let defOptions: RequestOptions | undefined;
+export const SetDefOptions = (options?: RequestOptions) => defOptions = options;
+
+export const Request = (method: string, endpoint: string, options = defOptions, data?: object | string | null) => {
     let content: string;
 
     const headers: OutgoingHttpHeaders = {};
@@ -78,7 +81,7 @@ export const Request = (method: string, endpoint: string, options?: RequestOptio
     };
 
     const
-        URL = API_PATH + endpoint,
+        url = `${API_PATH}/${endpoint}`,
         retryCount = options?.rateLimit?.retryCount ?? DEFAULT_RETRY_COUNT,
         rateLimitCallback = options?.rateLimit?.callback;
 
@@ -86,7 +89,7 @@ export const Request = (method: string, endpoint: string, options?: RequestOptio
         let attempts = 0;
 
         const TryRequest = () => {
-            HttpsRequest(URL, requestOptions, content).then((result) => {
+            HttpsRequest(url, requestOptions, content).then((result) => {
                 const code = result.code;
 
                 if((code >= 200) && (code < 300))

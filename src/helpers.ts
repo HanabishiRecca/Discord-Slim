@@ -1,5 +1,5 @@
 export const
-    HOST = 'https://discord.com' as const,
+    HOST = 'https://discord.com',
     API = `${HOST}/api` as const,
     API_VERSION = 9,
     API_PATH = `${API}/v${API_VERSION}` as const,
