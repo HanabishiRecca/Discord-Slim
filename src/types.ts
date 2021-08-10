@@ -693,7 +693,7 @@ export type ApplicationCommandOption = {
 
 export type ApplicationCommandOptionChoice = {
     name: string;
-    value: string | number | boolean;
+    value: string | number;
 };
 
 export type GuildApplicationCommandPermissions = {
