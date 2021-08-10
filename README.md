@@ -33,7 +33,7 @@ npm i discord-slim
 ## Usage example
 ### Initial setup
 ```js
-const { Client, ClientEvents, Authorization, Events, Actions, Helpers, Tools } = require('discord-slim');
+import { Client, ClientEvents, Authorization, Events, Actions, Helpers, Tools } from 'discord-slim';
 
 // Basic setup to control client operation.
 // You probably want to use such code for every bot.

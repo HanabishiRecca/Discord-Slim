@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import { EventEmitter } from 'events';
-import { SafeJsonParse, Sleep } from './util';
-import { VoiceEncryptionModes, SpeakingStates } from './helpers';
+import { SafeJsonParse, Sleep } from './util.js';
+import { VoiceEncryptionModes, SpeakingStates } from './helpers.js';
 
 const VOICE_VERSION = 4;
 

@@ -1,9 +1,9 @@
-import { Request, RequestOptions } from './request';
+import { Request, RequestOptions } from './request.js';
 import { URLSearchParams } from 'url';
 import type * as helpers from './helpers';
 import type * as types from './types';
 
-export { SetDefOptions as setDefaultRequestOptions } from './request';
+export { SetDefOptions as setDefaultRequestOptions } from './request.js';
 
 const
     Path = (...paths: string[]) => paths.join('/'),
@@ -56,7 +56,6 @@ const enum PATHS {
     search = 'search',
     slack = 'slack',
     stage_instances = 'stage-instances',
-    sync = 'sync',
     templates = 'templates',
     thread_members = 'thread-members',
     threads = 'threads',
