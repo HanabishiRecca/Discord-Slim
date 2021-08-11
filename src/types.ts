@@ -671,11 +671,13 @@ export type Webhook = {
     url?: string;
 };
 
-// Slash commands types
+// Application commands types
 
 export type ApplicationCommand = {
     id: string;
+    type?: helpers.ApplicationCommandTypes;
     application_id: string;
+    guild_id?: string;
     name: string;
     description: string;
     options?: ApplicationCommandOption[];
@@ -693,7 +695,7 @@ export type ApplicationCommandOption = {
 
 export type ApplicationCommandOptionChoice = {
     name: string;
-    value: string | number;
+    value: string | number | boolean;
 };
 
 export type GuildApplicationCommandPermissions = {
@@ -713,7 +715,7 @@ export type Interaction = {
     id: string;
     application_id: string;
     type: helpers.InteractionTypes;
-    data?: ApplicationCommandInteractionData;
+    data?: InteractionData;
     guild_id?: string;
     channel_id?: string;
     member?: Member;
@@ -723,31 +725,42 @@ export type Interaction = {
     message?: Message;
 };
 
-export type ApplicationCommandInteractionData = {
+export type InteractionData = {
     id: string;
     name: string;
-    resolved?: ApplicationCommandInteractionDataResolved;
-    options?: ApplicationCommandInteractionDataOption[];
+    type?: helpers.ApplicationCommandTypes;
+    resolved?: InteractionDataResolved;
+    options?: InteractionDataOption[];
     custom_id?: string;
     component_type?: helpers.ComponentTypes;
+    values?: SelectOption[];
+    target_id?: string;
 };
 
-export type ApplicationCommandInteractionDataResolved = {
+export type InteractionDataResolved = {
     users?: { [id: string]: User; };
     members?: { [id: string]: Member; };
     roles?: { [id: string]: Role; };
     channels?: { [id: string]: Channel; };
+    messages?: { [id: string]: Message; };
 };
 
-export type ApplicationCommandInteractionDataOption = {
+export type InteractionDataOption = {
     name: string;
     type: helpers.ApplicationCommandOptionTypes;
     value?: string | number | boolean;
-    options?: ApplicationCommandInteractionDataOption[];
+    options?: InteractionDataOption[];
+};
+
+export type MessageInteraction = {
+    id: string;
+    type: helpers.InteractionTypes;
+    name: string;
+    user: User;
 };
 
 export type InteractionResponse = {
-    type: helpers.InteractionResponseTypes;
+    type: helpers.InteractionCallbackTypes;
     data?: InteractionApplicationCommandCallbackData;
 };
 
@@ -756,15 +769,8 @@ export type InteractionApplicationCommandCallbackData = {
     content?: string;
     embeds?: Embed[];
     allowed_mentions?: AllowedMentions;
-    flags?: helpers.InteractionResponseFlags;
+    flags?: helpers.InteractionCallbackDataFlags;
     components?: ActionRow[];
-};
-
-export type MessageInteraction = {
-    id: string;
-    type: helpers.InteractionTypes;
-    name: string;
-    user: User;
 };
 
 // Gateway types

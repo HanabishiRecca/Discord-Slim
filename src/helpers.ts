@@ -44,7 +44,7 @@ export const Permissions = {
     MANAGE_ROLES: 0x0010000000n,
     MANAGE_WEBHOOKS: 0x0020000000n,
     MANAGE_EMOJIS: 0x0040000000n,
-    USE_SLASH_COMMANDS: 0x0080000000n,
+    USE_APPLICATION_COMMANDS: 0x0080000000n,
     REQUEST_TO_SPEAK: 0x0100000000n,
     MANAGE_THREADS: 0x0400000000n,
     USE_PUBLIC_THREADS: 0x0800000000n,
@@ -187,9 +187,9 @@ export enum PermissionsOverwriteTypes {
 }
 
 export enum AllowedMentionTypes {
-    ROLE_MENTIONS = 'roles',
-    USER_MENTIONS = 'users',
-    EVERYONE_MENTIONS = 'everyone',
+    ROLES = 'roles',
+    USERS = 'users',
+    EVERYONE = 'everyone',
 }
 
 export enum DefaultMessageNotificationLevel {
@@ -352,7 +352,7 @@ export enum InteractionTypes {
     MESSAGE_COMPONENT = 3,
 }
 
-export enum InteractionResponseTypes {
+export enum InteractionCallbackTypes {
     PONG = 1,
     CHANNEL_MESSAGE_WITH_SOURCE = 4,
     DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE = 5,
@@ -360,7 +360,7 @@ export enum InteractionResponseTypes {
     UPDATE_MESSAGE = 7,
 }
 
-export enum InteractionResponseFlags {
+export enum InteractionCallbackDataFlags {
     EPHEMERAL = 64,
 }
 
@@ -474,4 +474,10 @@ export enum ThreadArchiveDuration {
     _24_HOURS = 1440,
     _3_DAYS = 4320,
     _1_WEEK = 10080,
+}
+
+export enum ApplicationCommandTypes {
+    CHAT_INPUT = 1,
+    USER = 2,
+    MESSAGE = 3,
 }

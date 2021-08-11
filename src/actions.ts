@@ -710,6 +710,7 @@ export const Application = {
         description: string;
         options?: types.ApplicationCommandOption[];
         default_permission?: boolean;
+        type?: helpers.ApplicationCommandTypes;
     }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
         Request(METHODS.POST, Path(PATHS.applications, application_id, PATHS.commands), requestOptions, params),
 
@@ -730,11 +731,15 @@ export const Application = {
     GetGuildCommands: (application_id: string, guild_id: string, requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
         Request(METHODS.GET, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands), requestOptions),
 
+    BulkOverwriteGlobalCommands: (application_id: string, params: types.ApplicationCommand[], requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
+        Request(METHODS.PUT, Path(PATHS.applications, application_id, PATHS.commands), requestOptions, params),
+
     CreateGuildCommand: (application_id: string, guild_id: string, params: {
         name: string;
         description: string;
         options?: types.ApplicationCommandOption[];
         default_permission?: boolean;
+        type?: helpers.ApplicationCommandTypes;
     }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
         Request(METHODS.POST, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands), requestOptions, params),
 
@@ -751,6 +756,26 @@ export const Application = {
 
     DeleteGuildCommand: (application_id: string, guild_id: string, command_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands, command_id), requestOptions),
+
+    BulkOverwriteGuildCommands: (application_id: string, guild_id: string, params: types.ApplicationCommand[], requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
+        Request(METHODS.PUT, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands), requestOptions, params),
+
+    GetGuildCommandPermissions: (application_id: string, guild_id: string, requestOptions?: RequestOptions): Promise<types.GuildApplicationCommandPermissions[]> =>
+        Request(METHODS.GET, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands, PATHS.permissions), requestOptions),
+
+    GetCommandPermissions: (application_id: string, guild_id: string, command_id: string, requestOptions?: RequestOptions): Promise<types.GuildApplicationCommandPermissions> =>
+        Request(METHODS.GET, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands, command_id, PATHS.permissions), requestOptions),
+
+    EditCommandPermissions: (application_id: string, guild_id: string, command_id: string, params: {
+        permissions: types.ApplicationCommandPermissions[];
+    }, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.PUT, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands, command_id, PATHS.permissions), requestOptions, params),
+
+    BatchEditCommandPermissions: (application_id: string, guild_id: string, params: {
+        id: string;
+        permissions: types.ApplicationCommandPermissions[];
+    }[], requestOptions?: RequestOptions): Promise<types.GuildApplicationCommandPermissions[]> =>
+        Request(METHODS.PUT, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands, PATHS.permissions), requestOptions, params),
 
     CreateInteractionResponse: (interaction_id: string, interaction_token: string, params: types.InteractionResponse, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.POST, Path(PATHS.interactions, interaction_id, interaction_token, PATHS.callback), requestOptions, params),
@@ -776,7 +801,7 @@ export const Application = {
         tts?: string;
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
-        flags?: helpers.InteractionResponseFlags;
+        flags?: helpers.InteractionCallbackDataFlags;
         components?: types.ActionRow[];
     }, requestOptions?: RequestOptions): Promise<types.Message | null> =>
         Request(METHODS.POST, Path(PATHS.webhooks, application_id, interaction_token), requestOptions, params),
@@ -794,23 +819,6 @@ export const Application = {
 
     DeleteFollowupMessage: (application_id: string, interaction_token: string, message_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, Path(PATHS.webhooks, application_id, interaction_token, PATHS.messages, message_id), requestOptions),
-
-    GetGuildCommandPermissions: (application_id: string, guild_id: string, requestOptions?: RequestOptions): Promise<types.GuildApplicationCommandPermissions[]> =>
-        Request(METHODS.GET, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands, PATHS.permissions), requestOptions),
-
-    GetCommandPermissions: (application_id: string, guild_id: string, command_id: string, requestOptions?: RequestOptions): Promise<types.GuildApplicationCommandPermissions> =>
-        Request(METHODS.GET, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands, command_id, PATHS.permissions), requestOptions),
-
-    EditCommandPermissions: (application_id: string, guild_id: string, command_id: string, params: {
-        permissions: types.ApplicationCommandPermissions[];
-    }, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.PUT, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands, command_id, PATHS.permissions), requestOptions, params),
-
-    BatchEditCommandPermissions: (application_id: string, guild_id: string, params: {
-        id: string;
-        permissions: types.ApplicationCommandPermissions[];
-    }[], requestOptions?: RequestOptions): Promise<types.GuildApplicationCommandPermissions[]> =>
-        Request(METHODS.PUT, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands, PATHS.permissions), requestOptions, params),
 };
 
 export const OAuth2 = {
