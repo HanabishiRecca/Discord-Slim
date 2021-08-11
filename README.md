@@ -126,10 +126,10 @@ client.events.on(Events.GUILD_CREATE, (guild) => {
 client.events.on(Events.INTERACTION_CREATE, (interaction) => {
     if(interaction.data?.name != 'echo') return;
     Actions.Application.CreateInteractionResponse(interaction.id, interaction.token, {
-        type: Helpers.InteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE,
+        type: Helpers.InteractionCallbackTypes.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
             content: interaction.data.options[0].value.toString(),
-            flags: Helpers.InteractionResponseFlags.EPHEMERAL,
+            flags: Helpers.InteractionCallbackDataFlags.EPHEMERAL,
         },
     });
 });
