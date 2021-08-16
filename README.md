@@ -103,6 +103,14 @@ client.events.on(Events.READY, () => {
 });
 ```
 
+### Async capabilities
+```js
+client.events.on(Events.READY, async (data) => {
+    // Log all application global commands
+    console.log(await Actions.Application.GetGlobalCommands(data.user.id));
+});
+```
+
 ### Using slash commands
 Note: slash commands requires `applications.commands` scope. Read details in [docs](https://discord.com/developers/docs/interactions/slash-commands).  
 ```js
