@@ -864,6 +864,7 @@ export const Thread = {
         archived?: boolean;
         auto_archive_duration?: helpers.ThreadArchiveDuration;
         locked?: boolean;
+        invitable?: boolean;
         rate_limit_per_user?: number | null;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
         Request(METHODS.PATCH, Path(PATHS.channels, channel_id), requestOptions, params),
@@ -881,6 +882,7 @@ export const Thread = {
         name: string;
         auto_archive_duration: helpers.ThreadArchiveDuration;
         type?: helpers.ChannelTypes.GUILD_PRIVATE_THREAD | helpers.ChannelTypes.GUILD_PUBLIC_THREAD | helpers.ChannelTypes.GUILD_NEWS_THREAD;
+        invitable?: boolean;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
         Request(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.threads), requestOptions, params),
 

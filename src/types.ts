@@ -284,7 +284,8 @@ export type ThreadMetadata = {
     archived: boolean;
     auto_archive_duration: helpers.ThreadArchiveDuration;
     archive_timestamp: string;
-    locked?: boolean;
+    locked: boolean;
+    invitable?: boolean;
 };
 
 export type ThreadMember = {
