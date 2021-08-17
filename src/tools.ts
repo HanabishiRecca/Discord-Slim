@@ -105,6 +105,12 @@ export const CdnImages = {
             `${CDN}/avatars/${user.id}/${user.avatar}${SizeExtOpt(size, ext)}` :
             `${CDN}/embed/avatars/${Number(user.discriminator) % 5}.png`,
 
+    UserBanner: (user: User | {
+        id: string;
+        banner: string;
+    }, size?: number, ext?: 'png' | 'jpg' | 'webp' | 'gif') =>
+        user.banner ? `${CDN}/banners/${user.id}/${user.banner}${SizeExtOpt(size, ext)}` : null,
+
     ApplicationIcon: (application: Application | {
         id: string;
         icon: string;

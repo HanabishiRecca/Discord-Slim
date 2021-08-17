@@ -588,6 +588,8 @@ export type User = {
     bot?: boolean;
     system?: boolean;
     mfa_enabled?: boolean;
+    banner?: string | null;
+    accent_color?: number | null;
     locale?: string;
     verified?: boolean;
     email?: string | null;
