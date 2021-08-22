@@ -26,7 +26,7 @@
         "dist/**/*"
     ],
     "dependencies": {
-        "ws": "8.1.*"
+        "ws": "8.2.*"
     },
     "devDependencies": {
         "@types/node": "*",
