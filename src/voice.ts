@@ -19,12 +19,15 @@ const enum OPCode {
     CLIENT_DISCONNECT = 13,
 }
 
-type Intent = (
-    | { op: OPCode.HELLO; d: { heartbeat_interval: number; }; }
-    | { op: OPCode.READY; d: { ssrc: number; ip: string; port: number; modes: string[]; }; }
-    | { op: OPCode.SESSION_DESCRIPTION; d: { mode: string; secret_key: number[]; }; }
-    | { op: OPCode.HEARTBEAT_ACK; }
-);
+type Intent = {
+    op: (
+        | OPCode.HELLO
+        | OPCode.READY
+        | OPCode.SESSION_DESCRIPTION
+        | OPCode.HEARTBEAT_ACK
+    );
+    d: any;
+};
 
 const
     fatalCodes = [4002, 4004, 4006, 4011, 4014],
@@ -74,40 +77,40 @@ export class Voice extends EventEmitter {
     private _send = (op: OPCode, d: any) =>
         this._ws && this._ws.send(JSON.stringify({ op, d }));
 
+    private _intentHandlers = {
+        [OPCode.HELLO]: (d: { heartbeat_interval: number; }) => {
+            this._send(this._resume ? OPCode.RESUME : OPCode.IDENTIFY, this._options);
+            this._resume = true;
+            this._lastHeartbeatAck = true;
+            this._setHeartbeatTimer(d.heartbeat_interval);
+            this._sendHeartbeat();
+        },
+
+        [OPCode.READY]: (d: { ssrc: number; ip: string; port: number; }) => {
+            const { ssrc, ip, port } = d;
+            this._broadcast = { ssrc, ip, port };
+            this._send(OPCode.SELECT_PROTOCOL, {
+                protocol: 'udp',
+                data: {
+                    address: ip,
+                    port,
+                    mode: this._encryption,
+                },
+            });
+        },
+
+        [OPCode.SESSION_DESCRIPTION]: (d: { secret_key: number[]; }) => {
+            const { secret_key } = d;
+            this.emit(VoiceEvents.CONNECT, { ...this._broadcast, secret_key });
+        },
+
+        [OPCode.HEARTBEAT_ACK]: () =>
+            this._lastHeartbeatAck = true,
+    };
+
     private _onMessage = (data: WebSocket.Data) => {
         const intent = SafeJsonParse(String(data)) as Intent | null;
-        if(!intent) return;
-
-        switch(intent.op) {
-            case OPCode.HELLO:
-                this._send(this._resume ? OPCode.RESUME : OPCode.IDENTIFY, this._options);
-                this._resume = true;
-                this._lastHeartbeatAck = true;
-                this._setHeartbeatTimer(intent.d.heartbeat_interval);
-                this._sendHeartbeat();
-                break;
-            case OPCode.READY:
-                this._broadcast = {
-                    ip: intent.d.ip,
-                    ssrc: intent.d.ssrc,
-                    port: intent.d.port,
-                };
-                this._send(OPCode.SELECT_PROTOCOL, {
-                    protocol: 'udp',
-                    data: {
-                        address: intent.d.ip,
-                        port: intent.d.port,
-                        mode: this._encryption,
-                    },
-                });
-                break;
-            case OPCode.SESSION_DESCRIPTION:
-                this.emit(VoiceEvents.CONNECT, { ...this._broadcast, secret_key: intent.d.secret_key });
-                break;
-            case OPCode.HEARTBEAT_ACK:
-                this._lastHeartbeatAck = true;
-                break;
-        }
+        intent && this._intentHandlers[intent.op]?.(intent.d);
     };
 
     private _sendHeartbeat = () => {

@@ -25,17 +25,19 @@ const enum Events {
     RESUMED = 'RESUMED',
 }
 
-type Intent = (
-    | { op: OPCode.HELLO; d: { heartbeat_interval: number; }; }
-    | { op: OPCode.HEARTBEAT_ACK; }
-    | { op: OPCode.HEARTBEAT; }
-    | { op: OPCode.INVALID_SESSION; d: boolean; }
-    | { op: OPCode.RECONNECT; }
-    | { op: OPCode.DISPATCH; s?: number; } & (
-        | { t: Events.READY; d: { session_id: string; user: User; }; }
-        | { t: Events.RESUMED; d: null; }
-    )
-);
+type Intent = {
+    op: (
+        | OPCode.DISPATCH
+        | OPCode.HELLO
+        | OPCode.HEARTBEAT_ACK
+        | OPCode.HEARTBEAT
+        | OPCode.INVALID_SESSION
+        | OPCode.RECONNECT
+    );
+    t: any;
+    s: any;
+    d: any;
+};
 
 const
     fatalCodes = [4004, 4010, 4011, 4012, 4013, 4014],
@@ -106,65 +108,72 @@ export class Client extends EventEmitter {
     private _send = (op: OPCode, d: any) =>
         this._ws && this._ws.send(JSON.stringify({ op, d }));
 
-    private _onMessage = (data: WebSocket.Data) => {
-        const intent = SafeJsonParse(String(data)) as Intent | null;
-        if(!intent) return;
+    private _dispatchHandlers = {
+        [Events.READY]: (d: { session_id: string; user: User; }) => {
+            const { user, session_id } = d;
+            this._user = user;
+            this._sessionId = session_id;
+            this.emit(ClientEvents.CONNECT);
+        },
 
-        switch(intent.op) {
-            case OPCode.DISPATCH:
-                if(intent.s && (intent.s > this._lastSequence))
-                    this._lastSequence = intent.s;
-
-                switch(intent.t) {
-                    case Events.READY:
-                        this._user = intent.d.user;
-                        this._sessionId = intent.d.session_id;
-                        this.emit(ClientEvents.CONNECT);
-                        break;
-                    case Events.RESUMED:
-                        this.emit(ClientEvents.CONNECT);
-                        break;
-                }
-
-                this.emit(ClientEvents.INTENT, intent);
-                this._eventHandler.emit(intent.t, intent.d);
-                break;
-            case OPCode.HELLO:
-                this._identify();
-                this._lastHeartbeatAck = true;
-                this._setHeartbeatTimer(intent.d.heartbeat_interval);
-                this._sendHeartbeat();
-                break;
-            case OPCode.HEARTBEAT_ACK:
-                this._lastHeartbeatAck = true;
-                break;
-            case OPCode.HEARTBEAT:
-                this._sendHeartbeat();
-                break;
-            case OPCode.INVALID_SESSION:
-                this.emit(ClientEvents.WARN, `Invalid session. Resumable: ${intent.d}`);
-                this._wsConnect(intent.d);
-                break;
-            case OPCode.RECONNECT:
-                this.emit(ClientEvents.WARN, 'Server forced reconnect.');
-                this._wsConnect(true);
-                break;
-        }
+        [Events.RESUMED]: () =>
+            this.emit(ClientEvents.CONNECT),
     };
 
-    private _identify = () =>
-        this._sessionId ?
-            this._send(OPCode.RESUME, {
-                token: this._auth?.authorization.token,
-                session_id: this._sessionId,
-                seq: this._lastSequence,
-            }) :
-            this._send(OPCode.IDENTIFY, {
-                token: this._auth?.authorization.token,
-                properties: this._props,
-                intents: this._intents ?? Intents.SYSTEM,
-                shard: this._shard,
-            });
+    private _intentHandlers = {
+        [OPCode.DISPATCH]: (intent: { t: Events; s?: number; d: any; }) => {
+            const { t, s, d } = intent;
+
+            if(s && (s > this._lastSequence))
+                this._lastSequence = s;
+
+            this._dispatchHandlers[t]?.(d);
+            this.emit(ClientEvents.INTENT, intent);
+            this._eventHandler.emit(t, d);
+        },
+
+        [OPCode.HELLO]: (intent: { d: { heartbeat_interval: number; }; }) => {
+            this._identify();
+            this._lastHeartbeatAck = true;
+            this._setHeartbeatTimer(intent.d.heartbeat_interval);
+            this._sendHeartbeat();
+        },
+
+        [OPCode.HEARTBEAT_ACK]: () =>
+            this._lastHeartbeatAck = true,
+
+        [OPCode.HEARTBEAT]: () =>
+            this._sendHeartbeat(),
+
+        [OPCode.INVALID_SESSION]: (intent: { d: boolean; }) => {
+            const { d } = intent;
+            this.emit(ClientEvents.WARN, `Invalid session. Resumable: ${d}`);
+            this._wsConnect(d);
+        },
+
+        [OPCode.RECONNECT]: () => {
+            this.emit(ClientEvents.WARN, 'Server forced reconnect.');
+            this._wsConnect(true);
+        },
+    };
+
+    private _onMessage = (data: WebSocket.Data) => {
+        const intent = SafeJsonParse(String(data)) as Intent | null;
+        intent && this._intentHandlers[intent.op]?.(intent);
+    };
+
+    private _identify = () => this._sessionId ?
+        this._send(OPCode.RESUME, {
+            token: this._auth?.authorization.token,
+            session_id: this._sessionId,
+            seq: this._lastSequence,
+        }) :
+        this._send(OPCode.IDENTIFY, {
+            token: this._auth?.authorization.token,
+            properties: this._props,
+            intents: this._intents ?? Intents.SYSTEM,
+            shard: this._shard,
+        });
 
     private _sendHeartbeat = () => {
         if(this._lastHeartbeatAck) {
