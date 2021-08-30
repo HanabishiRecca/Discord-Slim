@@ -5,9 +5,6 @@ import type * as helpers from './helpers';
 export enum Events {
     READY = 'READY',
     RESUMED = 'RESUMED',
-    APPLICATION_COMMAND_CREATE = 'APPLICATION_COMMAND_CREATE',
-    APPLICATION_COMMAND_UPDATE = 'APPLICATION_COMMAND_UPDATE',
-    APPLICATION_COMMAND_DELETE = 'APPLICATION_COMMAND_DELETE',
     CHANNEL_CREATE = 'CHANNEL_CREATE',
     CHANNEL_UPDATE = 'CHANNEL_UPDATE',
     CHANNEL_DELETE = 'CHANNEL_DELETE',
@@ -67,9 +64,6 @@ type EventTypes = {
         };
     };
     [Events.RESUMED]: {};
-    [Events.APPLICATION_COMMAND_CREATE]: types.ApplicationCommand & { guild_id?: string; };
-    [Events.APPLICATION_COMMAND_UPDATE]: types.ApplicationCommand & { guild_id?: string; };
-    [Events.APPLICATION_COMMAND_DELETE]: types.ApplicationCommand & { guild_id?: string; };
     [Events.CHANNEL_CREATE]: types.Channel;
     [Events.CHANNEL_UPDATE]: types.Channel;
     [Events.CHANNEL_DELETE]: types.Channel;
