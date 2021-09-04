@@ -312,21 +312,21 @@ export type Embed = {
 };
 
 export type EmbedThumbnail = {
-    url?: string;
+    url: string;
     proxy_url?: string;
     height?: number;
     width?: number;
 };
 
 export type EmbedVideo = {
-    url?: string;
+    url: string;
     proxy_url?: string;
     height?: number;
     width?: number;
 };
 
 export type EmbedImage = {
-    url?: string;
+    url: string;
     proxy_url?: string;
     height?: number;
     width?: number;
@@ -338,7 +338,7 @@ export type EmbedProvider = {
 };
 
 export type EmbedAuthor = {
-    name?: string;
+    name: string;
     url?: string;
     icon_url?: string;
     proxy_icon_url?: string;
