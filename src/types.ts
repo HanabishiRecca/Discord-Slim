@@ -685,6 +685,7 @@ export type ApplicationCommand = {
     description: string;
     options?: ApplicationCommandOption[];
     default_permission?: boolean;
+    version: string;
 };
 
 export type ApplicationCommandOption = {
