@@ -282,7 +282,6 @@ export const Guild = {
 
     Create: (params: {
         name: string;
-        region?: string;
         icon?: string;
         verification_level?: helpers.VerificationLevel;
         default_message_notifications?: helpers.DefaultMessageNotificationLevel;
@@ -306,7 +305,6 @@ export const Guild = {
 
     Modify: (guild_id: string, params: {
         name?: string;
-        region?: string | null;
         verification_level?: helpers.VerificationLevel;
         default_message_notifications?: helpers.DefaultMessageNotificationLevel;
         explicit_content_filter?: helpers.ExplicitContentFilterLevel;

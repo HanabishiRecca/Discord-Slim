@@ -59,7 +59,6 @@ export type AuditLogChangeKeyGuild = {
     discovery_splash_hash: string;
     banner_hash: string;
     owner_id: string;
-    region: string;
     preferred_locale: string;
     afk_channel_id: string;
     afk_timeout: number;
