@@ -1,0 +1,31 @@
+{
+    "name": "discord-slim",
+    "version": "2.2.4",
+    "description": "Lightweight Discord API library for Node.js.",
+    "author": "Hanabishi",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/HanabishiRecca/Discord-Slim"
+    },
+    "keywords": [
+        "discord",
+        "bot",
+        "api",
+        "client",
+        "library",
+        "framework"
+    ],
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "license": "MIT",
+    "engines": {
+        "node": ">=14.0.0"
+    },
+    "files": [
+        "dist/**/*"
+    ],
+    "dependencies": {
+        "ws": "8.2.*"
+    }
+}
