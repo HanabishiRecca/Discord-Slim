@@ -1,13 +1,13 @@
 {
     "scripts": {
         "build": "rollup -c",
-        "watch": "rollup -cw"
+        "start": "rollup -cw"
     },
     "devDependencies": {
-        "@rollup/plugin-typescript": "8.2.*",
         "@types/node": "*",
         "@types/ws": "*",
         "rollup": "2.56.*",
-        "rollup-plugin-dts": "4.0.*"
+        "rollup-plugin-delete": "2.0.*",
+        "rollup-plugin-ts": "1.4.*"
     }
 }
