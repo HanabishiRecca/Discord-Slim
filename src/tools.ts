@@ -1,4 +1,4 @@
-import { Permissions as Flags, TimestampStyles, CDN, HOST } from './helpers.js';
+import { Permissions as Flags, TimestampStyles, CDN, HOST } from './helpers';
 import type { Guild, User, Application, Team, Emoji, Message, Channel, Role } from './types';
 
 type Permission = typeof Flags[keyof typeof Flags];

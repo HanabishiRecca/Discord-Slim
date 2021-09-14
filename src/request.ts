@@ -1,7 +1,7 @@
 import https from 'https';
 import type { OutgoingHttpHeaders } from 'http';
-import { SafeJsonParse } from './util.js';
-import { TokenTypes, API_PATH } from './helpers.js';
+import { SafeJsonParse } from './util';
+import { TokenTypes, API_PATH } from './helpers';
 
 const
     DEFAULT_CONNECTION_TIMEOUT = 5000,

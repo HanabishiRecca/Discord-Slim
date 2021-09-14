@@ -1,11 +1,11 @@
-export { Client, ClientEvents } from './client.js';
-export { Authorization } from './request.js';
-export { Events } from './events.js';
-export * as Actions from './actions.js';
-export * as Helpers from './helpers.js';
+export { Client, ClientEvents } from './client';
+export { Authorization } from './request';
+export { Events } from './events';
+export * as Actions from './actions';
+export * as Helpers from './helpers';
 
 import type * as Types from './types';
 export { Types };
 
-export * as Tools from './tools.js';
-export { Voice, VoiceEvents } from './voice.js';
+export * as Tools from './tools';
+export { Voice, VoiceEvents } from './voice';

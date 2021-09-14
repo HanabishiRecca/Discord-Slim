@@ -1,9 +1,9 @@
-import { Request, RequestOptions } from './request.js';
+import { Request, RequestOptions } from './request';
 import { URLSearchParams } from 'url';
 import type * as helpers from './helpers';
 import type * as types from './types';
 
-export { SetDefOptions as setDefaultRequestOptions } from './request.js';
+export { SetDefOptions as setDefaultRequestOptions } from './request';
 
 const
     Path = (...paths: string[]) => paths.join('/'),
