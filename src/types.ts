@@ -364,6 +364,7 @@ export type Attachment = {
     proxy_url: string;
     height?: number | null;
     width?: number | null;
+    ephemeral?: boolean;
 };
 
 export type ChannelMention = {
