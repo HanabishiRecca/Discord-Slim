@@ -1,14 +1,15 @@
-import { Permissions as Flags, TimestampStyles, MessageStickerFormatTypes, CDN, HOST } from './helpers';
-import type { Guild, User, Application, Team, Emoji, Message, Channel, Role, Sticker, StickerPack } from './types';
+import * as helpers from './helpers';
+import type * as types from './types';
 
-type Permission = typeof Flags[keyof typeof Flags];
+type Permission = typeof helpers.Permissions[keyof typeof helpers.Permissions];
 type PermissionSet = string | number | bigint;
 
 export const Permissions = {
+
     equals: (a: PermissionSet, b: PermissionSet) =>
         BigInt(a) == BigInt(b),
 
-    combine: (permissions: PermissionSet[]) => {
+    combine: (permissions: (PermissionSet | Permission)[]) => {
         let result = 0n;
         for(const p of permissions)
             result |= BigInt(p);
@@ -19,27 +20,55 @@ export const Permissions = {
         (BigInt(source) & BigInt(permission)) == BigInt(permission),
 
     has: (source: PermissionSet, permission: Permission) =>
-        Permissions.check(source, Flags.ADMINISTRATOR) || Permissions.check(source, permission),
+        Permissions.check(source, helpers.Permissions.ADMINISTRATOR) || Permissions.check(source, permission),
 
     add: (source: PermissionSet, permission: Permission) =>
         String(BigInt(source) | BigInt(permission)),
 
     remove: (source: PermissionSet, permission: Permission) =>
         String(BigInt(source) & ~BigInt(permission)),
+
 };
 
-const EID = (value: any) => (typeof value == 'object') ? value.id : value;
+const EID = (
+    value: { id: string | null; } | string | null,
+) =>
+    ((typeof value == 'object') ? value?.id : value) ?? '';
 
-export const Mentions = {
-    User: (user: User | { id: string; } | string) => `<@${EID(user)}>`,
-    Channel: (channel: Channel | { id: string; } | string) => `<#${EID(channel)}>`,
-    Role: (role: Role | { id: string; } | string) => `<@&${EID(role)}>`,
+export const Mention = {
+
+    User: (
+        user: types.User | { id: string; } | string,
+    ) =>
+        `<@${EID(user)}>`,
+
+    Channel: (
+        channel: types.Channel | { id: string; } | string,
+    ) =>
+        `<#${EID(channel)}>`,
+
+    Role: (
+        role: types.Role | { id: string; } | string,
+    ) =>
+        `<@&${EID(role)}>`,
+
 };
 
 export const Format = {
-    Emoji: (emoji: Emoji) => `<${emoji.animated ? 'a' : ''}:${emoji.name}:${emoji.id}>`,
-    Reaction: (emoji: Emoji) => `${emoji.name}:${emoji.id}`,
-    Timestamp: (timestamp: number | string | Date, style?: TimestampStyles) => {
+
+    Emoji: (
+        emoji: types.Emoji | { name: string; id: string; animated?: boolean; },
+    ) =>
+        `<${emoji.animated ? 'a' : ''}:${emoji.name}:${emoji.id}>`,
+
+    Reaction: (
+        emoji: types.Emoji | { name: string; id: string; }
+    ) => `${emoji.name}:${emoji.id}`,
+
+    Timestamp: (
+        timestamp: number | string | Date,
+        style?: helpers.TimestampStyles,
+    ) => {
         let value;
 
         if(timestamp instanceof Date)
@@ -53,96 +82,120 @@ export const Format = {
             `<t:${value}:${style}>` :
             `<t:${value}>`;
     },
+
 };
 
 export const Link = {
-    Message: (message: Message | {
-        id: string;
-        channel_id: string;
-        guild_id?: string;
-    }) =>
-        `${HOST}/channels/${message.guild_id ?? '@me'}/${message.channel_id}/${message.id}`,
+
+    Message: (
+        message: types.Message | { id: string; channel_id: string; guild_id?: string; },
+    ) =>
+        `${helpers.HOST}/channels/${message.guild_id ?? '@me'}/${message.channel_id}/${message.id}`,
+
 };
 
-const SizeExtOpt = (size?: number, ext?: string) => (ext ? `.${ext}` : '') + (size ? `?size=${size}` : '');
+const SizeExtOpt = (size?: number, ext?: string) =>
+    (ext ? `.${ext}` : '') + (size ? `?size=${size}` : '');
 
-export const CdnImages = {
-    CustomEmoji: (emoji: Emoji | {
-        id: string;
-    } | string, size?: number, ext?: 'png' | 'jpg' | 'webp' | 'gif') =>
-        `${CDN}/emojis/${EID(emoji)}${SizeExtOpt(size, ext)}`,
+export const Resource = {
 
-    GuildIcon: (guild: Guild | {
-        id: string;
-        icon: string;
-    }, size?: number, ext?: 'png' | 'jpg' | 'webp' | 'gif') =>
-        guild.icon ? `${CDN}/icons/${guild.id}/${guild.icon}${SizeExtOpt(size, ext)}` : null,
+    CustomEmoji: (
+        emoji: types.Emoji | { id: string; } | string,
+        size?: number,
+        ext?: 'png' | 'jpg' | 'webp' | 'gif',
+    ) =>
+        `${helpers.CDN}/emojis/${EID(emoji)}${SizeExtOpt(size, ext)}`,
 
-    GuildSplash: (guild: Guild | {
-        id: string;
-        splash: string;
-    }, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
-        guild.splash ? `${CDN}/splashes/${guild.id}/${guild.splash}${SizeExtOpt(size, ext)}` : null,
+    GuildIcon: (
+        guild: types.Guild | { id: string; icon: string; },
+        size?: number,
+        ext?: 'png' | 'jpg' | 'webp' | 'gif',
+    ) =>
+        guild.icon ?
+            `${helpers.CDN}/icons/${guild.id}/${guild.icon}${SizeExtOpt(size, ext)}` : null,
 
-    GuildDiscoverySplash: (guild: Guild | {
-        id: string;
-        discovery_splash: string;
-    }, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
-        guild.discovery_splash ? `${CDN}/discovery-splashes/${guild.id}/${guild.discovery_splash}${SizeExtOpt(size, ext)}` : null,
-
-    GuildBanner: (guild: Guild | {
-        id: string;
-        banner: string;
-    }, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
-        guild.banner ? `${CDN}/banners/${guild.id}/${guild.banner}${SizeExtOpt(size, ext)}` : null,
-
-    UserAvatar: (user: User | {
-        id: string;
-        discriminator: string | number;
-        avatar?: string;
-    }, size?: number, ext?: 'png' | 'jpg' | 'webp' | 'gif') =>
-        user.avatar ?
-            `${CDN}/avatars/${user.id}/${user.avatar}${SizeExtOpt(size, ext)}` :
-            `${CDN}/embed/avatars/${Number(user.discriminator) % 5}.png`,
-
-    UserBanner: (user: User | {
-        id: string;
-        banner: string;
-    }, size?: number, ext?: 'png' | 'jpg' | 'webp' | 'gif') =>
-        user.banner ? `${CDN}/banners/${user.id}/${user.banner}${SizeExtOpt(size, ext)}` : null,
-
-    ApplicationIcon: (application: Application | {
-        id: string;
-        icon: string;
-    }, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
-        application.icon ? `${CDN}/app-icons/${application.id}/${application.icon}${SizeExtOpt(size, ext)}` : null,
-
-    ApplicationAsset: (application: Application | {
-        id: string;
-    } | string, asset_id: string, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
-        `${CDN}/app-assets/${EID(application)}/${asset_id}${SizeExtOpt(size, ext)}`,
-
-    AchievementIcon: (application: Application | {
-        id: string;
-    } | string, achievement_id: string, icon_hash: string, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
-        `${CDN}/app-assets/${EID(application)}/achievements/${achievement_id}/icons/${icon_hash}${SizeExtOpt(size, ext)}`,
-
-    StickerPackBanner: (
-        application: Application | { id: string; } | string,
-        sticker_pack: StickerPack | { banner_asset_id: string; },
+    GuildSplash: (
+        guild: types.Guild | { id: string; splash: string; },
         size?: number,
         ext?: 'png' | 'jpg' | 'webp',
     ) =>
-        `${CDN}/app-assets/${EID(application)}/store/${sticker_pack.banner_asset_id}${SizeExtOpt(size, ext)}`,
+        guild.splash ?
+            `${helpers.CDN}/splashes/${guild.id}/${guild.splash}${SizeExtOpt(size, ext)}` : null,
 
-    TeamIcon: (team: Team | {
-        id: string;
-        icon: string;
-    }, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
-        team.icon ? `${CDN}/team-icons/${team.id}/${team.icon}${SizeExtOpt(size, ext)}` : null,
+    GuildDiscoverySplash: (
+        guild: types.Guild | { id: string; discovery_splash: string; },
+        size?: number,
+        ext?: 'png' | 'jpg' | 'webp',
+    ) =>
+        guild.discovery_splash ?
+            `${helpers.CDN}/discovery-splashes/${guild.id}/${guild.discovery_splash}${SizeExtOpt(size, ext)}` : null,
+
+    GuildBanner: (
+        guild: types.Guild | { id: string; banner: string; },
+        size?: number,
+        ext?: 'png' | 'jpg' | 'webp',
+    ) =>
+        guild.banner ? `${helpers.CDN}/banners/${guild.id}/${guild.banner}${SizeExtOpt(size, ext)}` : null,
+
+    UserAvatar: (
+        user: types.User | { id: string; discriminator: string | number; avatar?: string; },
+        size?: number,
+        ext?: 'png' | 'jpg' | 'webp' | 'gif',
+    ) =>
+        user.avatar ?
+            `${helpers.CDN}/avatars/${user.id}/${user.avatar}${SizeExtOpt(size, ext)}` :
+            `${helpers.CDN}/embed/avatars/${Number(user.discriminator) % 5}.png`,
+
+    UserBanner: (
+        user: types.User | { id: string; banner: string; },
+        size?: number,
+        ext?: 'png' | 'jpg' | 'webp' | 'gif',
+    ) =>
+        user.banner ?
+            `${helpers.CDN}/banners/${user.id}/${user.banner}${SizeExtOpt(size, ext)}` : null,
+
+    ApplicationIcon: (
+        application: types.Application | { id: string; icon: string; },
+        size?: number,
+        ext?: 'png' | 'jpg' | 'webp',
+    ) =>
+        application.icon ?
+            `${helpers.CDN}/app-icons/${application.id}/${application.icon}${SizeExtOpt(size, ext)}` : null,
+
+    ApplicationAsset: (
+        application: types.Application | { id: string; } | string,
+        asset_id: string,
+        size?: number,
+        ext?: 'png' | 'jpg' | 'webp',
+    ) =>
+        `${helpers.CDN}/app-assets/${EID(application)}/${asset_id}${SizeExtOpt(size, ext)}`,
+
+    AchievementIcon: (
+        application: types.Application | { id: string; } | string,
+        achievement_id: string | number | BigInt,
+        icon_hash: string,
+        size?: number, ext?: 'png' | 'jpg' | 'webp',
+    ) =>
+        `${helpers.CDN}/app-assets/${EID(application)}/achievements/${achievement_id}/icons/${icon_hash}${SizeExtOpt(size, ext)}`,
+
+    StickerPackBanner: (
+        application: types.Application | { id: string; } | string,
+        sticker_pack: types.StickerPack | { banner_asset_id: string; },
+        size?: number,
+        ext?: 'png' | 'jpg' | 'webp',
+    ) =>
+        `${helpers.CDN}/app-assets/${EID(application)}/store/${sticker_pack.banner_asset_id}${SizeExtOpt(size, ext)}`,
+
+    TeamIcon: (
+        team: types.Team | { id: string; icon: string; },
+        size?: number,
+        ext?: 'png' | 'jpg' | 'webp',
+    ) =>
+        team.icon ? `${helpers.CDN}/team-icons/${team.id}/${team.icon}${SizeExtOpt(size, ext)}` : null,
 
     Sticker: (
-        sticker: Sticker | { id: string; format_type: MessageStickerFormatTypes; },
+        sticker: types.Sticker | { id: string; format_type: helpers.MessageStickerFormatTypes; },
     ) =>
-        `${CDN}/stickers/${EID(sticker)}.${(sticker.format_type == MessageStickerFormatTypes.LOTTIE) ? 'json' : 'png'}`,
+        `${helpers.CDN}/stickers/${EID(sticker)}.${(sticker.format_type == helpers.MessageStickerFormatTypes.LOTTIE) ? 'json' : 'png'}`,
+
 };
