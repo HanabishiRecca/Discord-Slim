@@ -485,3 +485,8 @@ export enum ApplicationCommandTypes {
     USER = 2,
     MESSAGE = 3,
 }
+
+export enum StickerTypes {
+    STANDARD = 1,
+    GUILD = 2,
+}

@@ -1,5 +1,5 @@
-import { Permissions as Flags, TimestampStyles, CDN, HOST } from './helpers';
-import type { Guild, User, Application, Team, Emoji, Message, Channel, Role } from './types';
+import { Permissions as Flags, TimestampStyles, MessageStickerFormatTypes, CDN, HOST } from './helpers';
+import type { Guild, User, Application, Team, Emoji, Message, Channel, Role, Sticker, StickerPack } from './types';
 
 type Permission = typeof Flags[keyof typeof Flags];
 type PermissionSet = string | number | bigint;
@@ -127,9 +127,22 @@ export const CdnImages = {
     } | string, achievement_id: string, icon_hash: string, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
         `${CDN}/app-assets/${EID(application)}/achievements/${achievement_id}/icons/${icon_hash}${SizeExtOpt(size, ext)}`,
 
+    StickerPackBanner: (
+        application: Application | { id: string; } | string,
+        sticker_pack: StickerPack | { banner_asset_id: string; },
+        size?: number,
+        ext?: 'png' | 'jpg' | 'webp',
+    ) =>
+        `${CDN}/app-assets/${EID(application)}/store/${sticker_pack.banner_asset_id}${SizeExtOpt(size, ext)}`,
+
     TeamIcon: (team: Team | {
         id: string;
         icon: string;
     }, size?: number, ext?: 'png' | 'jpg' | 'webp') =>
         team.icon ? `${CDN}/team-icons/${team.id}/${team.icon}${SizeExtOpt(size, ext)}` : null,
+
+    Sticker: (
+        sticker: Sticker | { id: string; format_type: MessageStickerFormatTypes; },
+    ) =>
+        `${CDN}/stickers/${EID(sticker)}.${(sticker.format_type == MessageStickerFormatTypes.LOTTIE) ? 'json' : 'png'}`,
 };

@@ -56,6 +56,8 @@ const enum PATHS {
     search = 'search',
     slack = 'slack',
     stage_instances = 'stage-instances',
+    sticker_packs = 'sticker-packs',
+    stickers = 'stickers',
     templates = 'templates',
     thread_members = 'thread-members',
     threads = 'threads',
@@ -407,6 +409,9 @@ export const Guild = {
 
     GetWebhooks: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Webhook[]> =>
         Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.webhooks), requestOptions),
+
+    ListStickers: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Sticker[]> =>
+        Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.stickers), requestOptions),
 };
 
 export const Emoji = {
@@ -919,4 +924,29 @@ export const StageInstance = {
 
     Delete: (channel_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, Path(PATHS.stage_instances, channel_id), requestOptions),
+};
+
+export const Sticker = {
+    Get: (sticker_id: string, requestOptions?: RequestOptions): Promise<types.Sticker> =>
+        Request(METHODS.GET, Path(PATHS.stickers, sticker_id), requestOptions),
+
+    GetFromGuild: (guild_id: string, sticker_id: string, requestOptions?: RequestOptions): Promise<types.Sticker> =>
+        Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.stickers, sticker_id), requestOptions),
+
+    // Create: TODO
+
+    Modify: (guild_id: string, sticker_id: string, params: {
+        name?: string;
+        description?: string | null;
+        tags?: string;
+    }, requestOptions?: RequestOptions): Promise<types.Sticker> =>
+        Request(METHODS.PATCH, Path(PATHS.guilds, guild_id, PATHS.stickers, sticker_id), requestOptions, params),
+
+    Delete: (guild_id: string, sticker_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.DELETE, Path(PATHS.guilds, guild_id, PATHS.stickers, sticker_id), requestOptions),
+};
+
+export const StickerPacks = {
+    ListNitro: (requestOptions?: RequestOptions): Promise<{ sticker_packs: types.StickerPack[]; }> =>
+        Request(METHODS.GET, PATHS.sticker_packs, requestOptions),
 };

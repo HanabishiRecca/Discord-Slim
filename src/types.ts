@@ -226,8 +226,8 @@ export type Message = {
     interaction?: MessageInteraction;
     thread?: Channel;
     components?: ActionRow[];
-    sticker_items?: MessageStickerItem[];
-    stickers?: MessageSticker[];
+    sticker_items?: StickerItem[];
+    stickers?: Sticker[];
 };
 
 export type MessageActivity = {
@@ -240,25 +240,6 @@ export type MessageReference = {
     channel_id?: string;
     guild_id?: string;
     fail_if_not_exists?: boolean;
-};
-
-export type MessageStickerItem = {
-    id: string;
-    name: string;
-    format_type: helpers.MessageStickerFormatTypes;
-};
-
-export type MessageSticker = {
-    id: string;
-    pack_id?: string;
-    name: string;
-    description: string;
-    tags: string;
-    format_type: helpers.MessageStickerFormatTypes;
-    available?: boolean;
-    guild_id?: string;
-    user?: User;
-    sort_value?: number;
 };
 
 export type FollowedChannel = {
@@ -920,4 +901,36 @@ export type StageInstance = {
     topic: string;
     privacy_level: helpers.PrivacyLevel;
     discoverable_disabled: boolean;
+};
+
+// Sticker types
+
+export type Sticker = {
+    id: string;
+    pack_id?: string;
+    name: string;
+    description: string | null;
+    tags: string;
+    type: helpers.StickerTypes;
+    format_type: helpers.MessageStickerFormatTypes;
+    available?: boolean;
+    guild_id?: string;
+    user?: User;
+    sort_value?: number;
+};
+
+export type StickerItem = {
+    id: string;
+    name: string;
+    format_type: helpers.MessageStickerFormatTypes;
+};
+
+export type StickerPack = {
+    id: string;
+    stickers: Sticker[];
+    name: string;
+    sku_id: string;
+    cover_sticker_id?: string;
+    description: string;
+    banner_asset_id: string;
 };
