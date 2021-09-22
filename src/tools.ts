@@ -198,4 +198,11 @@ export const Resource = {
     ) =>
         `${helpers.CDN}/stickers/${EID(sticker)}.${(sticker.format_type == helpers.MessageStickerFormatTypes.LOTTIE) ? 'json' : 'png'}`,
 
+    RoleIcon: (
+        role: types.Role | { id: string; icon: string; },
+        size?: number,
+        ext?: 'png' | 'jpg' | 'webp',
+    ) =>
+        role.icon ? `${helpers.CDN}/role-icons/${role.id}/${role.icon}${SizeExtOpt(size, ext)}` : null,
+
 };

@@ -3,11 +3,11 @@ import type * as helpers from './helpers';
 // Audit Log types
 
 export type AuditLog = {
-    webhooks: Webhook[];
-    users: User[];
     audit_log_entries: AuditLogEntry[];
     integrations: Integration[];
     threads: Channel[];
+    users: User[];
+    webhooks: Webhook[];
 };
 
 export type AuditLogEntry = {
@@ -21,14 +21,14 @@ export type AuditLogEntry = {
 };
 
 export type AuditEntryInfo = {
-    delete_member_days?: string;
-    members_removed?: string;
     channel_id?: string;
-    message_id?: string;
     count?: string;
+    delete_member_days?: string;
     id?: number;
-    type?: string;
+    members_removed?: string;
+    message_id?: string;
     role_name?: string;
+    type?: string;
 };
 
 export type AuditLogChange = {
@@ -50,119 +50,121 @@ export type AuditLogChangeKey = (
 );
 
 export type AuditLogChangeKeyGuild = {
-    id: string;
-    type: string;
-    name: string;
-    description: string;
-    icon_hash: string;
-    splash_hash: string;
-    discovery_splash_hash: string;
-    banner_hash: string;
-    owner_id: string;
-    preferred_locale: string;
     afk_channel_id: string;
     afk_timeout: number;
-    rules_channel_id: string;
-    public_updates_channel_id: string;
-    mfa_level: number;
-    verification_level: number;
-    explicit_content_filter: helpers.ExplicitContentFilterLevel;
+    banner_hash: string;
     default_message_notifications: helpers.DefaultMessageNotificationLevel;
+    description: string;
+    discovery_splash_hash: string;
+    explicit_content_filter: helpers.ExplicitContentFilterLevel;
+    icon_hash: string;
+    id: string;
+    mfa_level: number;
+    name: string;
+    owner_id: string;
+    preferred_locale: string;
+    prune_delete_days: number;
+    public_updates_channel_id: string;
+    rules_channel_id: string;
+    splash_hash: string;
+    system_channel_id: string;
+    type: string;
     vanity_url_code: string;
+    verification_level: number;
+    widget_channel_id: string;
+    widget_enabled: boolean;
     $add: AuditLogPartialRole[];
     $remove: AuditLogPartialRole[];
-    prune_delete_days: number;
-    widget_enabled: boolean;
-    widget_channel_id: string;
-    system_channel_id: string;
 };
 
 export type AuditLogPartialRole = {
-    name: string;
+    icon_hash: string;
     id: string;
+    name: string;
+    unicode_emoji: string;
 };
 
 export type AuditLogChangeKeyChannel = {
-    id: string;
-    type: helpers.ChannelTypes;
-    name: string;
-    position: number;
-    topic: string;
-    bitrate: number;
-    permission_overwrites: PermissionsOverwrite[];
-    nsfw: boolean;
     application_id: string;
+    bitrate: number;
+    id: string;
+    name: string;
+    nsfw: boolean;
+    permission_overwrites: PermissionsOverwrite[];
+    position: number;
     rate_limit_per_user: number;
+    topic: string;
+    type: helpers.ChannelTypes;
 };
 
 export type AuditLogChangeKeyRole = {
+    allow: string;
+    color: number;
+    deny: string;
+    hoist: boolean;
     id: string;
-    type: string;
+    mentionable: boolean;
     name: string;
     permissions: string;
-    color: number;
-    hoist: boolean;
-    mentionable: boolean;
-    allow: string;
-    deny: string;
+    type: string;
 };
 
 export type AuditLogChangeKeyInvite = {
-    id: string;
-    type: string;
-    name: string;
-    code: string;
     channel_id: string;
+    code: string;
+    id: string;
     inviter_id: string;
-    max_uses: number;
-    uses: number;
     max_age: number;
+    max_uses: number;
+    name: string;
     temporary: boolean;
+    type: string;
+    uses: number;
 };
 
 export type AuditLogChangeKeyUser = {
-    id: string;
-    type: string;
-    name: string;
-    deaf: boolean;
-    mute: boolean;
-    nick: string;
     avatar_hash: boolean;
+    deaf: boolean;
+    id: string;
+    mute: boolean;
+    name: string;
+    nick: string;
+    type: string;
 };
 
 export type AuditLogChangeKeyIntegration = {
-    id: string;
-    type: string;
-    name: string;
     enable_emoticons: boolean;
     expire_behavior: number;
     expire_grace_period: number;
+    id: string;
+    name: string;
+    type: string;
 };
 
 export type AuditLogChangeKeyVoiceChannel = {
     id: string;
-    type: string;
     name: string;
+    type: string;
     user_limit: number;
 };
 
 export type AuditLogChangeKeySticker = {
-    id: string;
-    type: string;
-    name: string;
-    description: string;
-    tags: string;
-    format_type: helpers.MessageStickerFormatTypes;
     available: boolean;
+    description: string;
+    format_type: helpers.MessageStickerFormatTypes;
     guild_id: string;
+    id: string;
+    name: string;
+    tags: string;
+    type: string;
 };
 
 export type AuditLogChangeStageInstance = {
     id: string;
-    type: helpers.ChannelTypes;
     name: string;
-    topic: string;
     privacy_level: helpers.PrivacyLevel;
+    topic: string;
+    type: helpers.ChannelTypes;
 };
 
 // Channel types
@@ -598,6 +600,8 @@ export type Role = {
     name: string;
     color: number;
     hoist: boolean;
+    icon: string | null;
+    unicode_emoji: string | null;
     position: number;
     permissions: string;
     managed: boolean;
@@ -608,7 +612,7 @@ export type Role = {
 export type RoleTags = {
     bot_id?: string;
     integration_id?: string;
-    premium_subscriber?: boolean;
+    premium_subscriber?: boolean | null;
 };
 
 // Voice types

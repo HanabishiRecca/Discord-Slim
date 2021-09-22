@@ -492,6 +492,8 @@ export const Role = {
         permissions?: string;
         color?: number;
         hoist?: boolean;
+        icon?: string;
+        unicode_emoji?: string;
         mentionable?: boolean;
     }, requestOptions?: RequestOptions): Promise<types.Role> =>
         Request(METHODS.POST, Path(PATHS.guilds, guild_id, PATHS.roles), requestOptions, params),
@@ -501,6 +503,8 @@ export const Role = {
         permissions?: string | null;
         color?: number | null;
         hoist?: boolean | null;
+        icon?: string | null;
+        unicode_emoji?: string | null;
         mentionable?: boolean | null;
     }, requestOptions?: RequestOptions): Promise<types.Role> =>
         Request(METHODS.PATCH, Path(PATHS.guilds, guild_id, PATHS.roles, role_id), requestOptions, params),
