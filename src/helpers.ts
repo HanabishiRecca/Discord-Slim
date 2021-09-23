@@ -54,6 +54,8 @@ export const Permissions = {
     START_EMBEDDED_ACTIVITIES: 0x8000000000n,
 } as const;
 
+export type Permission = typeof Permissions[keyof typeof Permissions];
+
 export enum Intents {
     SYSTEM = 0,
     GUILDS = 1 << 0,

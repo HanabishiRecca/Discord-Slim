@@ -1,34 +1,58 @@
 import * as helpers from './helpers';
 import type * as types from './types';
 
-type Permission = typeof helpers.Permissions[keyof typeof helpers.Permissions];
-type PermissionSet = string | number | bigint;
+type PermissionLike = string | number | bigint | PermissionSet;
 
-export const Permissions = {
+const EPV = (p: PermissionLike) =>
+    p instanceof PermissionSet ? p.value : BigInt(p);
 
-    equals: (a: PermissionSet, b: PermissionSet) =>
-        BigInt(a) == BigInt(b),
+export class PermissionSet {
+    private _value: bigint;
 
-    combine: (permissions: (PermissionSet | Permission)[]) => {
-        let result = 0n;
-        for(const p of permissions)
-            result |= BigInt(p);
-        return String(result);
-    },
+    constructor(value?: string | number | bigint) {
+        this._value = value ? BigInt(value) : 0n;
+    }
 
-    check: (source: PermissionSet, permission: Permission) =>
-        (BigInt(source) & BigInt(permission)) == BigInt(permission),
+    get value() { return this._value; }
 
-    has: (source: PermissionSet, permission: Permission) =>
-        Permissions.check(source, helpers.Permissions.ADMINISTRATOR) || Permissions.check(source, permission),
+    toString = () => String(this._value);
+    toJSON = () => String(this._value);
+    valueOf = () => this._value;
 
-    add: (source: PermissionSet, permission: Permission) =>
-        String(BigInt(source) | BigInt(permission)),
+    clone = () => new PermissionSet(this._value);
 
-    remove: (source: PermissionSet, permission: Permission) =>
-        String(BigInt(source) & ~BigInt(permission)),
+    equals = (permissions: PermissionLike) =>
+        this._value == EPV(permissions);
 
-};
+    combine = (permissions: PermissionLike | PermissionLike[]) => {
+        if(Array.isArray(permissions)) {
+            let value = this._value;
+            for(const p of permissions)
+                value |= EPV(p);
+            this._value = value;
+        } else {
+            this._value |= EPV(permissions);
+        }
+    };
+
+    check = (permission: helpers.Permission) =>
+        (this._value & permission) == permission;
+
+    has = (permission: helpers.Permission) =>
+        this.check(helpers.Permissions.ADMINISTRATOR) || this.check(permission);
+
+    add = (permission: helpers.Permission) =>
+        void (this._value |= permission);
+
+    remove = (permission: helpers.Permission) =>
+        void (this._value &= ~permission);
+
+    set = (permission: helpers.Permission, set: boolean) =>
+        void (set ? this.add : this.remove)(permission);
+
+    toggle = (permission: helpers.Permission) =>
+        void this.set(permission, !this.has(permission));
+}
 
 const EID = (value: { id: string; } | string) =>
     (typeof value == 'object') ? value.id : value;
