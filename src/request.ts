@@ -54,8 +54,11 @@ export type RequestOptions = {
 };
 
 let defOptions: RequestOptions | undefined;
+
+// @internal
 export const SetDefOptions = (options?: RequestOptions) => defOptions = options;
 
+// @internal
 export const Request = (method: string, endpoint: string, options = defOptions, data?: object | string | null) => {
     let content: string;
 
