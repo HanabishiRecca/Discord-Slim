@@ -92,7 +92,7 @@ client.events.on(Events.MESSAGE_CREATE, (message) => {
 
     // Using both reply and mention just for demo.
     Actions.Message.Create(message.channel_id, {
-        content: `Hi, ${Tools.Mentions.User(message.author)}!`,
+        content: `Hi, ${Tools.Mention.User(message.author)}!`,
         message_reference: {
             channel_id: message.channel_id,
             message_id: message.id,
