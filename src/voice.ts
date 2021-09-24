@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import { EventEmitter } from 'events';
-import { SafeJsonParse, Sleep } from './util';
-import { VoiceEncryptionModes, SpeakingStates } from './helpers';
+import * as util from './util';
+import * as helpers from './helpers';
 
 const VOICE_VERSION = 4;
 
@@ -53,7 +53,7 @@ export class Voice extends EventEmitter {
 
         if(!resume) {
             this._resume = false;
-            await Sleep(5000);
+            await util.Sleep(5000);
         }
 
         if(this._ws)
@@ -109,7 +109,7 @@ export class Voice extends EventEmitter {
     };
 
     private _onMessage = (data: WebSocket.Data) => {
-        const intent = SafeJsonParse(String(data)) as Intent | null;
+        const intent = util.SafeJsonParse(String(data)) as Intent | null;
         intent && this._intentHandlers[intent.op]?.(intent.d);
     };
 
@@ -144,7 +144,7 @@ export class Voice extends EventEmitter {
     private _onError = (error: Error) =>
         this.emit(VoiceEvents.ERROR, error);
 
-    Connect = (server_id: string, user_id: string, session_id: string, token: string, endpoint: string, encryption: VoiceEncryptionModes) => {
+    Connect = (server_id: string, user_id: string, session_id: string, token: string, endpoint: string, encryption: helpers.VoiceEncryptionModes) => {
         this._options = { token, server_id, user_id, session_id };
         this._endpoint = endpoint;
         this._encryption = encryption;
@@ -155,7 +155,7 @@ export class Voice extends EventEmitter {
     Disconnect = (code?: number) =>
         this._wsDisconnect(code);
 
-    SetSpeakingState = (state: SpeakingStates, delay?: number) => {
+    SetSpeakingState = (state: helpers.SpeakingStates, delay?: number) => {
         if(!this._ws) throw 'No connection.';
         this._send(OPCode.SPEAKING, {
             speaking: state,

@@ -1,18 +1,18 @@
 import https from 'https';
 import type { OutgoingHttpHeaders } from 'http';
-import { SafeJsonParse } from './util';
-import { TokenTypes, API_PATH } from './helpers';
+import * as util from './util';
+import * as helpers from './helpers';
 
 const
     DEFAULT_CONNECTION_TIMEOUT = 5000,
     DEFAULT_RETRY_COUNT = 5;
 
 export class Authorization {
-    private _type: TokenTypes;
+    private _type: helpers.TokenTypes;
     private _token: string;
     private _cache!: string;
 
-    constructor(token: string, type: TokenTypes = TokenTypes.BOT) {
+    constructor(token: string, type: helpers.TokenTypes = helpers.TokenTypes.BOT) {
         this._token = token;
         this._type = type;
         this._update();
@@ -24,7 +24,7 @@ export class Authorization {
             this._token;
 
     get type() { return this._type; };
-    set type(value: TokenTypes) { this._type = value; this._update(); };
+    set type(value: helpers.TokenTypes) { this._type = value; this._update(); };
 
     get token() { return this._token; };
     set token(value: string) { this._token = value; this._update(); };
@@ -81,7 +81,7 @@ export const Request = (method: string, endpoint: string, options = defOptions, 
     };
 
     const
-        url = `${API_PATH}/${endpoint}`,
+        url = `${helpers.API_PATH}/${endpoint}`,
         retryCount = options?.rateLimit?.retryCount ?? DEFAULT_RETRY_COUNT,
         rateLimitCallback = options?.rateLimit?.callback;
 
@@ -93,10 +93,10 @@ export const Request = (method: string, endpoint: string, options = defOptions, 
                 const code = result.code;
 
                 if((code >= 200) && (code < 300))
-                    return resolve(SafeJsonParse(result.data));
+                    return resolve(util.SafeJsonParse(result.data));
 
                 if((code >= 400) && (code < 500)) {
-                    const response = SafeJsonParse(result.data);
+                    const response = util.SafeJsonParse(result.data);
                     if(code != 429)
                         return reject({ code, response });
 

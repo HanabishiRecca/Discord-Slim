@@ -1,10 +1,10 @@
 import WebSocket from 'ws';
 import { EventEmitter } from 'events';
-import { API_VERSION, Intents, ActivityTypes, StatusTypes, TokenTypes } from './helpers';
-import { SafeJsonParse, Sleep } from './util';
-import { Request, Authorization } from './request';
-import type { EventHandler } from './events';
-import type { User } from './types';
+import * as helpers from './helpers';
+import * as util from './util';
+import * as request from './request';
+import type * as events from './events';
+import type * as types from './types';
 
 const enum OPCode {
     DISPATCH = 0,
@@ -49,10 +49,10 @@ export class Client extends EventEmitter {
     private _lastHeartbeatAck = false;
     private _heartbeatTimer?: NodeJS.Timeout;
     private _ws?: WebSocket;
-    private _auth?: { authorization: Authorization; };
-    private _intents?: Intents;
-    private _eventHandler = new EventEmitter() as EventHandler;
-    private _user?: User;
+    private _auth?: { authorization: request.Authorization; };
+    private _intents?: helpers.Intents;
+    private _eventHandler = new EventEmitter() as events.EventHandler;
+    private _user?: types.User;
     private _shard?: [number, number];
     private _props?: object | null = { $os: 'linux', $browser: 'bot', $device: 'bot' };
 
@@ -66,11 +66,11 @@ export class Client extends EventEmitter {
         if(!resume) {
             this._sessionId = undefined;
             this._lastSequence = 0;
-            await Sleep(5000);
+            await util.Sleep(5000);
         }
 
-        const response = await Request('GET',
-            this._auth?.authorization.type == TokenTypes.BOT ?
+        const response = await request.Request('GET',
+            this._auth?.authorization.type == helpers.TokenTypes.BOT ?
                 '/gateway/bot' :
                 '/gateway',
             this._auth
@@ -86,7 +86,7 @@ export class Client extends EventEmitter {
             return this.emit(ClientEvents.FATAL, 'Unexpected gateway API response.');
 
         try {
-            this._ws = new WebSocket(`${response.url}?v=${API_VERSION}`);
+            this._ws = new WebSocket(`${response.url}?v=${helpers.API_VERSION}`);
         } catch {
             return this.emit(ClientEvents.FATAL, 'Unable to create a socket.');
         }
@@ -109,7 +109,7 @@ export class Client extends EventEmitter {
         this._ws && this._ws.send(JSON.stringify({ op, d }));
 
     private _dispatchHandlers = {
-        [Events.READY]: (d: { session_id: string; user: User; }) => {
+        [Events.READY]: (d: { session_id: string; user: types.User; }) => {
             const { user, session_id } = d;
             this._user = user;
             this._sessionId = session_id;
@@ -158,7 +158,7 @@ export class Client extends EventEmitter {
     };
 
     private _onMessage = (data: WebSocket.Data) => {
-        const intent = SafeJsonParse(String(data)) as Intent | null;
+        const intent = util.SafeJsonParse(String(data)) as Intent | null;
         intent && this._intentHandlers[intent.op]?.(intent);
     };
 
@@ -171,7 +171,7 @@ export class Client extends EventEmitter {
         this._send(OPCode.IDENTIFY, {
             token: this._auth?.authorization.token,
             properties: this._props,
-            intents: this._intents ?? Intents.SYSTEM,
+            intents: this._intents ?? helpers.Intents.SYSTEM,
             shard: this._shard,
         });
 
@@ -206,7 +206,7 @@ export class Client extends EventEmitter {
     private _onError = (error: Error) =>
         this.emit(ClientEvents.ERROR, error);
 
-    Connect = (authorization: Authorization, intents?: Intents, shard?: { id: number; total: number; }) => {
+    Connect = (authorization: request.Authorization, intents?: helpers.Intents, shard?: { id: number; total: number; }) => {
         this._auth = { authorization };
         this._intents = intents;
         this._shard = shard ? [shard.id, shard.total] : undefined;
@@ -237,10 +237,10 @@ export class Client extends EventEmitter {
         since: number | null;
         activities: {
             name: string;
-            type: ActivityTypes;
+            type: helpers.ActivityTypes;
             url?: string;
         }[];
-        status: StatusTypes;
+        status: helpers.StatusTypes;
         afk: boolean;
     }) => {
         if(!this._ws) throw 'No connection.';
