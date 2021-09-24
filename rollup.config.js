@@ -6,6 +6,8 @@ const input = 'src/index.ts';
 const output = {
     dir: 'package/dist',
     format: 'es',
+    generatedCode: 'es2015',
+    sourcemap: true,
 };
 
 const plugins = [
