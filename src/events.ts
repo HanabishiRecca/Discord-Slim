@@ -115,6 +115,7 @@ type EventTypes = {
         roles: string[];
         user: types.User;
         nick?: string | null;
+        avatar: string | null;
         joined_at: string | null;
         premium_since?: string | null;
         deaf?: boolean;

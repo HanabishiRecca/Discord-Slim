@@ -461,10 +461,10 @@ export const Member = {
     }, requestOptions?: RequestOptions): Promise<types.Member> =>
         Request(METHODS.PATCH, Path(PATHS.guilds, guild_id, PATHS.members, user_id), requestOptions, params),
 
-    ModifyCurrentNick: (guild_id: string, params: {
+    ModifyCurrent: (guild_id: string, params: {
         nick?: string | null;
-    }, requestOptions?: RequestOptions): Promise<string | null> =>
-        Request(METHODS.PATCH, Path(PATHS.guilds, guild_id, PATHS.members, PATHS.me, PATHS.nick), requestOptions, params),
+    }, requestOptions?: RequestOptions): Promise<types.Member> =>
+        Request(METHODS.PATCH, Path(PATHS.guilds, guild_id, PATHS.members, PATHS.me), requestOptions, params),
 
     AddRole: (guild_id: string, user_id: string, role_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.PUT, Path(PATHS.guilds, guild_id, PATHS.members, user_id, PATHS.roles, role_id), requestOptions),
