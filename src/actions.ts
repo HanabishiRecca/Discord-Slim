@@ -885,13 +885,13 @@ export const Thread = {
 
     StartWithMessage: (channel_id: string, message_id: string, params: {
         name: string;
-        auto_archive_duration: helpers.ThreadArchiveDuration;
+        auto_archive_duration?: helpers.ThreadArchiveDuration;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
         Request(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.messages, message_id, PATHS.threads), requestOptions, params),
 
     Start: (channel_id: string, params: {
         name: string;
-        auto_archive_duration: helpers.ThreadArchiveDuration;
+        auto_archive_duration?: helpers.ThreadArchiveDuration;
         type?: helpers.ChannelTypes.GUILD_PRIVATE_THREAD | helpers.ChannelTypes.GUILD_PUBLIC_THREAD | helpers.ChannelTypes.GUILD_NEWS_THREAD;
         invitable?: boolean;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
