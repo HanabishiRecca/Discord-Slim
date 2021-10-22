@@ -222,8 +222,8 @@ export const Message = {
         embed?: types.Embed;
         flags?: helpers.MessageFlags;
         allowed_mentions?: types.AllowedMentions;
-        attachments?: types.Attachment[];
         components?: types.ActionRow[];
+        attachments?: types.Attachment[];
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.PATCH, Path(PATHS.channels, channel_id, PATHS.messages, message_id), requestOptions, params),
 
@@ -703,8 +703,8 @@ export const Webhook = {
         content?: string;
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
-        attachments?: types.Attachment[];
         components?: types.ActionRow[];
+        attachments?: types.Attachment[];
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.PATCH, Path(PATHS.webhooks, webhook_id, webhook_token, PATHS.messages, message_id), requestOptions, params),
 

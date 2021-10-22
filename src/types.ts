@@ -341,6 +341,7 @@ export type EmbedField = {
 export type Attachment = {
     id: string;
     filename: string;
+    description?: string;
     content_type?: string;
     size: number;
     url: string;
@@ -751,16 +752,17 @@ export type MessageInteraction = {
 
 export type InteractionResponse = {
     type: helpers.InteractionCallbackTypes;
-    data?: InteractionApplicationCommandCallbackData;
+    data?: InteractionCallbackData;
 };
 
-export type InteractionApplicationCommandCallbackData = {
+export type InteractionCallbackData = {
     tts?: boolean;
     content?: string;
     embeds?: Embed[];
     allowed_mentions?: AllowedMentions;
     flags?: helpers.InteractionCallbackDataFlags;
     components?: ActionRow[];
+    attachments?: Attachment[];
 };
 
 // Gateway types
