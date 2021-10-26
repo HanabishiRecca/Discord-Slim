@@ -909,6 +909,9 @@ export const Thread = {
     RemoveMember: (channel_id: string, user_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, Path(PATHS.channels, channel_id, PATHS.thread_members, user_id), requestOptions),
 
+    GetMember: (channel_id: string, user_id: string, requestOptions?: RequestOptions): Promise<types.ThreadMember> =>
+        Request(METHODS.GET, Path(PATHS.channels, channel_id, PATHS.thread_members, user_id), requestOptions),
+
     ListMembers: (channel_id: string, requestOptions?: RequestOptions): Promise<types.ThreadMember[]> =>
         Request(METHODS.GET, Path(PATHS.channels, channel_id, PATHS.thread_members), requestOptions),
 };
