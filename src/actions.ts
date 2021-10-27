@@ -687,29 +687,37 @@ export const Webhook = {
         Request(METHODS.POST, Path(PATHS.webhooks, webhook_id, webhook_token) + Query(params2), requestOptions, params1),
 
     ExecuteSlack: (webhook_id: string, webhook_token: string, params?: {
+        thread_id?: string;
         wait?: boolean;
     }, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.POST, Path(PATHS.webhooks, webhook_id, webhook_token, PATHS.slack) + Query(params), requestOptions),
 
     ExecuteGitHub: (webhook_id: string, webhook_token: string, params?: {
+        thread_id?: string;
         wait?: boolean;
     }, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.POST, Path(PATHS.webhooks, webhook_id, webhook_token, PATHS.github) + Query(params), requestOptions),
 
-    GetMessage: (webhook_id: string, webhook_token: string, message_id: string, requestOptions?: RequestOptions): Promise<types.Message> =>
-        Request(METHODS.GET, Path(PATHS.webhooks, webhook_id, webhook_token, PATHS.messages, message_id), requestOptions),
+    GetMessage: (webhook_id: string, webhook_token: string, message_id: string, params?: {
+        thread_id?: string;
+    }, requestOptions?: RequestOptions): Promise<types.Message> =>
+        Request(METHODS.GET, Path(PATHS.webhooks, webhook_id, webhook_token, PATHS.messages, message_id) + Query(params), requestOptions),
 
-    EditMessage: (webhook_id: string, webhook_token: string, message_id: string, params: {
+    EditMessage: (webhook_id: string, webhook_token: string, message_id: string, params1: {
         content?: string;
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
         components?: types.ActionRow[];
         attachments?: types.Attachment[];
+    }, params2?: {
+        thread_id?: string;
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
-        Request(METHODS.PATCH, Path(PATHS.webhooks, webhook_id, webhook_token, PATHS.messages, message_id), requestOptions, params),
+        Request(METHODS.PATCH, Path(PATHS.webhooks, webhook_id, webhook_token, PATHS.messages, message_id) + Query(params2), requestOptions, params1),
 
-    DeleteMessage: (webhook_id: string, webhook_token: string, message_id: string, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.DELETE, Path(PATHS.webhooks, webhook_id, webhook_token, PATHS.messages, message_id), requestOptions),
+    DeleteMessage: (webhook_id: string, webhook_token: string, message_id: string, params?: {
+        thread_id?: string;
+    }, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.DELETE, Path(PATHS.webhooks, webhook_id, webhook_token, PATHS.messages, message_id) + Query(params), requestOptions),
 };
 
 export const Application = {
