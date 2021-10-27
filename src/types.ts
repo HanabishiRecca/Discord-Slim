@@ -680,6 +680,7 @@ export type ApplicationCommandOption = {
     description: string;
     required?: boolean;
     choices?: ApplicationCommandOptionChoice[];
+    autocomplete?: boolean;
     options?: ApplicationCommandOption[];
     channel_types?: helpers.ChannelTypes[];
 };
@@ -741,6 +742,7 @@ export type InteractionDataOption = {
     type: helpers.ApplicationCommandOptionTypes;
     value?: string | number | boolean;
     options?: InteractionDataOption[];
+    focused?: boolean;
 };
 
 export type MessageInteraction = {
@@ -751,8 +753,18 @@ export type MessageInteraction = {
 };
 
 export type InteractionResponse = {
-    type: helpers.InteractionCallbackTypes;
-    data?: InteractionCallbackData;
+    type: helpers.InteractionCallbackTypes.PONG;
+} | {
+    type: (
+        | helpers.InteractionCallbackTypes.CHANNEL_MESSAGE_WITH_SOURCE
+        | helpers.InteractionCallbackTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+        | helpers.InteractionCallbackTypes.DEFERRED_UPDATE_MESSAGE
+        | helpers.InteractionCallbackTypes.UPDATE_MESSAGE
+    );
+    data: InteractionCallbackData;
+} | {
+    type: helpers.InteractionCallbackTypes.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT;
+    data: InteractionAutocompleteCallbackData;
 };
 
 export type InteractionCallbackData = {
@@ -763,6 +775,10 @@ export type InteractionCallbackData = {
     flags?: helpers.InteractionCallbackDataFlags;
     components?: ActionRow[];
     attachments?: Attachment[];
+};
+
+export type InteractionAutocompleteCallbackData = {
+    choices: ApplicationCommandOptionChoice[];
 };
 
 // Gateway types
