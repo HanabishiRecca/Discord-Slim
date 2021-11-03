@@ -6,7 +6,7 @@
     "devDependencies": {
         "@types/node": "*",
         "@types/ws": "*",
-        "rollup": "2.58.*",
+        "rollup": "2.59.*",
         "rollup-plugin-delete": "2.0.*",
         "rollup-plugin-ts": "~1.4.7"
     }
