@@ -680,9 +680,11 @@ export type ApplicationCommandOption = {
     description: string;
     required?: boolean;
     choices?: ApplicationCommandOptionChoice[];
-    autocomplete?: boolean;
     options?: ApplicationCommandOption[];
     channel_types?: helpers.ChannelTypes[];
+    min_value?: number;
+    max_value?: number;
+    autocomplete?: boolean;
 };
 
 export type ApplicationCommandOptionChoice = {
