@@ -109,7 +109,7 @@ export const Channel = {
         parent_id?: string | null;
         rtc_region?: string | null;
         video_quality_mode?: helpers.VideoQualityModes;
-        default_auto_archive_duration?: helpers.ThreadArchiveDuration | null;
+        default_auto_archive_duration?: helpers.ThreadArchiveDurations | null;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
         Request(METHODS.PATCH, Path(PATHS.channels, id), requestOptions, params),
 
@@ -289,9 +289,9 @@ export const Guild = {
     Create: (params: {
         name: string;
         icon?: string;
-        verification_level?: helpers.VerificationLevel;
-        default_message_notifications?: helpers.DefaultMessageNotificationLevel;
-        explicit_content_filter?: helpers.ExplicitContentFilterLevel;
+        verification_level?: helpers.VerificationLevels;
+        default_message_notifications?: helpers.DefaultMessageNotificationLevels;
+        explicit_content_filter?: helpers.ExplicitContentFilterLevels;
         roles?: types.Role[];
         channels?: types.Channel[];
         afk_channel_id?: string;
@@ -311,9 +311,9 @@ export const Guild = {
 
     Modify: (guild_id: string, params: {
         name?: string;
-        verification_level?: helpers.VerificationLevel;
-        default_message_notifications?: helpers.DefaultMessageNotificationLevel;
-        explicit_content_filter?: helpers.ExplicitContentFilterLevel;
+        verification_level?: helpers.VerificationLevels;
+        default_message_notifications?: helpers.DefaultMessageNotificationLevels;
+        explicit_content_filter?: helpers.ExplicitContentFilterLevels;
         afk_channel_id?: string | null;
         afk_timeout?: number;
         icon?: string | null;
@@ -881,7 +881,7 @@ export const Thread = {
     Modify: (channel_id: string, params: {
         name?: string;
         archived?: boolean;
-        auto_archive_duration?: helpers.ThreadArchiveDuration;
+        auto_archive_duration?: helpers.ThreadArchiveDurations;
         locked?: boolean;
         invitable?: boolean;
         rate_limit_per_user?: number | null;
@@ -893,13 +893,13 @@ export const Thread = {
 
     StartWithMessage: (channel_id: string, message_id: string, params: {
         name: string;
-        auto_archive_duration?: helpers.ThreadArchiveDuration;
+        auto_archive_duration?: helpers.ThreadArchiveDurations;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
         Request(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.messages, message_id, PATHS.threads), requestOptions, params),
 
     Start: (channel_id: string, params: {
         name: string;
-        auto_archive_duration?: helpers.ThreadArchiveDuration;
+        auto_archive_duration?: helpers.ThreadArchiveDurations;
         type?: helpers.ChannelTypes.GUILD_PRIVATE_THREAD | helpers.ChannelTypes.GUILD_PUBLIC_THREAD | helpers.ChannelTypes.GUILD_NEWS_THREAD;
         invitable?: boolean;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
@@ -928,7 +928,7 @@ export const StageInstance = {
     Create: (params: {
         channel_id: string;
         topic: string;
-        privacy_level?: helpers.PrivacyLevel;
+        privacy_level?: helpers.PrivacyLevels;
     }, requestOptions?: RequestOptions): Promise<types.StageInstance> =>
         Request(METHODS.POST, PATHS.stage_instances, requestOptions, params),
 
@@ -937,7 +937,7 @@ export const StageInstance = {
 
     Modify: (channel_id: string, params: {
         topic?: string;
-        privacy_level?: helpers.PrivacyLevel;
+        privacy_level?: helpers.PrivacyLevels;
     }, requestOptions?: RequestOptions): Promise<types.StageInstance> =>
         Request(METHODS.PATCH, Path(PATHS.stage_instances, channel_id), requestOptions, params),
 

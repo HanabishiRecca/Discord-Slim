@@ -46,17 +46,17 @@ export type AuditLogChangeKey = (
     | AuditLogChangeKeyIntegration
     | AuditLogChangeKeyVoiceChannel
     | AuditLogChangeKeySticker
-    | AuditLogChangeStageInstance
+    | AuditLogChangeKeyStageInstance
 );
 
 export type AuditLogChangeKeyGuild = {
     afk_channel_id: string;
     afk_timeout: number;
     banner_hash: string;
-    default_message_notifications: helpers.DefaultMessageNotificationLevel;
+    default_message_notifications: helpers.DefaultMessageNotificationLevels;
     description: string;
     discovery_splash_hash: string;
-    explicit_content_filter: helpers.ExplicitContentFilterLevel;
+    explicit_content_filter: helpers.ExplicitContentFilterLevels;
     icon_hash: string;
     id: string;
     mfa_level: number;
@@ -159,10 +159,10 @@ export type AuditLogChangeKeySticker = {
     type: string;
 };
 
-export type AuditLogChangeStageInstance = {
+export type AuditLogChangeKeyStageInstance = {
     id: string;
     name: string;
-    privacy_level: helpers.PrivacyLevel;
+    privacy_level: helpers.PrivacyLevels;
     topic: string;
     type: helpers.ChannelTypes;
 };
@@ -194,7 +194,7 @@ export type Channel = {
     member_count?: number;
     thread_metadata?: ThreadMetadata;
     member?: ThreadMember;
-    default_auto_archive_duration?: helpers.ThreadArchiveDuration;
+    default_auto_archive_duration?: helpers.ThreadArchiveDurations;
     permissions?: string;
 };
 
@@ -264,7 +264,7 @@ export type PermissionsOverwrite = {
 
 export type ThreadMetadata = {
     archived: boolean;
-    auto_archive_duration: helpers.ThreadArchiveDuration;
+    auto_archive_duration: helpers.ThreadArchiveDurations;
     archive_timestamp: string;
     locked: boolean;
     invitable?: boolean;
@@ -394,13 +394,13 @@ export type Guild = {
     afk_timeout: number;
     widget_enabled?: boolean;
     widget_channel_id?: string | null;
-    verification_level: helpers.VerificationLevel;
-    default_message_notifications: helpers.DefaultMessageNotificationLevel;
-    explicit_content_filter: helpers.ExplicitContentFilterLevel;
+    verification_level: helpers.VerificationLevels;
+    default_message_notifications: helpers.DefaultMessageNotificationLevels;
+    explicit_content_filter: helpers.ExplicitContentFilterLevels;
     roles: Role[];
     emojis: Emoji[];
     features: helpers.GuildFeatures[];
-    mfa_level: helpers.MFA_Level;
+    mfa_level: helpers.MFA_Levels;
     application_id: string | null;
     system_channel_id: string | null;
     system_channel_flags: helpers.SystemChannelFlags;
@@ -419,7 +419,7 @@ export type Guild = {
     vanity_url_code: string | null;
     description: string | null;
     banner: string | null;
-    premium_tier: helpers.PremiumTier;
+    premium_tier: helpers.PremiumTiers;
     premium_subscription_count?: number;
     preferred_locale: string;
     public_updates_channel_id: string | null;
@@ -427,7 +427,7 @@ export type Guild = {
     approximate_member_count?: number;
     approximate_presence_count?: number;
     welcome_screen?: WelcomeScreen;
-    nsfw_level: helpers.GuildNSFWLevel;
+    nsfw_level: helpers.GuildNSFWLevels;
     stage_instances?: StageInstance[];
 };
 
@@ -701,7 +701,7 @@ export type GuildApplicationCommandPermissions = {
 
 export type ApplicationCommandPermissions = {
     id: string;
-    type: helpers.ApplicationCommandPermissionType;
+    type: helpers.ApplicationCommandPermissionTypes;
     permission: boolean;
 };
 
@@ -924,7 +924,7 @@ export type StageInstance = {
     guild_id: string;
     channel_id: string;
     topic: string;
-    privacy_level: helpers.PrivacyLevel;
+    privacy_level: helpers.PrivacyLevels;
     discoverable_disabled: boolean;
 };
 

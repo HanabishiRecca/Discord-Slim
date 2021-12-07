@@ -198,23 +198,23 @@ export enum AllowedMentionTypes {
     EVERYONE = 'everyone',
 }
 
-export enum DefaultMessageNotificationLevel {
+export enum DefaultMessageNotificationLevels {
     ALL_MESSAGES = 0,
     ONLY_MENTIONS = 1,
 }
 
-export enum ExplicitContentFilterLevel {
+export enum ExplicitContentFilterLevels {
     DISABLED = 0,
     MEMBERS_WITHOUT_ROLES = 1,
     ALL_MEMBERS = 2,
 }
 
-export enum MFA_Level {
+export enum MFA_Levels {
     NONE = 0,
     ELEVATED = 1,
 }
 
-export enum VerificationLevel {
+export enum VerificationLevels {
     NONE = 0,
     LOW = 1,
     MEDIUM = 2,
@@ -260,7 +260,7 @@ export enum IntegrationExpireBehaviors {
     KICK = 1,
 }
 
-export enum PremiumTier {
+export enum PremiumTiers {
     NONE = 0,
     TIER_1 = 1,
     TIER_2 = 2,
@@ -353,7 +353,7 @@ export enum ApplicationCommandOptionTypes {
     NUMBER = 10,
 }
 
-export enum ApplicationCommandPermissionType {
+export enum ApplicationCommandPermissionTypes {
     ROLE = 1,
     USER = 2,
 }
@@ -446,12 +446,12 @@ export enum ButtonStyles {
     LINK = 5,
 }
 
-export enum PrivacyLevel {
+export enum PrivacyLevels {
     PUBLIC = 1,
     GUILD_ONLY = 2,
 }
 
-export enum GuildNSFWLevel {
+export enum GuildNSFWLevels {
     DEFAULT = 0,
     EXPLICIT = 1,
     SAFE = 2,
@@ -485,7 +485,7 @@ export enum TimestampStyles {
     RELATIVE_TIME = 'R',
 }
 
-export enum ThreadArchiveDuration {
+export enum ThreadArchiveDurations {
     _1_HOUR = 60,
     _24_HOURS = 1440,
     _3_DAYS = 4320,
