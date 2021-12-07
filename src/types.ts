@@ -4,6 +4,7 @@ import type * as helpers from './helpers';
 
 export type AuditLog = {
     audit_log_entries: AuditLogEntry[];
+    guild_scheduled_events: ScheduledEvent[];
     integrations: Integration[];
     threads: Channel[];
     users: User[];
@@ -47,6 +48,7 @@ export type AuditLogChangeKey = (
     | AuditLogChangeKeyVoiceChannel
     | AuditLogChangeKeySticker
     | AuditLogChangeKeyStageInstance
+    | AuditLogChangeKeyScheduledEvent
 );
 
 export type AuditLogChangeKeyGuild = {
@@ -165,6 +167,15 @@ export type AuditLogChangeKeyStageInstance = {
     privacy_level: helpers.PrivacyLevels;
     topic: string;
     type: helpers.ChannelTypes;
+};
+
+export type AuditLogChangeKeyScheduledEvent = {
+    channel_id: string;
+    description: string;
+    entity_type: helpers.ScheduledEventEntityTypes;
+    location: string;
+    privacy_level: helpers.ScheduledEventPrivacyLevels;
+    status: helpers.ScheduledEventStatuses;
 };
 
 // Channel types
@@ -429,6 +440,9 @@ export type Guild = {
     welcome_screen?: WelcomeScreen;
     nsfw_level: helpers.GuildNSFWLevels;
     stage_instances?: StageInstance[];
+    stickers?: Sticker[];
+    guild_scheduled_events?: ScheduledEvent[];
+    premium_progress_bar_enabled: boolean;
 };
 
 export type UnavailableGuild = {
@@ -530,6 +544,7 @@ export type Invite = {
     approximate_member_count?: number;
     expires_at?: string | null;
     stage_instance?: InviteStageInstance;
+    guild_scheduled_event?: ScheduledEvent;
 };
 
 export type InviteMetadata = {
@@ -958,4 +973,34 @@ export type StickerPack = {
     cover_sticker_id?: string;
     description: string;
     banner_asset_id: string;
+};
+
+// Guild Scheduled Event types
+
+export type ScheduledEvent = {
+    id: string;
+    guild_id: string;
+    channel_id: string | null;
+    creator_id: string | null;
+    name: string;
+    description?: string;
+    scheduled_start_time: string;
+    scheduled_end_time: string | null;
+    privacy_level: helpers.ScheduledEventPrivacyLevels;
+    status: helpers.ScheduledEventStatuses;
+    entity_type: helpers.ScheduledEventEntityTypes;
+    entity_id: string | null;
+    entity_metadata: ScheduledEventEntityMetadata | null;
+    creator?: ScheduledEventUser;
+    user_count?: number;
+};
+
+export type ScheduledEventEntityMetadata = {
+    location?: string;
+};
+
+export type ScheduledEventUser = {
+    guild_scheduled_event_id: string;
+    user: User;
+    member?: Member;
 };

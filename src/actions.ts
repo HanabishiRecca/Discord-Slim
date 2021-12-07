@@ -57,6 +57,7 @@ const enum PATHS {
     recipients = 'recipients',
     regions = 'regions',
     roles = 'roles',
+    scheduled_events = 'scheduled-events',
     search = 'search',
     slack = 'slack',
     stage_instances = 'stage-instances',
@@ -328,6 +329,7 @@ export const Guild = {
         preferred_locale?: string | null;
         features?: helpers.GuildFeatures[];
         description?: string | null;
+        premium_progress_bar_enabled?: boolean;
     }, requestOptions?: RequestOptions): Promise<types.Guild> =>
         Request(METHODS.PATCH, Path(PATHS.guilds, guild_id), requestOptions, params),
 
@@ -416,6 +418,11 @@ export const Guild = {
 
     ListStickers: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Sticker[]> =>
         Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.stickers), requestOptions),
+
+    ListScheduledEvents: (guild_id: string, params?: {
+        with_user_count?: boolean;
+    }, requestOptions?: RequestOptions): Promise<types.ScheduledEvent[]> =>
+        Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.scheduled_events) + Query(params), requestOptions),
 };
 
 export const Emoji = {
@@ -560,6 +567,7 @@ export const Invite = {
     Get: (invite_code: string, params?: {
         with_counts?: boolean;
         with_expiration?: boolean;
+        guild_scheduled_event_id?: string;
     }, requestOptions?: RequestOptions): Promise<types.Invite> =>
         Request(METHODS.GET, Path(PATHS.invites, invite_code) + Query(params), requestOptions),
 
@@ -894,6 +902,7 @@ export const Thread = {
     StartWithMessage: (channel_id: string, message_id: string, params: {
         name: string;
         auto_archive_duration?: helpers.ThreadArchiveDurations;
+        rate_limit_per_user?: number | null;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
         Request(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.messages, message_id, PATHS.threads), requestOptions, params),
 
@@ -902,6 +911,7 @@ export const Thread = {
         auto_archive_duration?: helpers.ThreadArchiveDurations;
         type?: helpers.ChannelTypes.GUILD_PRIVATE_THREAD | helpers.ChannelTypes.GUILD_PUBLIC_THREAD | helpers.ChannelTypes.GUILD_NEWS_THREAD;
         invitable?: boolean;
+        rate_limit_per_user?: number | null;
     }, requestOptions?: RequestOptions): Promise<types.Channel> =>
         Request(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.threads), requestOptions, params),
 
@@ -968,4 +978,47 @@ export const Sticker = {
 export const StickerPacks = {
     ListNitro: (requestOptions?: RequestOptions): Promise<{ sticker_packs: types.StickerPack[]; }> =>
         Request(METHODS.GET, PATHS.sticker_packs, requestOptions),
+};
+
+export const ScheduledEvent = {
+    Create: (guild_id: string, params: {
+        channel_id?: string;
+        entity_metadata?: types.ScheduledEventEntityMetadata;
+        name: string;
+        privacy_level: helpers.ScheduledEventPrivacyLevels;
+        scheduled_start_time: string;
+        scheduled_end_time?: string;
+        description?: string;
+        entity_type: helpers.ScheduledEventEntityTypes;
+    }, requestOptions?: RequestOptions): Promise<types.ScheduledEvent> =>
+        Request(METHODS.POST, Path(PATHS.guilds, guild_id, PATHS.scheduled_events), requestOptions, params),
+
+    Get: (guild_id: string, event_id: string, params?: {
+        with_user_count?: boolean;
+    }, requestOptions?: RequestOptions): Promise<types.ScheduledEvent> =>
+        Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.scheduled_events, event_id) + Query(params), requestOptions),
+
+    Modify: (guild_id: string, event_id: string, params: {
+        channel_id?: string | null;
+        entity_metadata?: types.ScheduledEventEntityMetadata;
+        name?: string;
+        privacy_level?: helpers.ScheduledEventPrivacyLevels;
+        scheduled_start_time?: string;
+        scheduled_end_time?: string;
+        description?: string;
+        entity_type?: helpers.ScheduledEventEntityTypes;
+        status?: helpers.ScheduledEventStatuses;
+    }, requestOptions?: RequestOptions): Promise<types.ScheduledEvent> =>
+        Request(METHODS.PATCH, Path(PATHS.guilds, guild_id, PATHS.scheduled_events, event_id), requestOptions, params),
+
+    Delete: (guild_id: string, event_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.DELETE, Path(PATHS.guilds, guild_id, PATHS.scheduled_events, event_id), requestOptions),
+
+    GetUsers: (guild_id: string, event_id: string, params?: {
+        limit?: number;
+        with_member?: boolean;
+        before?: string;
+        after?: string;
+    }, requestOptions?: RequestOptions): Promise<types.ScheduledEventUser[]> =>
+        Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.scheduled_events, event_id, PATHS.users) + Query(params), requestOptions),
 };

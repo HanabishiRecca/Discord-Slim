@@ -23,6 +23,11 @@ export enum Events {
     GUILD_ROLE_CREATE = 'GUILD_ROLE_CREATE',
     GUILD_ROLE_UPDATE = 'GUILD_ROLE_UPDATE',
     GUILD_ROLE_DELETE = 'GUILD_ROLE_DELETE',
+    GUILD_SCHEDULED_EVENT_CREATE = 'GUILD_SCHEDULED_EVENT_CREATE',
+    GUILD_SCHEDULED_EVENT_UPDATE = 'GUILD_SCHEDULED_EVENT_UPDATE',
+    GUILD_SCHEDULED_EVENT_DELETE = 'GUILD_SCHEDULED_EVENT_DELETE',
+    GUILD_SCHEDULED_EVENT_USER_ADD = 'GUILD_SCHEDULED_EVENT_USER_ADD',
+    GUILD_SCHEDULED_EVENT_USER_REMOVE = 'GUILD_SCHEDULED_EVENT_USER_REMOVE',
     INTERACTION_CREATE = 'INTERACTION_CREATE',
     INVITE_CREATE = 'INVITE_CREATE',
     INVITE_DELETE = 'INVITE_DELETE',
@@ -223,6 +228,19 @@ type EventTypes = {
     [Events.STAGE_INSTANCE_CREATE]: types.StageInstance;
     [Events.STAGE_INSTANCE_UPDATE]: types.StageInstance;
     [Events.STAGE_INSTANCE_DELETE]: types.StageInstance;
+    [Events.GUILD_SCHEDULED_EVENT_CREATE]: types.ScheduledEvent;
+    [Events.GUILD_SCHEDULED_EVENT_UPDATE]: types.ScheduledEvent;
+    [Events.GUILD_SCHEDULED_EVENT_DELETE]: types.ScheduledEvent;
+    [Events.GUILD_SCHEDULED_EVENT_USER_ADD]: {
+        guild_scheduled_event_id: string;
+        user_id: string;
+        guild_id: string;
+    };
+    [Events.GUILD_SCHEDULED_EVENT_USER_REMOVE]: {
+        guild_scheduled_event_id: string;
+        user_id: string;
+        guild_id: string;
+    };
 };
 
 export interface EventHandler extends EventEmitter {

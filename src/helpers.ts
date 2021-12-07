@@ -46,6 +46,7 @@ export const Permissions = {
     MANAGE_EMOJIS: 0x0040000000n,
     USE_APPLICATION_COMMANDS: 0x0080000000n,
     REQUEST_TO_SPEAK: 0x0100000000n,
+    MANAGE_EVENTS: 0x0200000000n,
     MANAGE_THREADS: 0x0400000000n,
     CREATE_PUBLIC_THREADS: 0x0800000000n,
     CREATE_PRIVATE_THREADS: 0x1000000000n,
@@ -117,6 +118,9 @@ export enum AuditLogEvents {
     STICKER_CREATE = 90,
     STICKER_UPDATE = 91,
     STICKER_DELETE = 92,
+    GUILD_SCHEDULED_EVENT_CREATE = 100,
+    GUILD_SCHEDULED_EVENT_UPDATE = 101,
+    GUILD_SCHEDULED_EVENT_DELETE = 102,
     THREAD_CREATE = 110,
     THREAD_UPDATE = 111,
     THREAD_DELETE = 112,
@@ -501,4 +505,21 @@ export enum ApplicationCommandTypes {
 export enum StickerTypes {
     STANDARD = 1,
     GUILD = 2,
+}
+
+export enum ScheduledEventPrivacyLevels {
+    GUILD_ONLY = 2,
+}
+
+export enum ScheduledEventEntityTypes {
+    STAGE_INSTANCE = 1,
+    VOICE = 2,
+    EXTERNAL = 3,
+}
+
+export enum ScheduledEventStatuses {
+    SCHEDULED = 1,
+    ACTIVE = 2,
+    COMPLETED = 3,
+    CANCELED = 4,
 }
