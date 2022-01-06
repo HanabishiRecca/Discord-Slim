@@ -1,19 +1,9 @@
-import * as client from './client';
-export const { Client, ClientEvents } = client;
-
-import * as request from './request';
-export const { Authorization } = request;
-
-import * as events from './events';
-export const { Events } = events;
-
-import * as Actions from './actions';
-import * as Helpers from './helpers';
-import * as Tools from './tools';
-export { Actions, Helpers, Tools };
-
+export { Client, ClientEvents } from './client.js';
+export { Authorization } from './request.js';
+export { Events } from './events.js';
+import * as Actions from './actions.js';
+import * as Helpers from './helpers.js';
 import type * as Types from './types';
-export type { Types };
-
-import * as voice from './voice';
-export const { Voice, VoiceEvents } = voice;
+import * as Tools from './tools.js';
+export { Actions, Helpers, Types, Tools };
+export { Voice, VoiceEvents } from './voice.js';

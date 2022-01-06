@@ -1,13 +1,10 @@
 import { URLSearchParams } from 'url';
-import * as request from './request';
+import { Request, SetDefOptions } from './request.js';
+import type { RequestOptions } from './request';
 import type * as helpers from './helpers';
 import type * as types from './types';
 
-const { Request, SetDefOptions } = request;
-
 export const setDefaultRequestOptions = SetDefOptions;
-
-type RequestOptions = request.RequestOptions;
 
 const
     Path = (...paths: string[]) => paths.join('/'),

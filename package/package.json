@@ -22,9 +22,6 @@
     "engines": {
         "node": ">=14.0.0"
     },
-    "files": [
-        "dist/**/*"
-    ],
     "dependencies": {
         "ws": "8.3.*"
     }

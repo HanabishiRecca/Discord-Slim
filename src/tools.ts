@@ -1,4 +1,4 @@
-import * as helpers from './helpers';
+import * as helpers from './helpers.js';
 import type * as types from './types';
 
 type PermissionLike = string | number | bigint | PermissionSet;

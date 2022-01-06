@@ -1,0 +1,4 @@
+*
+!dist/*.[tj]s
+dist/types.js
+dist/util.d.ts
