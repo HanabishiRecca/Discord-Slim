@@ -39,6 +39,7 @@ const enum PATHS {
     interactions = 'interactions',
     invites = 'invites',
     me = '@me',
+    member = 'member',
     members = 'members',
     messages = 'messages',
     nick = 'nick',
@@ -368,7 +369,7 @@ export const Guild = {
 
     ModifyRolePositions: (guild_id: string, params: ({
         id: string;
-        position: number | null;
+        position?: number | null;
     })[], requestOptions?: RequestOptions): Promise<types.Role[]> =>
         Request(METHODS.PATCH, Path(PATHS.guilds, guild_id, PATHS.roles), requestOptions, params),
 
@@ -462,6 +463,7 @@ export const Member = {
         mute?: boolean | null;
         deaf?: boolean | null;
         channel_id?: string | null;
+        communication_disabled_until?: string | null;
     }, requestOptions?: RequestOptions): Promise<types.Member> =>
         Request(METHODS.PATCH, Path(PATHS.guilds, guild_id, PATHS.members, user_id), requestOptions, params),
 
@@ -614,6 +616,9 @@ export const User = {
         limit?: number;
     }, requestOptions?: RequestOptions): Promise<types.Guild[]> =>
         Request(METHODS.GET, Path(PATHS.users, PATHS.me, PATHS.guilds) + Query(params), requestOptions),
+
+    GetCurrentMember: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Member> =>
+        Request(METHODS.GET, Path(PATHS.users, PATHS.me, PATHS.guilds, guild_id, PATHS.member), requestOptions),
 
     LeaveGuild: (guild_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, Path(PATHS.users, PATHS.me, PATHS.guilds, guild_id), requestOptions),

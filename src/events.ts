@@ -86,7 +86,7 @@ type EventTypes = {
         threads: types.Channel[];
         members: types.ThreadMember[];
     };
-    [Events.THREAD_MEMBER_UPDATE]: types.ThreadMember;
+    [Events.THREAD_MEMBER_UPDATE]: types.ThreadMember & { guild_id: string; };
     [Events.THREAD_MEMBERS_UPDATE]: {
         id: string;
         guild_id: string;
@@ -126,6 +126,7 @@ type EventTypes = {
         deaf?: boolean;
         mute?: boolean;
         pending?: boolean;
+        communication_disabled_until?: string | null;
     };
     [Events.GUILD_MEMBERS_CHUNK]: {
         guild_id: string;

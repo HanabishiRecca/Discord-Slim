@@ -44,6 +44,7 @@ export type AuditLogChangeKey = (
     | AuditLogChangeKeyRole
     | AuditLogChangeKeyInvite
     | AuditLogChangeKeyUser
+    | AuditLogChangeKeyMember
     | AuditLogChangeKeyIntegration
     | AuditLogChangeKeyVoiceChannel
     | AuditLogChangeKeySticker
@@ -126,6 +127,13 @@ export type AuditLogChangeKeyInvite = {
 
 export type AuditLogChangeKeyUser = {
     avatar_hash: boolean;
+    id: string;
+    name: string;
+    type: string;
+};
+
+export type AuditLogChangeKeyMember = {
+    communication_disabled_until: string;
     deaf: boolean;
     id: string;
     mute: boolean;
@@ -479,6 +487,7 @@ export type Member = {
     mute: boolean;
     pending?: boolean;
     permissions?: string;
+    communication_disabled_until?: string | null;
 };
 
 export type Integration = {
@@ -535,7 +544,7 @@ export type WelcomeScreenChannel = {
 export type Invite = {
     code: string;
     guild?: Guild;
-    channel: Channel;
+    channel: Channel | null;
     inviter?: User;
     target_type?: helpers.InviteTargetTypes;
     target_user?: User;
@@ -972,7 +981,7 @@ export type StickerPack = {
     sku_id: string;
     cover_sticker_id?: string;
     description: string;
-    banner_asset_id: string;
+    banner_asset_id?: string;
 };
 
 // Guild Scheduled Event types
