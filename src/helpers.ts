@@ -43,7 +43,7 @@ export const Permissions = {
     MANAGE_NICKNAMES: 1n << 27n,
     MANAGE_ROLES: 1n << 28n,
     MANAGE_WEBHOOKS: 1n << 29n,
-    MANAGE_EMOJIS: 1n << 30n,
+    MANAGE_EMOJIS_AND_STICKERS: 1n << 30n,
     USE_APPLICATION_COMMANDS: 1n << 31n,
     REQUEST_TO_SPEAK: 1n << 32n,
     MANAGE_EVENTS: 1n << 33n,
@@ -184,6 +184,7 @@ export enum MessageFlags {
     HAS_THREAD = 1 << 5,
     EPHEMERAL = 1 << 6,
     LOADING = 1 << 7,
+    FAILED_TO_MENTION_SOME_ROLES_IN_THREAD = 1 << 8,
 }
 
 export enum MessageStickerFormatTypes {
@@ -298,7 +299,7 @@ export enum WidgetStyleOptions {
 }
 
 export enum UserFlags {
-    NONE = 0,
+    NO_FLAGS = 0,
     STAFF = 1 << 0,
     PARTNER = 1 << 1,
     HYPESQUAD = 1 << 2,
@@ -356,6 +357,7 @@ export enum ApplicationCommandOptionTypes {
     ROLE = 8,
     MENTIONABLE = 9,
     NUMBER = 10,
+    ATTACHMENT = 11,
 }
 
 export enum ApplicationCommandPermissionTypes {
@@ -368,6 +370,7 @@ export enum InteractionTypes {
     APPLICATION_COMMAND = 2,
     MESSAGE_COMPONENT = 3,
     APPLICATION_COMMAND_AUTOCOMPLETE = 4,
+    MODAL_SUBMIT = 5,
 }
 
 export enum InteractionCallbackTypes {
@@ -377,10 +380,7 @@ export enum InteractionCallbackTypes {
     DEFERRED_UPDATE_MESSAGE = 6,
     UPDATE_MESSAGE = 7,
     APPLICATION_COMMAND_AUTOCOMPLETE_RESULT = 8,
-}
-
-export enum InteractionCallbackDataFlags {
-    EPHEMERAL = 1 << 6,
+    MODAL = 9,
 }
 
 export enum OAuth2Scopes {
@@ -442,6 +442,7 @@ export enum ComponentTypes {
     ACTION_ROW = 1,
     BUTTON = 2,
     SELECT_MENU = 3,
+    TEXT_INPUT = 4,
 }
 
 export enum ButtonStyles {
@@ -453,7 +454,6 @@ export enum ButtonStyles {
 }
 
 export enum PrivacyLevels {
-    PUBLIC = 1,
     GUILD_ONLY = 2,
 }
 
@@ -524,4 +524,9 @@ export enum ScheduledEventStatuses {
     ACTIVE = 2,
     COMPLETED = 3,
     CANCELED = 4,
+}
+
+export enum TextInputStyles {
+    SHORT = 1,
+    PARAGRAPH = 2,
 }

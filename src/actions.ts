@@ -129,9 +129,9 @@ export const Channel = {
         Request(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.messages, PATHS.bulk_delete), requestOptions, params),
 
     EditPermissions: (channel_id: string, overwrite_id: string, params: {
-        allow: string;
-        deny: string;
-        type: helpers.PermissionsOverwriteTypes,
+        allow?: string | null;
+        deny?: string | null;
+        type: helpers.PermissionsOverwriteTypes;
     }, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.PUT, Path(PATHS.channels, channel_id, PATHS.permissions, overwrite_id), requestOptions, params),
 
@@ -154,13 +154,6 @@ export const Channel = {
 
     GetWebhooks: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Webhook[]> =>
         Request(METHODS.GET, Path(PATHS.channels, channel_id, PATHS.webhooks), requestOptions),
-
-    ListActiveThreads: (channel_id: string, requestOptions?: RequestOptions): Promise<{
-        threads: types.Channel[];
-        members: types.ThreadMember[];
-        has_more: boolean;
-    }> =>
-        Request(METHODS.GET, Path(PATHS.channels, channel_id, PATHS.threads, PATHS.active), requestOptions),
 
     ListPublicArchivedThreads: (channel_id: string, params?: {
         before?: string;
@@ -202,10 +195,10 @@ export const Message = {
         nonce?: number | string;
         tts?: string;
         embeds?: types.Embed[];
-        embed?: types.Embed;
         allowed_mentions?: types.AllowedMentions;
         message_reference?: types.MessageReference;
         components?: types.ActionRow[];
+        flags?: helpers.MessageFlags;
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
         Request(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.messages), requestOptions, params),
 
@@ -218,7 +211,6 @@ export const Message = {
     Edit: (channel_id: string, message_id: string, params: {
         content?: string;
         embeds?: types.Embed[];
-        embed?: types.Embed;
         flags?: helpers.MessageFlags;
         allowed_mentions?: types.AllowedMentions;
         components?: types.ActionRow[];
@@ -383,7 +375,6 @@ export const Guild = {
         days?: number;
         compute_prune_count?: boolean;
         include_roles?: string;
-        reason?: string;
     }, requestOptions?: RequestOptions): Promise<{ pruned: number | null; }> =>
         Request(METHODS.POST, Path(PATHS.guilds, guild_id, PATHS.prune), requestOptions, params),
 
@@ -488,7 +479,6 @@ export const Ban = {
 
     Add: (guild_id: string, user_id: string, params?: {
         delete_message_days?: number;
-        reason?: string;
     }, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.PUT, Path(PATHS.guilds, guild_id, PATHS.bans, user_id), requestOptions, params),
 
@@ -524,13 +514,13 @@ export const Role = {
 };
 
 export const Widget = {
-    GetSettings: (guild_id: string, requestOptions?: RequestOptions): Promise<types.GuildWidget> =>
+    GetSettings: (guild_id: string, requestOptions?: RequestOptions): Promise<types.GuildWidgetSettings> =>
         Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.widget), requestOptions),
 
-    Modify: (guild_id: string, params: types.GuildWidget, requestOptions?: RequestOptions): Promise<types.GuildWidget> =>
+    Modify: (guild_id: string, params: types.GuildWidgetSettings, requestOptions?: RequestOptions): Promise<types.GuildWidgetSettings> =>
         Request(METHODS.PATCH, Path(PATHS.guilds, guild_id, PATHS.widget), requestOptions, params),
 
-    Get: (guild_id: string, requestOptions?: RequestOptions): Promise<object> =>
+    Get: (guild_id: string, requestOptions?: RequestOptions): Promise<types.GuildWidget> =>
         Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.widget_json), requestOptions),
 
     GetImage: (guild_id: string, params?: {
@@ -690,6 +680,7 @@ export const Webhook = {
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
         components?: types.ActionRow[];
+        flags?: helpers.MessageFlags;
     }, params2?: {
         wait?: boolean;
         thread_id?: string;
@@ -830,7 +821,7 @@ export const Application = {
         tts?: string;
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
-        flags?: helpers.InteractionCallbackDataFlags;
+        flags?: helpers.MessageFlags;
         components?: types.ActionRow[];
     }, requestOptions?: RequestOptions): Promise<types.Message | null> =>
         Request(METHODS.POST, Path(PATHS.webhooks, application_id, interaction_token), requestOptions, params),
@@ -992,6 +983,7 @@ export const ScheduledEvent = {
         scheduled_end_time?: string;
         description?: string;
         entity_type: helpers.ScheduledEventEntityTypes;
+        image?: string;
     }, requestOptions?: RequestOptions): Promise<types.ScheduledEvent> =>
         Request(METHODS.POST, Path(PATHS.guilds, guild_id, PATHS.scheduled_events), requestOptions, params),
 
@@ -1010,6 +1002,7 @@ export const ScheduledEvent = {
         description?: string;
         entity_type?: helpers.ScheduledEventEntityTypes;
         status?: helpers.ScheduledEventStatuses;
+        image?: string;
     }, requestOptions?: RequestOptions): Promise<types.ScheduledEvent> =>
         Request(METHODS.PATCH, Path(PATHS.guilds, guild_id, PATHS.scheduled_events, event_id), requestOptions, params),
 

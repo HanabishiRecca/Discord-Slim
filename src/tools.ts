@@ -212,4 +212,11 @@ export const Resource = {
     ) => role.icon ?
             `${helpers.CDN}/role-icons/${role.id}/${role.icon}${SizeExtOpt(size, ext)}` : null,
 
+    GuildScheduledEventCover: (
+        event: types.ScheduledEvent | { id: string; image: string | null; },
+        size?: number,
+        ext?: 'png' | 'jpg' | 'webp',
+    ) => event.image ?
+            `${helpers.CDN}/guild-events/${event.id}/${event.image}${SizeExtOpt(size, ext)}` : null,
+
 };

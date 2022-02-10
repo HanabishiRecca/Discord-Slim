@@ -49,7 +49,7 @@ const authorization = new Authorization('token');
 
 // Request options for actions.
 // By design every action can use its own options.
-// But for convinience you сan set default options globally for all actions.
+// But for convinience you can set default options globally for all actions.
 // Default options can be overridden by passing `requestOptions` argument.
 
 Actions.setDefaultRequestOptions({
@@ -163,7 +163,7 @@ client.events.on(Events.INTERACTION_CREATE, (interaction) => {
             content: interaction.data.options[0].value,
 
             // "EPHEMERAL" flag means that the response will be visible only by the caller.
-            flags: Helpers.InteractionCallbackDataFlags.EPHEMERAL,
+            flags: Helpers.MessageFlags.EPHEMERAL,
 
         },
     });

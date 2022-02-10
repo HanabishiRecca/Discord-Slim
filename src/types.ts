@@ -85,6 +85,7 @@ export type AuditLogPartialRole = {
     id: string;
     name: string;
     unicode_emoji: string;
+    type: string;
 };
 
 export type AuditLogChangeKeyChannel = {
@@ -181,9 +182,17 @@ export type AuditLogChangeKeyScheduledEvent = {
     channel_id: string;
     description: string;
     entity_type: helpers.ScheduledEventEntityTypes;
+    id: string;
     location: string;
     privacy_level: helpers.ScheduledEventPrivacyLevels;
     status: helpers.ScheduledEventStatuses;
+    type: string;
+};
+
+export type AuditLogChangeKeyThread = {
+    id: string;
+    invitable: boolean;
+    type: string;
 };
 
 // Channel types
@@ -248,7 +257,6 @@ export type Message = {
     thread?: Channel;
     components?: ActionRow[];
     sticker_items?: StickerItem[];
-    stickers?: Sticker[];
 };
 
 export type MessageActivity = {
@@ -287,6 +295,7 @@ export type ThreadMetadata = {
     archive_timestamp: string;
     locked: boolean;
     invitable?: boolean;
+    create_timestamp?: string | null;
 };
 
 export type ThreadMember = {
@@ -469,11 +478,21 @@ export type GuildPreview = {
     approximate_member_count: number;
     approximate_presence_count: number;
     description: string | null;
+    stickers: Sticker[];
+};
+
+export type GuildWidgetSettings = {
+    id: string;
+    channel_id: string | null;
 };
 
 export type GuildWidget = {
     enabled: boolean;
-    channel_id: string | null;
+    name: string;
+    instant_invite: string | null;
+    channels: Channel[];
+    members: User[];
+    presence_count: number;
 };
 
 export type Member = {
@@ -741,6 +760,8 @@ export type Interaction = {
     token: string;
     version: number;
     message?: Message;
+    locale?: string;
+    guild_locale?: string;
 };
 
 export type InteractionData = {
@@ -753,6 +774,7 @@ export type InteractionData = {
     component_type?: helpers.ComponentTypes;
     values?: SelectOption[];
     target_id?: string;
+    components?: Component[];
 };
 
 export type InteractionDataResolved = {
@@ -761,6 +783,7 @@ export type InteractionDataResolved = {
     roles?: { [id: string]: Role; };
     channels?: { [id: string]: Channel; };
     messages?: { [id: string]: Message; };
+    attachments?: { [id: string]: Attachment; };
 };
 
 export type InteractionDataOption = {
@@ -776,6 +799,7 @@ export type MessageInteraction = {
     type: helpers.InteractionTypes;
     name: string;
     user: User;
+    member?: Member;
 };
 
 export type InteractionResponse = {
@@ -791,6 +815,9 @@ export type InteractionResponse = {
 } | {
     type: helpers.InteractionCallbackTypes.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT;
     data: InteractionAutocompleteCallbackData;
+} | {
+    type: helpers.InteractionCallbackTypes.MODAL;
+    data: InteractionModalCallbackData;
 };
 
 export type InteractionCallbackData = {
@@ -798,13 +825,19 @@ export type InteractionCallbackData = {
     content?: string;
     embeds?: Embed[];
     allowed_mentions?: AllowedMentions;
-    flags?: helpers.InteractionCallbackDataFlags;
+    flags?: helpers.MessageFlags;
     components?: ActionRow[];
     attachments?: Attachment[];
 };
 
 export type InteractionAutocompleteCallbackData = {
     choices: ApplicationCommandOptionChoice[];
+};
+
+export type InteractionModalCallbackData = {
+    custom_id: string;
+    title: string;
+    components: Component[];
 };
 
 // Gateway types
@@ -908,9 +941,20 @@ export type TeamMember = {
 
 // Message Components types
 
+export type Component = (
+    | ActionRow
+    | Button
+    | SelectMenu
+    | TextInput
+);
+
 export type ActionRow = {
     type: helpers.ComponentTypes.ACTION_ROW;
-    components: (Button | SelectMenu)[];
+    components: (
+        | Button
+        | SelectMenu
+        | TextInput
+    )[];
 };
 
 export type Button = {
@@ -941,6 +985,18 @@ export type SelectOption = {
     default?: boolean;
 };
 
+export type TextInput = {
+    type: helpers.ComponentTypes.TEXT_INPUT;
+    custom_id: string;
+    style: helpers.TextInputStyles;
+    label: string;
+    min_length?: number;
+    max_length?: number;
+    required?: boolean;
+    value?: string;
+    placeholder?: string;
+};
+
 // Stage Instance types
 
 export type StageInstance = {
@@ -949,7 +1005,6 @@ export type StageInstance = {
     channel_id: string;
     topic: string;
     privacy_level: helpers.PrivacyLevels;
-    discoverable_disabled: boolean;
 };
 
 // Sticker types
@@ -1002,6 +1057,7 @@ export type ScheduledEvent = {
     entity_metadata: ScheduledEventEntityMetadata | null;
     creator?: ScheduledEventUser;
     user_count?: number;
+    image: string | null;
 };
 
 export type ScheduledEventEntityMetadata = {
