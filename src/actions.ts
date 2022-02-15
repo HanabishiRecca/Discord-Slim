@@ -121,7 +121,7 @@ export const Channel = {
         after?: string;
         limit?: number;
     }, requestOptions?: RequestOptions): Promise<types.Message[]> =>
-        Request(METHODS.GET, Path(PATHS.channels, channel_id, PATHS.messages), requestOptions, params),
+        Request(METHODS.GET, Path(PATHS.channels, channel_id, PATHS.messages) + Query(params), requestOptions),
 
     BulkDeleteMessages: (channel_id: string, params: {
         messages: string[];
