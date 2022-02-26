@@ -52,7 +52,7 @@ export const Permissions = {
     CREATE_PRIVATE_THREADS: 1n << 36n,
     USE_EXTERNAL_STICKERS: 1n << 37n,
     SEND_MESSAGES_IN_THREADS: 1n << 38n,
-    START_EMBEDDED_ACTIVITIES: 1n << 39n,
+    USE_EMBEDDED_ACTIVITIES: 1n << 39n,
     MODERATE_MEMBERS: 1n << 40n,
 } as const;
 
