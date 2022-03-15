@@ -997,6 +997,7 @@ export type StageInstance = {
     channel_id: string;
     topic: string;
     privacy_level: helpers.PrivacyLevels;
+    guild_scheduled_event_id: string | null;
 };
 
 // Sticker types
@@ -1039,7 +1040,7 @@ export type ScheduledEvent = {
     channel_id: string | null;
     creator_id: string | null;
     name: string;
-    description?: string;
+    description?: string | null;
     scheduled_start_time: string;
     scheduled_end_time: string | null;
     privacy_level: helpers.ScheduledEventPrivacyLevels;
@@ -1049,7 +1050,7 @@ export type ScheduledEvent = {
     entity_metadata: ScheduledEventEntityMetadata | null;
     creator?: ScheduledEventUser;
     user_count?: number;
-    image: string | null;
+    image?: string | null;
 };
 
 export type ScheduledEventEntityMetadata = {

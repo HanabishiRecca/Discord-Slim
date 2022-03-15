@@ -994,15 +994,15 @@ export const ScheduledEvent = {
 
     Modify: (guild_id: string, event_id: string, params: {
         channel_id?: string | null;
-        entity_metadata?: types.ScheduledEventEntityMetadata;
+        entity_metadata?: types.ScheduledEventEntityMetadata | null;
         name?: string;
         privacy_level?: helpers.ScheduledEventPrivacyLevels;
         scheduled_start_time?: string;
         scheduled_end_time?: string;
-        description?: string;
+        description?: string | null;
         entity_type?: helpers.ScheduledEventEntityTypes;
         status?: helpers.ScheduledEventStatuses;
-        image?: string;
+        image?: string | null;
     }, requestOptions?: RequestOptions): Promise<types.ScheduledEvent> =>
         Request(METHODS.PATCH, Path(PATHS.guilds, guild_id, PATHS.scheduled_events, event_id), requestOptions, params),
 
