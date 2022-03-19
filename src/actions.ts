@@ -751,7 +751,13 @@ export const Application = {
     GetGuildCommands: (application_id: string, guild_id: string, requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
         Request(METHODS.GET, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands), requestOptions),
 
-    BulkOverwriteGlobalCommands: (application_id: string, params: types.ApplicationCommand[], requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
+    BulkOverwriteGlobalCommands: (application_id: string, params: {
+        name: string;
+        description: string;
+        options?: types.ApplicationCommandOption[];
+        default_permission?: boolean;
+        type?: helpers.ApplicationCommandTypes;
+    }[], requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
         Request(METHODS.PUT, Path(PATHS.applications, application_id, PATHS.commands), requestOptions, params),
 
     CreateGuildCommand: (application_id: string, guild_id: string, params: {
@@ -777,7 +783,13 @@ export const Application = {
     DeleteGuildCommand: (application_id: string, guild_id: string, command_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands, command_id), requestOptions),
 
-    BulkOverwriteGuildCommands: (application_id: string, guild_id: string, params: types.ApplicationCommand[], requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
+    BulkOverwriteGuildCommands: (application_id: string, guild_id: string, params: {
+        name: string;
+        description: string;
+        options?: types.ApplicationCommandOption[];
+        default_permission?: boolean;
+        type?: helpers.ApplicationCommandTypes;
+    }[], requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
         Request(METHODS.PUT, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands), requestOptions, params),
 
     GetGuildCommandPermissions: (application_id: string, guild_id: string, requestOptions?: RequestOptions): Promise<types.GuildApplicationCommandPermissions[]> =>
