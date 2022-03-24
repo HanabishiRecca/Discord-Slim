@@ -65,7 +65,7 @@ export type AuditLogChangeKeyGuild = {
     mfa_level: number;
     name: string;
     owner_id: string;
-    preferred_locale: string;
+    preferred_locale: helpers.Locales;
     prune_delete_days: number;
     public_updates_channel_id: string;
     rules_channel_id: string;
@@ -449,7 +449,7 @@ export type Guild = {
     banner: string | null;
     premium_tier: helpers.PremiumTiers;
     premium_subscription_count?: number;
-    preferred_locale: string;
+    preferred_locale: helpers.Locales;
     public_updates_channel_id: string | null;
     max_video_channel_users?: number;
     approximate_member_count?: number;
@@ -610,7 +610,7 @@ export type User = {
     mfa_enabled?: boolean;
     banner?: string | null;
     accent_color?: number | null;
-    locale?: string;
+    locale?: helpers.Locales;
     verified?: boolean;
     email?: string | null;
     flags?: helpers.UserFlags;
@@ -703,7 +703,9 @@ export type ApplicationCommand = {
     application_id: string;
     guild_id?: string;
     name: string;
+    name_localizations?: LocaleDictionary;
     description: string;
+    description_localizations?: LocaleDictionary;
     options?: ApplicationCommandOption[];
     default_permission?: boolean;
     version: string;
@@ -712,7 +714,9 @@ export type ApplicationCommand = {
 export type ApplicationCommandOption = {
     type: helpers.ApplicationCommandOptionTypes;
     name: string;
+    name_localizations?: LocaleDictionary;
     description: string;
+    description_localizations?: LocaleDictionary;
     required?: boolean;
     choices?: ApplicationCommandOptionChoice[];
     options?: ApplicationCommandOption[];
@@ -724,6 +728,7 @@ export type ApplicationCommandOption = {
 
 export type ApplicationCommandOptionChoice = {
     name: string;
+    name_localizations?: LocaleDictionary;
     value: string | number;
 };
 
@@ -740,6 +745,10 @@ export type ApplicationCommandPermissions = {
     permission: boolean;
 };
 
+export type LocaleDictionary = { [key in helpers.Locales]?: string; };
+
+// Interaction types
+
 export type Interaction = {
     id: string;
     application_id: string;
@@ -752,8 +761,8 @@ export type Interaction = {
     token: string;
     version: number;
     message?: Message;
-    locale?: string;
-    guild_locale?: string;
+    locale?: helpers.Locales;
+    guild_locale?: helpers.Locales;
 };
 
 export type InteractionData = {

@@ -722,8 +722,13 @@ export const Webhook = {
 };
 
 export const Application = {
-    GetGlobalCommands: (application_id: string, requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
-        Request(METHODS.GET, Path(PATHS.applications, application_id, PATHS.commands), requestOptions),
+    GetGlobalCommands: (application_id: string, params?: {
+        with_localizations?: boolean;
+    }, requestOptions?: RequestOptions): Promise<(types.ApplicationCommand & {
+        name_localized?: string;
+        description_localized?: string;
+    })[]> =>
+        Request(METHODS.GET, Path(PATHS.applications, application_id, PATHS.commands) + Query(params), requestOptions),
 
     CreateGlobalCommand: (application_id: string, params: {
         name: string;
@@ -748,8 +753,13 @@ export const Application = {
     DeleteGlobalCommand: (application_id: string, command_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, Path(PATHS.applications, application_id, PATHS.commands, command_id), requestOptions),
 
-    GetGuildCommands: (application_id: string, guild_id: string, requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
-        Request(METHODS.GET, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands), requestOptions),
+    GetGuildCommands: (application_id: string, guild_id: string, params?: {
+        with_localizations?: boolean;
+    }, requestOptions?: RequestOptions): Promise<(types.ApplicationCommand & {
+        name_localized?: string;
+        description_localized?: string;
+    })[]> =>
+        Request(METHODS.GET, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands) + Query(params), requestOptions),
 
     BulkOverwriteGlobalCommands: (application_id: string, params: {
         name: string;
