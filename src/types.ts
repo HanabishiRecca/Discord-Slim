@@ -13,7 +13,7 @@ export type AuditLog = {
 
 export type AuditLogEntry = {
     target_id: string | null;
-    changes?: AuditLogChange<keyof AuditLogChangeKey>[];
+    changes?: AuditLogChangeDict[keyof AuditLogChangeDict][];
     user_id: string | null;
     id: string;
     action_type: helpers.AuditLogEvents;
@@ -32,13 +32,17 @@ export type AuditEntryInfo = {
     type?: string;
 };
 
-export type AuditLogChange<K extends keyof AuditLogChangeKey> = {
-    new_value?: AuditLogChangeKey[K];
-    old_value?: AuditLogChangeKey[K];
+type AuditLogChangeDict = {
+    [K in keyof AuditLogChangeKeys]: AuditLogChange<K>;
+};
+
+export type AuditLogChange<K extends keyof AuditLogChangeKeys> = {
+    new_value?: AuditLogChangeKeys[K];
+    old_value?: AuditLogChangeKeys[K];
     key: K;
 };
 
-export type AuditLogChangeKey = {
+export type AuditLogChangeKeys = {
     afk_channel_id: string;
     afk_timeout: number;
     allow: string;
