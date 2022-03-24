@@ -13,7 +13,7 @@ export type AuditLog = {
 
 export type AuditLogEntry = {
     target_id: string | null;
-    changes?: AuditLogChange[];
+    changes?: AuditLogChange<keyof AuditLogChangeKey>[];
     user_id: string | null;
     id: string;
     action_type: helpers.AuditLogEvents;
@@ -32,46 +32,77 @@ export type AuditEntryInfo = {
     type?: string;
 };
 
-export type AuditLogChange = {
-    new_value?: AuditLogChangeKey;
-    old_value?: AuditLogChangeKey;
-    key: string;
+export type AuditLogChange<K extends keyof AuditLogChangeKey> = {
+    new_value?: AuditLogChangeKey[K];
+    old_value?: AuditLogChangeKey[K];
+    key: K;
 };
 
-export type AuditLogChangeKey = (
-    | AuditLogChangeKeyGuild
-    | AuditLogChangeKeyChannel
-    | AuditLogChangeKeyRole
-    | AuditLogChangeKeyInvite
-    | AuditLogChangeKeyUser
-    | AuditLogChangeKeyMember
-    | AuditLogChangeKeyIntegration
-    | AuditLogChangeKeyVoiceChannel
-    | AuditLogChangeKeySticker
-    | AuditLogChangeKeyStageInstance
-    | AuditLogChangeKeyScheduledEvent
-);
-
-export type AuditLogChangeKeyGuild = {
+export type AuditLogChangeKey = {
     afk_channel_id: string;
     afk_timeout: number;
+    allow: string;
+    application_id: string;
+    archived: boolean;
+    asset: string;
+    auto_archive_duration: number;
+    available: boolean;
+    avatar_hash: boolean;
     banner_hash: string;
+    bitrate: number;
+    channel_id: string;
+    code: string;
+    color: number;
+    communication_disabled_until: string;
+    deaf: boolean;
+    default_auto_archive_duration: helpers.ThreadArchiveDurations;
     default_message_notifications: helpers.DefaultMessageNotificationLevels;
+    deny: string;
     description: string;
     discovery_splash_hash: string;
+    enable_emoticons: boolean;
+    entity_type: helpers.ScheduledEventEntityTypes;
+    expire_behavior: helpers.IntegrationExpireBehaviors;
+    expire_grace_period: number;
     explicit_content_filter: helpers.ExplicitContentFilterLevels;
+    format_type: helpers.MessageStickerFormatTypes;
+    guild_id: string;
+    hoist: boolean;
     icon_hash: string;
     id: string;
-    mfa_level: number;
+    invitable: boolean;
+    inviter_id: string;
+    location: string;
+    locked: boolean;
+    max_age: number;
+    max_uses: number;
+    mentionable: boolean;
+    mfa_level: helpers.MFA_Levels;
+    mute: boolean;
     name: string;
+    nick: string;
+    nsfw: boolean;
     owner_id: string;
+    permission_overwrites: PermissionsOverwrite[];
+    permissions: string;
+    position: number;
     preferred_locale: helpers.Locales;
+    privacy_level: helpers.PrivacyLevels;
     prune_delete_days: number;
     public_updates_channel_id: string;
+    rate_limit_per_user: number;
+    region: string;
     rules_channel_id: string;
     splash_hash: string;
+    status: helpers.ScheduledEventStatuses;
     system_channel_id: string;
-    type: string;
+    tags: string;
+    temporary: boolean;
+    topic: string;
+    type: string | number;
+    unicode_emoji: string;
+    user_limit: number;
+    uses: number;
     vanity_url_code: string;
     verification_level: number;
     widget_channel_id: string;
@@ -85,113 +116,6 @@ export type AuditLogPartialRole = {
     id: string;
     name: string;
     unicode_emoji: string;
-    type: string;
-};
-
-export type AuditLogChangeKeyChannel = {
-    application_id: string;
-    bitrate: number;
-    id: string;
-    name: string;
-    nsfw: boolean;
-    permission_overwrites: PermissionsOverwrite[];
-    position: number;
-    rate_limit_per_user: number;
-    topic: string;
-    type: helpers.ChannelTypes;
-};
-
-export type AuditLogChangeKeyRole = {
-    allow: string;
-    color: number;
-    deny: string;
-    hoist: boolean;
-    id: string;
-    mentionable: boolean;
-    name: string;
-    permissions: string;
-    type: string;
-};
-
-export type AuditLogChangeKeyInvite = {
-    channel_id: string;
-    code: string;
-    id: string;
-    inviter_id: string;
-    max_age: number;
-    max_uses: number;
-    name: string;
-    temporary: boolean;
-    type: string;
-    uses: number;
-};
-
-export type AuditLogChangeKeyUser = {
-    avatar_hash: boolean;
-    id: string;
-    name: string;
-    type: string;
-};
-
-export type AuditLogChangeKeyMember = {
-    communication_disabled_until: string;
-    deaf: boolean;
-    id: string;
-    mute: boolean;
-    name: string;
-    nick: string;
-    type: string;
-};
-
-export type AuditLogChangeKeyIntegration = {
-    enable_emoticons: boolean;
-    expire_behavior: number;
-    expire_grace_period: number;
-    id: string;
-    name: string;
-    type: string;
-};
-
-export type AuditLogChangeKeyVoiceChannel = {
-    id: string;
-    name: string;
-    type: string;
-    user_limit: number;
-};
-
-export type AuditLogChangeKeySticker = {
-    available: boolean;
-    description: string;
-    format_type: helpers.MessageStickerFormatTypes;
-    guild_id: string;
-    id: string;
-    name: string;
-    tags: string;
-    type: string;
-};
-
-export type AuditLogChangeKeyStageInstance = {
-    id: string;
-    name: string;
-    privacy_level: helpers.PrivacyLevels;
-    topic: string;
-    type: helpers.ChannelTypes;
-};
-
-export type AuditLogChangeKeyScheduledEvent = {
-    channel_id: string;
-    description: string;
-    entity_type: helpers.ScheduledEventEntityTypes;
-    id: string;
-    location: string;
-    privacy_level: helpers.ScheduledEventPrivacyLevels;
-    status: helpers.ScheduledEventStatuses;
-    type: string;
-};
-
-export type AuditLogChangeKeyThread = {
-    id: string;
-    invitable: boolean;
     type: string;
 };
 
@@ -1051,7 +975,7 @@ export type ScheduledEvent = {
     description?: string | null;
     scheduled_start_time: string;
     scheduled_end_time: string | null;
-    privacy_level: helpers.ScheduledEventPrivacyLevels;
+    privacy_level: helpers.PrivacyLevels;
     status: helpers.ScheduledEventStatuses;
     entity_type: helpers.ScheduledEventEntityTypes;
     entity_id: string | null;

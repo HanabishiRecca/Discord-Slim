@@ -509,10 +509,6 @@ export enum StickerTypes {
     GUILD = 2,
 }
 
-export enum ScheduledEventPrivacyLevels {
-    GUILD_ONLY = 2,
-}
-
 export enum ScheduledEventEntityTypes {
     STAGE_INSTANCE = 1,
     VOICE = 2,

@@ -1000,7 +1000,7 @@ export const ScheduledEvent = {
         channel_id?: string;
         entity_metadata?: types.ScheduledEventEntityMetadata;
         name: string;
-        privacy_level: helpers.ScheduledEventPrivacyLevels;
+        privacy_level: helpers.PrivacyLevels;
         scheduled_start_time: string;
         scheduled_end_time?: string;
         description?: string;
@@ -1018,7 +1018,7 @@ export const ScheduledEvent = {
         channel_id?: string | null;
         entity_metadata?: types.ScheduledEventEntityMetadata | null;
         name?: string;
-        privacy_level?: helpers.ScheduledEventPrivacyLevels;
+        privacy_level?: helpers.PrivacyLevels;
         scheduled_start_time?: string;
         scheduled_end_time?: string;
         description?: string | null;
