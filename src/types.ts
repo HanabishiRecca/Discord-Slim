@@ -464,7 +464,7 @@ export type Guild = {
 
 export type UnavailableGuild = {
     id: string;
-    unavailable: true;
+    unavailable: boolean;
 };
 
 export type GuildPreview = {
