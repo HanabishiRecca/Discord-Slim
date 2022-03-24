@@ -916,7 +916,6 @@ export type Application = {
     terms_of_service_url?: string;
     privacy_policy_url?: string;
     owner?: User;
-    summary: string;
     verify_key: string;
     team: Team | null;
     guild_id?: string;
