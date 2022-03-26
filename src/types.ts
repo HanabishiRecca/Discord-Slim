@@ -73,6 +73,7 @@ export type AuditLogChangeKeys = {
     guild_id: string;
     hoist: boolean;
     icon_hash: string;
+    image_hash: string;
     id: string;
     invitable: boolean;
     inviter_id: string;
