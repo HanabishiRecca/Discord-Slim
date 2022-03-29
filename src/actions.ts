@@ -966,6 +966,7 @@ export const StageInstance = {
         channel_id: string;
         topic: string;
         privacy_level?: helpers.PrivacyLevels;
+        send_start_notification?: boolean;
     }, requestOptions?: RequestOptions): Promise<types.StageInstance> =>
         Request(METHODS.POST, PATHS.stage_instances, requestOptions, params),
 
