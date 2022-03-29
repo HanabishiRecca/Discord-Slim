@@ -853,6 +853,9 @@ export type Application = {
     slug?: string;
     cover_image?: string;
     flags?: helpers.ApplicationFlags;
+    tags?: string[];
+    install_params?: InstallParams;
+    custom_install_url?: string;
 };
 
 export type Team = {
@@ -867,6 +870,11 @@ export type TeamMember = {
     permissions: string[];
     team_id: string;
     user: User;
+};
+
+export type InstallParams = {
+    scopes: string[];
+    permissions: string;
 };
 
 // Message Components types
