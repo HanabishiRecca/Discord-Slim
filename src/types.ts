@@ -466,7 +466,6 @@ export type IntegrationApplication = {
     name: string;
     icon: string | null;
     description: string;
-    summary: string;
     bot?: User;
 };
 
