@@ -132,7 +132,7 @@ export type Channel = {
     guild_id?: string;
     position?: number;
     permission_overwrites?: PermissionsOverwrite[];
-    name?: string;
+    name?: string | null;
     topic?: string | null;
     nsfw?: boolean;
     last_message_id?: string | null;
