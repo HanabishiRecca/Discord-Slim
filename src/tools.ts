@@ -147,7 +147,7 @@ export const Resource = {
     GuildBanner: (
         guild: types.Guild | { id: string; banner?: string; },
         size?: number,
-        ext?: 'png' | 'jpg' | 'webp',
+        ext?: 'png' | 'jpg' | 'webp' | 'gif',
     ) => guild.banner ?
             `${helpers.CDN}/banners/${guild.id}/${guild.banner}${SizeExtOpt(size, ext)}` : null,
 

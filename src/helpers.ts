@@ -237,6 +237,7 @@ export enum SystemChannelFlags {
 }
 
 export enum GuildFeatures {
+    ANIMATED_BANNER = 'ANIMATED_BANNER',
     ANIMATED_ICON = 'ANIMATED_ICON',
     BANNER = 'BANNER',
     COMMERCE = 'COMMERCE',
