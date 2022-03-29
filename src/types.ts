@@ -631,9 +631,9 @@ export type ApplicationCommand = {
     application_id: string;
     guild_id?: string;
     name: string;
-    name_localizations?: LocaleDictionary;
+    name_localizations?: LocaleDictionary | null;
     description: string;
-    description_localizations?: LocaleDictionary;
+    description_localizations?: LocaleDictionary | null;
     options?: ApplicationCommandOption[];
     default_permission?: boolean;
     version: string;
@@ -642,9 +642,9 @@ export type ApplicationCommand = {
 export type ApplicationCommandOption = {
     type: helpers.ApplicationCommandOptionTypes;
     name: string;
-    name_localizations?: LocaleDictionary;
+    name_localizations?: LocaleDictionary | null;
     description: string;
-    description_localizations?: LocaleDictionary;
+    description_localizations?: LocaleDictionary | null;
     required?: boolean;
     choices?: ApplicationCommandOptionChoice[];
     options?: ApplicationCommandOption[];
@@ -656,7 +656,7 @@ export type ApplicationCommandOption = {
 
 export type ApplicationCommandOptionChoice = {
     name: string;
-    name_localizations?: LocaleDictionary;
+    name_localizations?: LocaleDictionary | null;
     value: string | number;
 };
 
@@ -673,7 +673,9 @@ export type ApplicationCommandPermissions = {
     permission: boolean;
 };
 
-export type LocaleDictionary = { [key in helpers.Locales]?: string; };
+export type LocaleDictionary = {
+    [key in helpers.Locales]?: string;
+};
 
 // Interaction types
 

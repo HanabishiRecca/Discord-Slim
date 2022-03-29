@@ -732,7 +732,9 @@ export const Application = {
 
     CreateGlobalCommand: (application_id: string, params: {
         name: string;
+        name_localizations?: types.LocaleDictionary | null;
         description: string;
+        description_localizations?: types.LocaleDictionary | null;
         options?: types.ApplicationCommandOption[];
         default_permission?: boolean;
         type?: helpers.ApplicationCommandTypes;
@@ -744,7 +746,9 @@ export const Application = {
 
     EditGlobalCommand: (application_id: string, command_id: string, params: {
         name?: string;
+        name_localizations?: types.LocaleDictionary | null;
         description?: string;
+        description_localizations?: types.LocaleDictionary | null;
         options?: types.ApplicationCommandOption[];
         default_permission?: boolean;
     }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
@@ -763,7 +767,9 @@ export const Application = {
 
     BulkOverwriteGlobalCommands: (application_id: string, params: {
         name: string;
+        name_localizations?: types.LocaleDictionary | null;
         description: string;
+        description_localizations?: types.LocaleDictionary | null;
         options?: types.ApplicationCommandOption[];
         default_permission?: boolean;
         type?: helpers.ApplicationCommandTypes;
@@ -772,7 +778,9 @@ export const Application = {
 
     CreateGuildCommand: (application_id: string, guild_id: string, params: {
         name: string;
+        name_localizations?: types.LocaleDictionary | null;
         description: string;
+        description_localizations?: types.LocaleDictionary | null;
         options?: types.ApplicationCommandOption[];
         default_permission?: boolean;
         type?: helpers.ApplicationCommandTypes;
@@ -784,7 +792,9 @@ export const Application = {
 
     EditGuildCommand: (application_id: string, guild_id: string, command_id: string, params: {
         name?: string;
+        name_localizations?: types.LocaleDictionary | null;
         description?: string;
+        description_localizations?: types.LocaleDictionary | null;
         options?: types.ApplicationCommandOption[];
         default_permission?: boolean;
     }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
@@ -795,7 +805,9 @@ export const Application = {
 
     BulkOverwriteGuildCommands: (application_id: string, guild_id: string, params: {
         name: string;
+        name_localizations?: types.LocaleDictionary | null;
         description: string;
+        description_localizations?: types.LocaleDictionary | null;
         options?: types.ApplicationCommandOption[];
         default_permission?: boolean;
         type?: helpers.ApplicationCommandTypes;
