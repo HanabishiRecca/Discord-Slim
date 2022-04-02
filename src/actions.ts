@@ -353,8 +353,12 @@ export const Guild = {
     }, requestOptions?: RequestOptions): Promise<types.Member[]> =>
         Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.members, PATHS.search) + Query(params), requestOptions),
 
-    GetBans: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Ban[]> =>
-        Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.bans), requestOptions),
+    GetBans: (guild_id: string, params?: {
+        limit?: number;
+        before?: string;
+        after?: string;
+    }, requestOptions?: RequestOptions): Promise<types.Ban[]> =>
+        Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.bans) + Query(params), requestOptions),
 
     GetRoles: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Role[]> =>
         Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.roles), requestOptions),
