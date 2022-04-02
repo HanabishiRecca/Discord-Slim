@@ -160,7 +160,7 @@ export type Message = {
     channel_id: string;
     guild_id?: string;
     author: User;
-    member?: Member;
+    member?: Omit<Member, 'user'>;
     content: string;
     timestamp: string;
     edited_timestamp: string | null;
@@ -195,9 +195,8 @@ export type MessageActivity = {
 
 export type MessageReference = {
     message_id?: string;
-    channel_id?: string;
+    channel_id: string;
     guild_id?: string;
-    fail_if_not_exists?: boolean;
 };
 
 export type FollowedChannel = {
@@ -344,9 +343,7 @@ export type Guild = {
     icon_hash?: string | null;
     splash: string | null;
     discovery_splash: string | null;
-    owner?: boolean;
     owner_id: string;
-    permissions?: string;
     afk_channel_id: string | null;
     afk_timeout: number;
     widget_enabled?: boolean;
@@ -362,15 +359,6 @@ export type Guild = {
     system_channel_id: string | null;
     system_channel_flags: helpers.SystemChannelFlags;
     rules_channel_id: string | null;
-    joined_at?: string;
-    large?: boolean;
-    unavailable?: boolean;
-    member_count?: number;
-    voice_states?: VoiceState[];
-    members?: Member[];
-    channels?: Channel[];
-    threads?: Channel[];
-    presences?: Presence[];
     max_presences?: number | null;
     max_members?: number;
     vanity_url_code: string | null;
@@ -385,9 +373,7 @@ export type Guild = {
     approximate_presence_count?: number;
     welcome_screen?: WelcomeScreen;
     nsfw_level: helpers.GuildNSFWLevels;
-    stage_instances?: StageInstance[];
     stickers?: Sticker[];
-    guild_scheduled_events?: ScheduledEvent[];
     premium_progress_bar_enabled: boolean;
 };
 
@@ -425,7 +411,7 @@ export type GuildWidget = {
 };
 
 export type Member = {
-    user?: User;
+    user: User;
     nick?: string | null;
     avatar?: string | null;
     roles: string[];

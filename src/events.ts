@@ -94,7 +94,19 @@ type EventTypes = {
         added_members?: (types.ThreadMember & types.Member & types.Presence)[];
         removed_member_ids?: string[];
     };
-    [Events.GUILD_CREATE]: types.Guild;
+    [Events.GUILD_CREATE]: types.Guild & {
+        joined_at: string;
+        large: boolean;
+        unavailable: boolean;
+        member_count: number;
+        voice_states: types.VoiceState[];
+        members: types.Member[];
+        channels: types.Channel[];
+        threads: types.Channel[];
+        presences: types.Presence[];
+        stage_instances: types.StageInstance[];
+        guild_scheduled_events: types.ScheduledEvent[];
+    };
     [Events.GUILD_UPDATE]: types.Guild;
     [Events.GUILD_DELETE]: types.UnavailableGuild;
     [Events.GUILD_BAN_ADD]: {

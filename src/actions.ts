@@ -196,7 +196,12 @@ export const Message = {
         tts?: string;
         embeds?: types.Embed[];
         allowed_mentions?: types.AllowedMentions;
-        message_reference?: types.MessageReference;
+        message_reference?: {
+            message_id: string;
+            channel_id?: string;
+            guild_id?: string;
+            fail_if_not_exists?: boolean;
+        };
         components?: types.ActionRow[];
         flags?: helpers.MessageFlags;
     }, requestOptions?: RequestOptions): Promise<types.Message> =>
@@ -608,7 +613,10 @@ export const User = {
         before?: string;
         after?: string;
         limit?: number;
-    }, requestOptions?: RequestOptions): Promise<types.Guild[]> =>
+    }, requestOptions?: RequestOptions): Promise<(types.Guild & {
+        owner: boolean;
+        permissions: string;
+    })[]> =>
         Request(METHODS.GET, Path(PATHS.users, PATHS.me, PATHS.guilds) + Query(params), requestOptions),
 
     GetCurrentMember: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Member> =>
