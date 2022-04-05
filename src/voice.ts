@@ -1,4 +1,4 @@
-import WebSocket from 'ws';
+import { WebSocket, RawData } from 'ws';
 import { EventEmitter } from 'events';
 import { Sleep, SafeJsonParse } from './util.js';
 import { VoiceEncryptionModes, SpeakingStates } from './helpers.js';
@@ -108,7 +108,7 @@ export class Voice extends EventEmitter {
             this._lastHeartbeatAck = true,
     };
 
-    private _onMessage = (data: WebSocket.Data) => {
+    private _onMessage = (data: RawData) => {
         const intent = SafeJsonParse(String(data)) as Intent | null;
         intent && this._intentHandlers[intent.op]?.(intent.d);
     };

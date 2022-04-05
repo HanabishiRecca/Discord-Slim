@@ -1,4 +1,4 @@
-import WebSocket from 'ws';
+import { WebSocket, RawData } from 'ws';
 import { EventEmitter } from 'events';
 import { Intents, TokenTypes, API_VERSION, ActivityTypes, StatusTypes } from './helpers.js';
 import { Sleep, SafeJsonParse } from './util.js';
@@ -157,7 +157,7 @@ export class Client extends EventEmitter {
         },
     };
 
-    private _onMessage = (data: WebSocket.Data) => {
+    private _onMessage = (data: RawData) => {
         const intent = SafeJsonParse(String(data)) as Intent | null;
         intent && this._intentHandlers[intent.op]?.(intent);
     };

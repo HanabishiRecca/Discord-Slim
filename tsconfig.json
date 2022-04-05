@@ -7,18 +7,11 @@
         "outDir": "package/dist",
         "declaration": true,
         "stripInternal": true,
-        "baseUrl": ".",
-        "esModuleInterop": true,
         "skipLibCheck": true,
         "removeComments": true,
-        "paths": {
-            "*": [
-                "node_modules/*"
-            ]
-        },
-        "lib": [
-            "ES2020"
-        ]
+        "noUncheckedIndexedAccess": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "lib": []
     },
     "include": [
         "src/index.ts"

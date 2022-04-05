@@ -1,4 +1,4 @@
-import https from 'https';
+import * as https from 'https';
 import type { OutgoingHttpHeaders } from 'http';
 import { SafeJsonParse } from './util.js';
 import { API_PATH, TokenTypes } from './helpers.js';
