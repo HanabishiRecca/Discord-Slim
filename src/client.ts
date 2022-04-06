@@ -39,6 +39,17 @@ type Intent = {
     d: any;
 };
 
+type GatewayResponse = {
+    url: string;
+    shards: number;
+    session_start_limit: {
+        total: number;
+        remaining: number;
+        reset_after: number;
+        max_concurrency: number;
+    };
+};
+
 const
     fatalCodes = [4004, 4010, 4011, 4012, 4013, 4014],
     dropCodes = [4007, 4009];
@@ -69,25 +80,29 @@ export class Client extends EventEmitter {
             await Sleep(5000);
         }
 
-        const response = await Request<{ url?: string; }>('GET',
-            this._auth?.authorization.type == TokenTypes.BOT ?
-                '/gateway/bot' :
-                '/gateway',
-            this._auth
+        const response = await Request<Partial<GatewayResponse>>('GET',
+            (this._auth?.authorization.type == TokenTypes.BOT) ?
+                '/gateway/bot' : '/gateway',
+            this._auth,
         ).catch(() => {});
 
         if(this._ws)
-            return this.emit(ClientEvents.WARN, 'Client already connected.');
+            return this.emit(ClientEvents.WARN, 'The client is already connected.');
 
         if(!response)
-            return this.emit(ClientEvents.FATAL, 'Unable to retrieve a gateway.');
+            return this.emit(ClientEvents.FATAL, 'Unable to connect to the gateway API.');
 
-        if(typeof response.url != 'string')
+        const { url, session_start_limit } = response;
+
+        if(typeof url != 'string')
             return this.emit(ClientEvents.FATAL, 'Unexpected gateway API response.');
 
+        if(Number(session_start_limit?.remaining) < 1)
+            return this.emit(ClientEvents.FATAL, 'Max session starts limit reached.');
+
         try {
-            this._ws = new WebSocket(`${response.url}?v=${API_VERSION}`);
-        } catch {
+            this._ws = new WebSocket(`${url}?v=${API_VERSION}`);
+        } catch(e) {
             return this.emit(ClientEvents.FATAL, 'Unable to create a socket.');
         }
 
