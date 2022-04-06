@@ -69,9 +69,9 @@ type EventTypes = {
         };
     };
     [Events.RESUMED]: {};
-    [Events.CHANNEL_CREATE]: types.Channel;
-    [Events.CHANNEL_UPDATE]: types.Channel;
-    [Events.CHANNEL_DELETE]: types.Channel;
+    [Events.CHANNEL_CREATE]: types.GuildChannel;
+    [Events.CHANNEL_UPDATE]: types.GuildChannel | types.GroupDMChannel;
+    [Events.CHANNEL_DELETE]: types.GuildChannel | types.GroupDMChannel;
     [Events.CHANNEL_PINS_UPDATE]: {
         guild_id?: string;
         channel_id: string;
@@ -101,7 +101,7 @@ type EventTypes = {
         member_count: number;
         voice_states: types.VoiceState[];
         members: types.Member[];
-        channels: types.Channel[];
+        channels: types.GuildChannel[];
         threads: types.Thread[];
         presences: types.Presence[];
         stage_instances: types.StageInstance[];

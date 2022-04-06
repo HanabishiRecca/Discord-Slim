@@ -127,12 +127,16 @@ export type AuditLogPartialRole = {
 // Channel types
 
 export type Channel = (
-    | GuildTextChannel
-    | GuildCategory
-    | GuildVoiceChannel
+    | GuildChannel
     | DMChannel
     | GroupDMChannel
     | Thread
+);
+
+export type GuildChannel = (
+    | GuildTextChannel
+    | GuildCategory
+    | GuildVoiceChannel
 );
 
 export type GuildTextChannel = {
@@ -470,7 +474,7 @@ export type GuildWidget = {
     enabled: boolean;
     name: string;
     instant_invite: string | null;
-    channels: Channel[];
+    channels: GuildChannel[];
     members: User[];
     presence_count: number;
 };
@@ -542,7 +546,7 @@ export type WelcomeScreenChannel = {
 export type Invite = {
     code: string;
     guild?: Guild;
-    channel: Channel | null;
+    channel: GuildChannel | null;
     inviter?: User;
     target_type?: helpers.InviteTargetTypes;
     target_user?: User;
@@ -670,7 +674,7 @@ export type Webhook = {
     token?: string;
     application_id: string | null;
     source_guild?: Guild;
-    source_channel?: Channel;
+    source_channel?: GuildChannel;
     url?: string;
 } & ({
     type: helpers.WebhookTypes.INCOMING;
@@ -680,7 +684,7 @@ export type Webhook = {
 }) & ({
     type: helpers.WebhookTypes.CHANNEL_FOLLOWER;
     source_guild: Guild;
-    source_channel: Channel;
+    source_channel: GuildChannel;
 } | {
     source_guild?: undefined;
     source_channel?: undefined;
@@ -796,7 +800,6 @@ export type Interaction = {
     type: (
         | helpers.InteractionTypes.APPLICATION_COMMAND
         | helpers.InteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE
-        | helpers.InteractionTypes.PING
     );
     data: InteractionData;
 } | {
@@ -804,7 +807,7 @@ export type Interaction = {
     data: InteractionDataComponent;
 } | {
     type: helpers.InteractionTypes.MODAL_SUBMIT;
-    data: InteractionDataComponent;
+    data: InteractionDataModal;
 } | {
     data?: undefined;
 }) & ({
@@ -833,15 +836,12 @@ export type InteractionData = {
     guild_id?: string;
     target_id?: string;
 } & ({
-    type: (
-        | helpers.ApplicationCommandTypes.USER
-        | helpers.ApplicationCommandTypes.MESSAGE
-    );
-    options?: undefined;
-    target_id: string;
-} | {
+    type: helpers.ApplicationCommandTypes.CHAT_INPUT;
     options: InteractionDataOption[];
     target_id?: undefined;
+} | {
+    options?: undefined;
+    target_id: string;
 });
 
 export type InteractionDataComponent = {
@@ -939,6 +939,11 @@ export type MessageInteraction = {
 
 export type InteractionResponse = {
     type: helpers.InteractionCallbackTypes;
+    data: (
+        | InteractionCallbackData
+        | InteractionAutocompleteCallbackData
+        | InteractionModalCallbackData
+    );
 } & ({
     type: (
         | helpers.InteractionCallbackTypes.CHANNEL_MESSAGE_WITH_SOURCE
@@ -1108,13 +1113,12 @@ export type Button = {
     url?: string;
     disabled?: boolean;
 } & ({
-    style: Exclude<helpers.ButtonStyles, helpers.ButtonStyles.LINK>;
-    custom_id: string;
-    url?: undefined;
-} | {
-    style: Exclude<helpers.ButtonStyles, helpers.ButtonStyles.LINK>;
+    style: helpers.ButtonStyles.LINK;
     custom_id?: undefined;
     url: string;
+} | {
+    custom_id: string;
+    url?: undefined;
 });
 
 export type SelectMenu = {

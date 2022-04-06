@@ -78,49 +78,73 @@ const enum PATHS {
 }
 
 export const Channel = {
-    Create: (guild_id: string, params: {
+    Create: <T extends types.GuildChannel>(guild_id: string, params: {
         name: string;
-        type?: helpers.ChannelTypes;
-        topic?: string;
-        bitrate?: number;
-        user_limit?: number;
-        rate_limit_per_user?: number;
         position?: number;
         permission_overwrites?: types.PermissionsOverwrite[];
+    } & ((T extends types.GuildTextChannel ? {
+        type?: (
+            | helpers.ChannelTypes.GUILD_TEXT
+            | helpers.ChannelTypes.GUILD_NEWS
+        );
+        topic?: string;
+        rate_limit_per_user?: number;
         parent_id?: string;
         nsfw?: boolean;
-    }, requestOptions?: RequestOptions): Promise<types.Channel> =>
+    } : never) | (T extends types.GuildCategory ? {
+        type: helpers.ChannelTypes.GUILD_CATEGORY;
+    } : never) | (T extends types.GuildVoiceChannel ? {
+        type: (
+            | helpers.ChannelTypes.GUILD_VOICE
+            | helpers.ChannelTypes.GUILD_STAGE_VOICE
+        );
+        bitrate?: number;
+        user_limit?: number;
+        parent_id?: string;
+    } : never)), requestOptions?: RequestOptions): Promise<T> =>
         Request(METHODS.POST, Path(PATHS.guilds, guild_id, PATHS.channels), requestOptions, params),
 
-    Get: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Channel> =>
+    Get: <T extends types.GuildChannel>(channel_id: string, requestOptions?: RequestOptions): Promise<T> =>
         Request(METHODS.GET, Path(PATHS.channels, channel_id), requestOptions),
 
-    Modify: (id: string, params: {
+    Modify: <T extends types.GuildChannel>(id: string, params: {
         name?: string;
-        type?: helpers.ChannelTypes;
         position?: number | null;
+        permission_overwrites?: types.PermissionsOverwrite[] | null;
+    } & (T extends types.GuildTextChannel ? {
+        type?: types.GuildTextChannel['type'];
         topic?: string | null;
         nsfw?: boolean | null;
         rate_limit_per_user?: number | null;
+        parent_id?: string | null;
+        default_auto_archive_duration?: helpers.ThreadArchiveDurations | null;
+    } : never) & (T extends types.GuildVoiceChannel ? {
         bitrate?: number | null;
         user_limit?: number | null;
-        permission_overwrites?: types.PermissionsOverwrite[] | null;
         parent_id?: string | null;
         rtc_region?: string | null;
         video_quality_mode?: helpers.VideoQualityModes;
-        default_auto_archive_duration?: helpers.ThreadArchiveDurations | null;
-    }, requestOptions?: RequestOptions): Promise<types.Channel> =>
+    } : never), requestOptions?: RequestOptions): Promise<T> =>
         Request(METHODS.PATCH, Path(PATHS.channels, id), requestOptions, params),
 
-    Delete: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Channel> =>
+    Delete: <T extends types.GuildChannel>(channel_id: string, requestOptions?: RequestOptions): Promise<T> =>
         Request(METHODS.DELETE, Path(PATHS.channels, channel_id), requestOptions),
 
     GetMessages: (channel_id: string, params?: {
-        around?: string;
-        before?: string;
-        after?: string;
         limit?: number;
-    }, requestOptions?: RequestOptions): Promise<types.Message[]> =>
+    } & ({
+        around?: string;
+        before?: undefined;
+        after?: undefined;
+    } | {
+        around?: undefined;
+        before?: string;
+        after?: undefined;
+    } | {
+        around?: undefined;
+        before?: undefined;
+        after?: string;
+    }), requestOptions?: RequestOptions): Promise<types.Message[]> =>
         Request(METHODS.GET, Path(PATHS.channels, channel_id, PATHS.messages) + Query(params), requestOptions),
 
     BulkDeleteMessages: (channel_id: string, params: {
@@ -289,7 +313,7 @@ export const Guild = {
         default_message_notifications?: helpers.DefaultMessageNotificationLevels;
         explicit_content_filter?: helpers.ExplicitContentFilterLevels;
         roles?: types.Role[];
-        channels?: types.Channel[];
+        channels?: types.GuildChannel[];
         afk_channel_id?: string;
         afk_timeout?: number;
         system_channel_id?: string;
@@ -331,7 +355,7 @@ export const Guild = {
     Delete: (guild_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, Path(PATHS.guilds, guild_id), requestOptions),
 
-    GetChannels: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Channel[]> =>
+    GetChannels: (guild_id: string, requestOptions?: RequestOptions): Promise<types.GuildChannel[]> =>
         Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.channels), requestOptions),
 
     ModifyChannelPositions: (guild_id: string, params: ({
@@ -360,9 +384,13 @@ export const Guild = {
 
     GetBans: (guild_id: string, params?: {
         limit?: number;
+    } & ({
         before?: string;
+        after?: undefined;
+    } | {
+        before?: undefined;
         after?: string;
-    }, requestOptions?: RequestOptions): Promise<types.Ban[]> =>
+    }), requestOptions?: RequestOptions): Promise<types.Ban[]> =>
         Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.bans) + Query(params), requestOptions),
 
     GetRoles: (guild_id: string, requestOptions?: RequestOptions): Promise<types.Role[]> =>
@@ -610,10 +638,14 @@ export const User = {
         Request(METHODS.PATCH, Path(PATHS.users, PATHS.me), requestOptions, params),
 
     GetCurrentGuilds: (params?: {
-        before?: string;
-        after?: string;
         limit?: number;
-    }, requestOptions?: RequestOptions): Promise<(types.Guild & {
+    } & ({
+        before?: string;
+        after?: undefined;
+    } | {
+        before?: undefined;
+        after?: string;
+    }), requestOptions?: RequestOptions): Promise<(types.Guild & {
         owner: boolean;
         permissions: string;
     })[]> =>
@@ -1009,8 +1041,12 @@ export const ScheduledEvent = {
     GetUsers: (guild_id: string, event_id: string, params?: {
         limit?: number;
         with_member?: boolean;
+    } & ({
         before?: string;
+        after?: undefined;
+    } | {
+        before?: undefined;
         after?: string;
-    }, requestOptions?: RequestOptions): Promise<types.ScheduledEventUser[]> =>
+    }), requestOptions?: RequestOptions): Promise<types.ScheduledEventUser[]> =>
         Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.scheduled_events, event_id, PATHS.users) + Query(params), requestOptions),
 };
