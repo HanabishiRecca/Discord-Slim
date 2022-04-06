@@ -220,3 +220,10 @@ export const Resource = {
             `${helpers.CDN}/guild-events/${event.id}/${event.image}${SizeExtOpt(size, ext)}` : null,
 
 };
+
+export const Utils = {
+
+    GetUserCreationDate: (user: types.User | { id: string; } | string) =>
+        new Date(Number(BigInt(EID(user)) >> 22n) + 1420070400000),
+
+};
