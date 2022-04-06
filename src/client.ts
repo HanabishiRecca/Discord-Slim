@@ -69,7 +69,7 @@ export class Client extends EventEmitter {
             await Sleep(5000);
         }
 
-        const response = await Request('GET',
+        const response = await Request<{ url?: string; }>('GET',
             this._auth?.authorization.type == TokenTypes.BOT ?
                 '/gateway/bot' :
                 '/gateway',

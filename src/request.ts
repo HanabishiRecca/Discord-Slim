@@ -53,42 +53,48 @@ export type RequestOptions = {
     };
 };
 
-let defOptions: RequestOptions | undefined;
+let defOptions: RequestOptions = {};
 
 // @internal
-export const SetDefOptions = (options?: RequestOptions) => defOptions = options;
+export const SetDefOptions = (options?: RequestOptions) =>
+    defOptions = options ?? {};
 
 // @internal
-export const Request = (method: string, endpoint: string, options = defOptions, data?: object | string | null) => {
-    let content: string;
-
+export const Request = <T>(
+    method: string,
+    endpoint: string,
+    { authorization, connectionTimeout, rateLimit }: RequestOptions = defOptions,
+    data?: object | string | null,
+) => {
     const headers: OutgoingHttpHeaders = {};
+    let content: string | undefined;
 
-    if(data) {
-        if(typeof data == 'string') {
-            headers[Headers.ContentType] = ContentTypes.Form;
-            headers[Headers.ContentLength] = Buffer.byteLength(content = data);
-        } else {
-            headers[Headers.ContentType] = ContentTypes.Json;
-            headers[Headers.ContentLength] = Buffer.byteLength(content = JSON.stringify(data));
-        }
+    if(typeof data == 'object') {
+        content = JSON.stringify(data);
+        headers[Headers.ContentType] = ContentTypes.Json;
+    } else if(typeof data == 'string') {
+        content = data;
+        headers[Headers.ContentType] = ContentTypes.Form;
     }
 
-    if(options?.authorization instanceof Authorization)
-        headers[Headers.Authorization] = String(options.authorization);
+    if(content)
+        headers[Headers.ContentLength] = Buffer.byteLength(content);
+
+    if(authorization instanceof Authorization)
+        headers[Headers.Authorization] = String(authorization);
 
     const requestOptions: https.RequestOptions = {
         method,
         headers,
-        timeout: options?.connectionTimeout ?? DEFAULT_CONNECTION_TIMEOUT,
+        timeout: connectionTimeout ?? DEFAULT_CONNECTION_TIMEOUT,
     };
 
     const
         url = `${API_PATH}/${endpoint}`,
-        retryCount = options?.rateLimit?.retryCount ?? DEFAULT_RETRY_COUNT,
-        rateLimitCallback = options?.rateLimit?.callback;
+        retryCount = rateLimit?.retryCount ?? DEFAULT_RETRY_COUNT,
+        rateLimitCallback = rateLimit?.callback;
 
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<T>((resolve, reject) => {
         let attempts = 0;
 
         const TryRequest = () => {

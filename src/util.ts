@@ -1,10 +1,9 @@
 // @internal
 export const SafeJsonParse = (data?: string) => {
-    if(data != null)
-        try {
-            return JSON.parse(data);
-        } catch {}
-    return null;
+    if(!data) return null;
+    try {
+        return JSON.parse(data);
+    } catch {}
 };
 
 // @internal
