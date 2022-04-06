@@ -77,13 +77,13 @@ type EventTypes = {
         channel_id: string;
         last_pin_timestamp?: string | null;
     };
-    [Events.THREAD_CREATE]: types.Channel;
-    [Events.THREAD_UPDATE]: types.Channel;
-    [Events.THREAD_DELETE]: types.Channel;
+    [Events.THREAD_CREATE]: types.Thread;
+    [Events.THREAD_UPDATE]: types.Thread;
+    [Events.THREAD_DELETE]: types.Thread;
     [Events.THREAD_LIST_SYNC]: {
         guild_id: string;
         channel_ids?: string[];
-        threads: types.Channel[];
+        threads: types.Thread[];
         members: types.ThreadMember[];
     };
     [Events.THREAD_MEMBER_UPDATE]: types.ThreadMember & { guild_id: string; };
@@ -102,7 +102,7 @@ type EventTypes = {
         voice_states: types.VoiceState[];
         members: types.Member[];
         channels: types.Channel[];
-        threads: types.Channel[];
+        threads: types.Thread[];
         presences: types.Presence[];
         stage_instances: types.StageInstance[];
         guild_scheduled_events: types.ScheduledEvent[];

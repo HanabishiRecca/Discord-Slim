@@ -159,7 +159,7 @@ export const Channel = {
         before?: string;
         limit?: number;
     }, requestOptions?: RequestOptions): Promise<{
-        threads: types.Channel[];
+        threads: types.Thread[];
         members: types.ThreadMember[];
         has_more: boolean;
     }> =>
@@ -169,7 +169,7 @@ export const Channel = {
         before?: string;
         limit?: number;
     }, requestOptions?: RequestOptions): Promise<{
-        threads: types.Channel[];
+        threads: types.Thread[];
         members: types.ThreadMember[];
         has_more: boolean;
     }> =>
@@ -179,7 +179,7 @@ export const Channel = {
         before?: string;
         limit?: number;
     }, requestOptions?: RequestOptions): Promise<{
-        threads: types.Channel[];
+        threads: types.Thread[];
         members: types.ThreadMember[];
         has_more: boolean;
     }> =>
@@ -266,7 +266,7 @@ export const GroupDM = {
     Modify: (id: string, params: {
         name?: string;
         icon?: string;
-    }, requestOptions?: RequestOptions): Promise<types.Channel> =>
+    }, requestOptions?: RequestOptions): Promise<types.GroupDMChannel> =>
         Request(METHODS.PATCH, Path(PATHS.channels, id), requestOptions, params),
 };
 
@@ -341,7 +341,7 @@ export const Guild = {
         Request(METHODS.PATCH, Path(PATHS.guilds, guild_id, PATHS.channels), requestOptions, params),
 
     ListActiveThreads: (guild_id: string, requestOptions?: RequestOptions): Promise<{
-        threads: types.Channel[];
+        threads: types.Thread[];
         members: types.ThreadMember[];
     }> =>
         Request(METHODS.GET, Path(PATHS.guilds, guild_id, PATHS.threads, PATHS.active), requestOptions),
@@ -627,7 +627,7 @@ export const User = {
 
     CreateDM: (params: {
         recipient_id: string;
-    }, requestOptions?: RequestOptions): Promise<types.Channel> =>
+    }, requestOptions?: RequestOptions): Promise<types.DMChannel> =>
         Request(METHODS.POST, Path(PATHS.users, PATHS.me, PATHS.channels), requestOptions, params),
 
     GetConnections: (requestOptions?: RequestOptions): Promise<types.Connection[]> =>
@@ -742,28 +742,13 @@ export const Application = {
     })[]> =>
         Request(METHODS.GET, Path(PATHS.applications, application_id, PATHS.commands) + Query(params), requestOptions),
 
-    CreateGlobalCommand: (application_id: string, params: {
-        name: string;
-        name_localizations?: types.LocaleDictionary | null;
-        description: string;
-        description_localizations?: types.LocaleDictionary | null;
-        options?: types.ApplicationCommandOption[];
-        default_permission?: boolean;
-        type?: helpers.ApplicationCommandTypes;
-    }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
+    CreateGlobalCommand: (application_id: string, params: types.ApplicationCommandBase, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
         Request(METHODS.POST, Path(PATHS.applications, application_id, PATHS.commands), requestOptions, params),
 
     GetGlobalCommand: (application_id: string, command_id: string, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
         Request(METHODS.GET, Path(PATHS.applications, application_id, PATHS.commands, command_id), requestOptions),
 
-    EditGlobalCommand: (application_id: string, command_id: string, params: {
-        name?: string;
-        name_localizations?: types.LocaleDictionary | null;
-        description?: string;
-        description_localizations?: types.LocaleDictionary | null;
-        options?: types.ApplicationCommandOption[];
-        default_permission?: boolean;
-    }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
+    EditGlobalCommand: (application_id: string, command_id: string, params: Partial<Omit<types.ApplicationCommandBase, 'type'>>, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
         Request(METHODS.PATCH, Path(PATHS.applications, application_id, PATHS.commands, command_id), requestOptions, params),
 
     DeleteGlobalCommand: (application_id: string, command_id: string, requestOptions?: RequestOptions): Promise<null> =>
@@ -777,53 +762,22 @@ export const Application = {
     })[]> =>
         Request(METHODS.GET, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands) + Query(params), requestOptions),
 
-    BulkOverwriteGlobalCommands: (application_id: string, params: {
-        name: string;
-        name_localizations?: types.LocaleDictionary | null;
-        description: string;
-        description_localizations?: types.LocaleDictionary | null;
-        options?: types.ApplicationCommandOption[];
-        default_permission?: boolean;
-        type?: helpers.ApplicationCommandTypes;
-    }[], requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
+    BulkOverwriteGlobalCommands: (application_id: string, params: types.ApplicationCommandBase[], requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
         Request(METHODS.PUT, Path(PATHS.applications, application_id, PATHS.commands), requestOptions, params),
 
-    CreateGuildCommand: (application_id: string, guild_id: string, params: {
-        name: string;
-        name_localizations?: types.LocaleDictionary | null;
-        description: string;
-        description_localizations?: types.LocaleDictionary | null;
-        options?: types.ApplicationCommandOption[];
-        default_permission?: boolean;
-        type?: helpers.ApplicationCommandTypes;
-    }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
+    CreateGuildCommand: (application_id: string, guild_id: string, params: types.ApplicationCommandBase, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
         Request(METHODS.POST, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands), requestOptions, params),
 
     GetGuildCommand: (application_id: string, guild_id: string, command_id: string, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
         Request(METHODS.GET, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands, command_id), requestOptions),
 
-    EditGuildCommand: (application_id: string, guild_id: string, command_id: string, params: {
-        name?: string;
-        name_localizations?: types.LocaleDictionary | null;
-        description?: string;
-        description_localizations?: types.LocaleDictionary | null;
-        options?: types.ApplicationCommandOption[];
-        default_permission?: boolean;
-    }, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
+    EditGuildCommand: (application_id: string, guild_id: string, command_id: string, params: Partial<Omit<types.ApplicationCommandBase, 'type'>>, requestOptions?: RequestOptions): Promise<types.ApplicationCommand> =>
         Request(METHODS.PATCH, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands, command_id), requestOptions, params),
 
     DeleteGuildCommand: (application_id: string, guild_id: string, command_id: string, requestOptions?: RequestOptions): Promise<null> =>
         Request(METHODS.DELETE, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands, command_id), requestOptions),
 
-    BulkOverwriteGuildCommands: (application_id: string, guild_id: string, params: {
-        name: string;
-        name_localizations?: types.LocaleDictionary | null;
-        description: string;
-        description_localizations?: types.LocaleDictionary | null;
-        options?: types.ApplicationCommandOption[];
-        default_permission?: boolean;
-        type?: helpers.ApplicationCommandTypes;
-    }[], requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
+    BulkOverwriteGuildCommands: (application_id: string, guild_id: string, params: types.ApplicationCommandBase[], requestOptions?: RequestOptions): Promise<types.ApplicationCommand[]> =>
         Request(METHODS.PUT, Path(PATHS.applications, application_id, PATHS.guilds, guild_id, PATHS.commands), requestOptions, params),
 
     GetGuildCommandPermissions: (application_id: string, guild_id: string, requestOptions?: RequestOptions): Promise<types.GuildApplicationCommandPermissions[]> =>
@@ -893,17 +847,13 @@ export const OAuth2 = {
         client_secret: string;
         redirect_uri: string;
         scope: helpers.OAuth2Scopes | string;
-    } & (
-            {
-                grant_type: helpers.OAuth2GrantTypes.AUTHORIZATION_CODE;
-                code: string;
-            } |
-            {
-                grant_type: helpers.OAuth2GrantTypes.REFRESH_TOKEN;
-                refresh_token: string;
-            }
-        )
-    ), requestOptions?: RequestOptions): Promise<{
+    } & ({
+        grant_type: helpers.OAuth2GrantTypes.AUTHORIZATION_CODE;
+        code: string;
+    } | {
+        grant_type: helpers.OAuth2GrantTypes.REFRESH_TOKEN;
+        refresh_token: string;
+    })), requestOptions?: RequestOptions): Promise<{
         access_token: string;
         token_type: helpers.TokenTypes.BEARER;
         expires_in: number;
@@ -925,24 +875,24 @@ export const OAuth2 = {
 };
 
 export const Thread = {
-    Modify: (channel_id: string, params: {
+    Modify: (thread_id: string, params: {
         name?: string;
         archived?: boolean;
         auto_archive_duration?: helpers.ThreadArchiveDurations;
         locked?: boolean;
         invitable?: boolean;
         rate_limit_per_user?: number | null;
-    }, requestOptions?: RequestOptions): Promise<types.Channel> =>
-        Request(METHODS.PATCH, Path(PATHS.channels, channel_id), requestOptions, params),
+    }, requestOptions?: RequestOptions): Promise<types.Thread> =>
+        Request(METHODS.PATCH, Path(PATHS.channels, thread_id), requestOptions, params),
 
-    Delete: (channel_id: string, requestOptions?: RequestOptions): Promise<types.Channel> =>
-        Request(METHODS.DELETE, Path(PATHS.channels, channel_id), requestOptions),
+    Delete: (thread_id: string, requestOptions?: RequestOptions): Promise<types.Thread> =>
+        Request(METHODS.DELETE, Path(PATHS.channels, thread_id), requestOptions),
 
     StartWithMessage: (channel_id: string, message_id: string, params: {
         name: string;
         auto_archive_duration?: helpers.ThreadArchiveDurations;
         rate_limit_per_user?: number | null;
-    }, requestOptions?: RequestOptions): Promise<types.Channel> =>
+    }, requestOptions?: RequestOptions): Promise<types.Thread> =>
         Request(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.messages, message_id, PATHS.threads), requestOptions, params),
 
     Start: (channel_id: string, params: {
@@ -951,26 +901,26 @@ export const Thread = {
         type?: helpers.ChannelTypes.GUILD_PRIVATE_THREAD | helpers.ChannelTypes.GUILD_PUBLIC_THREAD | helpers.ChannelTypes.GUILD_NEWS_THREAD;
         invitable?: boolean;
         rate_limit_per_user?: number | null;
-    }, requestOptions?: RequestOptions): Promise<types.Channel> =>
+    }, requestOptions?: RequestOptions): Promise<types.Thread> =>
         Request(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.threads), requestOptions, params),
 
-    Join: (channel_id: string, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.PUT, Path(PATHS.channels, channel_id, PATHS.thread_members, PATHS.me), requestOptions),
+    Join: (thread_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.PUT, Path(PATHS.channels, thread_id, PATHS.thread_members, PATHS.me), requestOptions),
 
-    AddMember: (channel_id: string, user_id: string, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.PUT, Path(PATHS.channels, channel_id, PATHS.thread_members, user_id), requestOptions),
+    AddMember: (thread_id: string, user_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.PUT, Path(PATHS.channels, thread_id, PATHS.thread_members, user_id), requestOptions),
 
-    Leave: (channel_id: string, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.DELETE, Path(PATHS.channels, channel_id, PATHS.thread_members, PATHS.me), requestOptions),
+    Leave: (thread_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.DELETE, Path(PATHS.channels, thread_id, PATHS.thread_members, PATHS.me), requestOptions),
 
-    RemoveMember: (channel_id: string, user_id: string, requestOptions?: RequestOptions): Promise<null> =>
-        Request(METHODS.DELETE, Path(PATHS.channels, channel_id, PATHS.thread_members, user_id), requestOptions),
+    RemoveMember: (thread_id: string, user_id: string, requestOptions?: RequestOptions): Promise<null> =>
+        Request(METHODS.DELETE, Path(PATHS.channels, thread_id, PATHS.thread_members, user_id), requestOptions),
 
-    GetMember: (channel_id: string, user_id: string, requestOptions?: RequestOptions): Promise<types.ThreadMember> =>
-        Request(METHODS.GET, Path(PATHS.channels, channel_id, PATHS.thread_members, user_id), requestOptions),
+    GetMember: (thread_id: string, user_id: string, requestOptions?: RequestOptions): Promise<types.ThreadMember> =>
+        Request(METHODS.GET, Path(PATHS.channels, thread_id, PATHS.thread_members, user_id), requestOptions),
 
-    ListMembers: (channel_id: string, requestOptions?: RequestOptions): Promise<types.ThreadMember[]> =>
-        Request(METHODS.GET, Path(PATHS.channels, channel_id, PATHS.thread_members), requestOptions),
+    ListMembers: (thread_id: string, requestOptions?: RequestOptions): Promise<types.ThreadMember[]> =>
+        Request(METHODS.GET, Path(PATHS.channels, thread_id, PATHS.thread_members), requestOptions),
 };
 
 export const StageInstance = {

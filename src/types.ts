@@ -6,7 +6,7 @@ export type AuditLog = {
     audit_log_entries: AuditLogEntry[];
     guild_scheduled_events: ScheduledEvent[];
     integrations: Integration[];
-    threads: Channel[];
+    threads: Thread[];
     users: User[];
     webhooks: Webhook[];
 };
@@ -126,33 +126,98 @@ export type AuditLogPartialRole = {
 
 // Channel types
 
-export type Channel = {
+export type Channel = (
+    | GuildTextChannel
+    | GuildCategory
+    | GuildVoiceChannel
+    | DMChannel
+    | GroupDMChannel
+    | Thread
+);
+
+export type GuildTextChannel = {
     id: string;
-    type: helpers.ChannelTypes;
-    guild_id?: string;
-    position?: number;
+    type: (
+        | helpers.ChannelTypes.GUILD_TEXT
+        | helpers.ChannelTypes.GUILD_NEWS
+    );
+    guild_id: string;
+    position: number;
     permission_overwrites?: PermissionsOverwrite[];
-    name?: string | null;
-    topic?: string | null;
-    nsfw?: boolean;
-    last_message_id?: string | null;
-    bitrate?: number;
-    user_limit?: number;
-    rate_limit_per_user?: number;
-    recipients?: User[];
-    icon?: string | null;
-    owner_id?: string;
+    name: string;
+    topic: string | null;
+    nsfw: boolean;
+    last_message_id: string | null;
+    rate_limit_per_user: number;
+    parent_id: string | null;
+    last_pin_timestamp: string | null;
+};
+
+export type GuildCategory = {
+    id: string;
+    type: helpers.ChannelTypes.GUILD_CATEGORY;
+    guild_id: string;
+    position: number;
+    permission_overwrites?: PermissionsOverwrite[];
+    name: string;
+};
+
+export type GuildVoiceChannel = {
+    id: string;
+    type: (
+        | helpers.ChannelTypes.GUILD_VOICE
+        | helpers.ChannelTypes.GUILD_STAGE_VOICE
+    );
+    guild_id: string;
+    position: number;
+    permission_overwrites?: PermissionsOverwrite[];
+    name: string;
+    bitrate: number;
+    user_limit: number;
+    parent_id: string | null;
+    rtc_region: string | null;
+    video_quality_mode: helpers.VideoQualityModes;
+};
+
+export type DMChannel = {
+    id: string;
+    type: helpers.ChannelTypes.DM;
+    last_message_id: string | null;
+    recipients: User[];
+    last_pin_timestamp: string | null;
+};
+
+export type GroupDMChannel = {
+    id: string;
+    type: helpers.ChannelTypes.GROUP_DM;
+    name: string;
+    last_message_id: string | null;
+    recipients: User[];
+    icon: string | null;
+    owner_id: string;
     application_id?: string;
-    parent_id?: string | null;
-    last_pin_timestamp?: string | null;
-    rtc_region?: string | null;
-    video_quality_mode?: helpers.VideoQualityModes;
-    message_count?: number;
-    member_count?: number;
-    thread_metadata?: ThreadMetadata;
-    member?: ThreadMember;
-    default_auto_archive_duration?: helpers.ThreadArchiveDurations;
-    permissions?: string;
+    last_pin_timestamp: string | null;
+};
+
+export type Thread = {
+    id: string;
+    type: (
+        | helpers.ChannelTypes.GUILD_PUBLIC_THREAD
+        | helpers.ChannelTypes.GUILD_PRIVATE_THREAD
+        | helpers.ChannelTypes.GUILD_NEWS_THREAD
+    );
+    guild_id: string;
+    name: string;
+    last_message_id: string | null;
+    rate_limit_per_user: number;
+    owner_id: string;
+    parent_id: string;
+    last_pin_timestamp: string | null;
+    message_count: number;
+    member_count: number;
+    thread_metadata: ThreadMetadata;
+    member: ThreadMember;
+    default_auto_archive_duration: helpers.ThreadArchiveDurations;
 };
 
 export type Message = {
@@ -166,7 +231,7 @@ export type Message = {
     edited_timestamp: string | null;
     tts: boolean;
     mention_everyone: boolean;
-    mentions: (User & { member?: Member; })[];
+    mentions: (User & { member?: Omit<Member, 'user'>; })[];
     mention_roles: string[];
     mention_channels?: ChannelMention[];
     attachments: Attachment[];
@@ -183,7 +248,7 @@ export type Message = {
     flags?: helpers.MessageFlags;
     referenced_message?: Message | null;
     interaction?: MessageInteraction;
-    thread?: Channel;
+    thread?: Thread;
     components?: ActionRow[];
     sticker_items?: StickerItem[];
 };
@@ -607,23 +672,44 @@ export type Webhook = {
     source_guild?: Guild;
     source_channel?: Channel;
     url?: string;
-};
+} & ({
+    type: helpers.WebhookTypes.INCOMING;
+    token: string;
+} | {
+    token?: undefined;
+}) & ({
+    type: helpers.WebhookTypes.CHANNEL_FOLLOWER;
+    source_guild: Guild;
+    source_channel: Channel;
+} | {
+    source_guild?: undefined;
+    source_channel?: undefined;
+});
 
 // Application commands types
 
-export type ApplicationCommand = {
-    id: string;
+export type ApplicationCommandBase = {
     type?: helpers.ApplicationCommandTypes;
-    application_id: string;
-    guild_id?: string;
     name: string;
     name_localizations?: LocaleDictionary | null;
-    description: string;
+    description?: string;
     description_localizations?: LocaleDictionary | null;
     options?: ApplicationCommandOption[];
     default_permission?: boolean;
+} & ({
+    type?: helpers.ApplicationCommandTypes.CHAT_INPUT;
+    description: string;
+} | {
+    description?: '';
+    options?: undefined;
+});
+
+export type ApplicationCommand = {
+    id: string;
+    application_id: string;
+    guild_id?: string;
     version: string;
-};
+} & ApplicationCommandBase;
 
 export type ApplicationCommandOption = {
     type: helpers.ApplicationCommandOptionTypes;
@@ -632,18 +718,41 @@ export type ApplicationCommandOption = {
     description: string;
     description_localizations?: LocaleDictionary | null;
     required?: boolean;
-    choices?: ApplicationCommandOptionChoice[];
+    choices?: ApplicationCommandOptionChoice<string | number>[];
     options?: ApplicationCommandOption[];
     channel_types?: helpers.ChannelTypes[];
     min_value?: number;
     max_value?: number;
     autocomplete?: boolean;
-};
+} & ({
+    type: helpers.ApplicationCommandOptionTypes.STRING;
+    choices?: ApplicationCommandOptionChoice<string>[];
+    min_value?: undefined;
+    max_value?: undefined;
+} | {
+    type: (
+        | helpers.ApplicationCommandOptionTypes.INTEGER
+        | helpers.ApplicationCommandOptionTypes.NUMBER
+    );
+    choices?: ApplicationCommandOptionChoice<number>[];
+} | {
+    choices?: undefined;
+    min_value?: undefined;
+    max_value?: undefined;
+    autocomplete?: undefined;
+}) & ({
+    choices: ApplicationCommandOptionChoice<string | number>[];
+    autocomplete?: false;
+    min_value?: undefined;
+    max_value?: undefined;
+} | {
+    choices?: undefined;
+});
 
-export type ApplicationCommandOptionChoice = {
+export type ApplicationCommandOptionChoice<T> = {
     name: string;
     name_localizations?: LocaleDictionary | null;
-    value: string | number;
+    value: T;
 };
 
 export type GuildApplicationCommandPermissions = {
@@ -669,7 +778,11 @@ export type Interaction = {
     id: string;
     application_id: string;
     type: helpers.InteractionTypes;
-    data?: InteractionData;
+    data?: (
+        | InteractionData
+        | InteractionDataComponent
+        | InteractionDataModal
+    );
     guild_id?: string;
     channel_id?: string;
     member?: Member;
@@ -679,28 +792,104 @@ export type Interaction = {
     message?: Message;
     locale?: helpers.Locales;
     guild_locale?: helpers.Locales;
-};
+} & ({
+    type: (
+        | helpers.InteractionTypes.APPLICATION_COMMAND
+        | helpers.InteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE
+        | helpers.InteractionTypes.PING
+    );
+    data: InteractionData;
+} | {
+    type: helpers.InteractionTypes.MESSAGE_COMPONENT;
+    data: InteractionDataComponent;
+} | {
+    type: helpers.InteractionTypes.MODAL_SUBMIT;
+    data: InteractionDataComponent;
+} | {
+    data?: undefined;
+}) & ({
+    guild_id: string;
+    member: Member;
+    user?: undefined;
+    guild_locale: helpers.Locales;
+} | {
+    guild_id?: undefined;
+    member?: undefined;
+    user: User;
+    guild_locale?: undefined;
+}) & ({
+    type: helpers.InteractionTypes.PING;
+    locale?: undefined;
+} | {
+    locale: helpers.Locales;
+});
 
 export type InteractionData = {
     id: string;
     name: string;
-    type?: helpers.ApplicationCommandTypes;
+    type: helpers.ApplicationCommandTypes;
     resolved?: InteractionDataResolved;
     options?: InteractionDataOption[];
-    custom_id?: string;
-    component_type?: helpers.ComponentTypes;
-    values?: SelectOption[];
+    guild_id?: string;
     target_id?: string;
-    components?: Component[];
+} & ({
+    type: (
+        | helpers.ApplicationCommandTypes.USER
+        | helpers.ApplicationCommandTypes.MESSAGE
+    );
+    options?: undefined;
+    target_id: string;
+} | {
+    options: InteractionDataOption[];
+    target_id?: undefined;
+});
+
+export type InteractionDataComponent = {
+    custom_id: string;
+    component_type: helpers.ComponentTypes;
+    values?: SelectOption[];
+} & ({
+    component_type: helpers.ComponentTypes.SELECT_MENU;
+    values: SelectOption[];
+} | {
+    values?: undefined;
+});
+
+export type InteractionDataModal = {
+    custom_id: string;
+    components: Component[];
 };
 
 export type InteractionDataResolved = {
-    users?: { [id: string]: User; };
-    members?: { [id: string]: Member; };
-    roles?: { [id: string]: Role; };
-    channels?: { [id: string]: Channel; };
-    messages?: { [id: string]: Message; };
-    attachments?: { [id: string]: Attachment; };
+    users?: {
+        [id: string]: User;
+    };
+    members?: {
+        [id: string]: Omit<Member,
+            | 'user'
+            | 'deaf'
+            | 'mute'
+        >;
+    };
+    roles?: {
+        [id: string]: Role;
+    };
+    channels?: {
+        [id: string]: {
+            id: string;
+            type: helpers.ChannelTypes;
+            name?: string;
+            thread_metadata?: ThreadMetadata;
+            parent_id?: string | null;
+            permissions?: string;
+        };
+    };
+    messages?: {
+        [id: string]: Message;
+    };
+    attachments?: {
+        [id: string]: Attachment;
+    };
 };
 
 export type InteractionDataOption = {
@@ -709,19 +898,48 @@ export type InteractionDataOption = {
     value?: string | number | boolean;
     options?: InteractionDataOption[];
     focused?: boolean;
-};
+} & ({
+    type: (
+        | helpers.ApplicationCommandOptionTypes.STRING
+        | helpers.ApplicationCommandOptionTypes.USER
+        | helpers.ApplicationCommandOptionTypes.CHANNEL
+        | helpers.ApplicationCommandOptionTypes.ROLE
+        | helpers.ApplicationCommandOptionTypes.MENTIONABLE
+        | helpers.ApplicationCommandOptionTypes.ATTACHMENT
+    );
+    value: string;
+    options?: undefined;
+} | {
+    type: (
+        | helpers.ApplicationCommandOptionTypes.INTEGER
+        | helpers.ApplicationCommandOptionTypes.NUMBER
+    );
+    value: number;
+    options?: undefined;
+} | {
+    type: helpers.ApplicationCommandOptionTypes.BOOLEAN;
+    value: boolean;
+    options?: undefined;
+} | {
+    type: (
+        | helpers.ApplicationCommandOptionTypes.SUB_COMMAND
+        | helpers.ApplicationCommandOptionTypes.SUB_COMMAND_GROUP
+    );
+    value?: undefined;
+    options: InteractionDataOption[];
+});
 
 export type MessageInteraction = {
     id: string;
     type: helpers.InteractionTypes;
     name: string;
     user: User;
-    member?: Member;
+    member?: Omit<Member, 'user'>;
 };
 
 export type InteractionResponse = {
-    type: helpers.InteractionCallbackTypes.PONG;
-} | {
+    type: helpers.InteractionCallbackTypes;
+} & ({
     type: (
         | helpers.InteractionCallbackTypes.CHANNEL_MESSAGE_WITH_SOURCE
         | helpers.InteractionCallbackTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
@@ -735,7 +953,7 @@ export type InteractionResponse = {
 } | {
     type: helpers.InteractionCallbackTypes.MODAL;
     data: InteractionModalCallbackData;
-};
+});
 
 export type InteractionCallbackData = {
     tts?: boolean;
@@ -748,13 +966,13 @@ export type InteractionCallbackData = {
 };
 
 export type InteractionAutocompleteCallbackData = {
-    choices: ApplicationCommandOptionChoice[];
+    choices: ApplicationCommandOptionChoice<string | number>[];
 };
 
 export type InteractionModalCallbackData = {
     custom_id: string;
     title: string;
-    components: Component[];
+    components: TextInput[];
 };
 
 // Gateway types
@@ -874,22 +1092,30 @@ export type Component = (
 
 export type ActionRow = {
     type: helpers.ComponentTypes.ACTION_ROW;
-    components: (
-        | Button
-        | SelectMenu
-        | TextInput
-    )[];
+    components: Exclude<Component, ActionRow>[];
 };
 
 export type Button = {
     type: helpers.ComponentTypes.BUTTON;
     style: helpers.ButtonStyles;
     label?: string;
-    emoji?: Emoji;
+    emoji?: Pick<Emoji,
+        | 'name'
+        | 'id'
+        | 'animated'
+    >;
     custom_id?: string;
     url?: string;
     disabled?: boolean;
-};
+} & ({
+    style: Exclude<helpers.ButtonStyles, helpers.ButtonStyles.LINK>;
+    custom_id: string;
+    url?: undefined;
+} | {
+    style: Exclude<helpers.ButtonStyles, helpers.ButtonStyles.LINK>;
+    custom_id?: undefined;
+    url: string;
+});
 
 export type SelectMenu = {
     type: helpers.ComponentTypes.SELECT_MENU;
@@ -905,7 +1131,11 @@ export type SelectOption = {
     label: string;
     value: string;
     description?: string;
-    emoji?: Emoji;
+    emoji?: Pick<Emoji,
+        | 'name'
+        | 'id'
+        | 'animated'
+    >;
     default?: boolean;
 };
 
@@ -946,7 +1176,20 @@ export type Sticker = {
     guild_id?: string;
     user?: User;
     sort_value?: number;
-};
+} & ({
+    type: helpers.StickerTypes.STANDARD;
+    pack_id: string;
+    available?: undefined;
+    guild_id?: undefined;
+    user?: undefined;
+    sort_value: number;
+} | {
+    type: helpers.StickerTypes.GUILD;
+    pack_id?: undefined;
+    available: boolean;
+    guild_id: string;
+    sort_value?: undefined;
+});
 
 export type StickerItem = {
     id: string;
