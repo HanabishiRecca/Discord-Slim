@@ -1,8 +1,8 @@
 import { WebSocket, RawData } from 'ws';
 import { EventEmitter } from 'events';
-import { Intents, TokenTypes, API_VERSION, ActivityTypes, StatusTypes } from './helpers.js';
-import { Sleep, SafeJsonParse } from './util.js';
-import { Authorization, Request } from './request.js';
+import { Intents, TokenTypes, API_VERSION, ActivityTypes, StatusTypes } from './helpers';
+import { Sleep, SafeJsonParse } from './_common';
+import { Authorization, Request } from './request';
 import type { EventHandler } from './events';
 import type { User } from './types';
 

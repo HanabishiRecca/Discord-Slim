@@ -1,11 +1,12 @@
 {
     "scripts": {
-        "build": "tsc",
-        "start": "tsc -w"
+        "build": "esbuild 'src/index.ts' --outdir='package/dist' --external:ws --bundle --platform=node --format=esm --analyze",
+        "postbuild": "tsc"
     },
     "devDependencies": {
         "@types/node": "*",
         "@types/ws": "8.5",
+        "esbuild": "0.14",
         "typescript": "4.6"
     }
 }
