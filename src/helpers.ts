@@ -559,4 +559,4 @@ export enum Locales {
     JAPANESE = 'ja',
     CHINESE_TAIWAN = 'zh-TW',
     KOREAN = 'ko',
-};
+}

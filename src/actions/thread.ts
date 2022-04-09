@@ -26,7 +26,11 @@ export const StartWithMessage = (channel_id: string, message_id: string, params:
 export const Start = (channel_id: string, params: {
     name: string;
     auto_archive_duration?: helpers.ThreadArchiveDurations;
-    type?: helpers.ChannelTypes.GUILD_PRIVATE_THREAD | helpers.ChannelTypes.GUILD_PUBLIC_THREAD | helpers.ChannelTypes.GUILD_NEWS_THREAD;
+    type?: (
+        | helpers.ChannelTypes.GUILD_PRIVATE_THREAD
+        | helpers.ChannelTypes.GUILD_PUBLIC_THREAD
+        | helpers.ChannelTypes.GUILD_NEWS_THREAD
+    );
     invitable?: boolean;
     rate_limit_per_user?: number | null;
 }, requestOptions?: RequestOptions) =>

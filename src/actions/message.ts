@@ -19,6 +19,7 @@ export const Create = (channel_id: string, params: {
         fail_if_not_exists?: boolean;
     };
     components?: types.ActionRow[];
+    sticker_ids?: string[];
     flags?: helpers.MessageFlags;
 }, requestOptions?: RequestOptions) =>
     Request<types.Message>(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.messages), requestOptions, params);
