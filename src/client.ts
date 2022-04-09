@@ -51,21 +51,25 @@ type GatewayResponse = {
 };
 
 const
-    fatalCodes = [4004, 4010, 4011, 4012, 4013, 4014],
-    dropCodes = [4007, 4009];
+    FATAL_CODES = Object.freeze([4004, 4010, 4011, 4012, 4013, 4014]),
+    DROP_CODES = Object.freeze([4007, 4009]);
 
 export class Client extends EventEmitter {
     private _sessionId?: string;
     private _lastSequence = 0;
     private _lastHeartbeatAck = false;
-    private _heartbeatTimer?: NodeJS.Timeout;
+    private _heartbeatTimer?: NodeJS.Timer;
     private _ws?: WebSocket;
     private _auth?: { authorization: Authorization; };
     private _intents?: Intents;
     private _eventHandler = new EventEmitter() as EventHandler;
     private _user?: User;
     private _shard?: [number, number];
-    private _props?: object | null = { $os: 'linux', $browser: 'bot', $device: 'bot' };
+    private _props?: object | null = {
+        $os: 'linux',
+        $browser: 'bot',
+        $device: 'bot',
+    };
 
     constructor() {
         super();
@@ -121,11 +125,13 @@ export class Client extends EventEmitter {
     };
 
     private _send = (op: OPCode, d: any) =>
-        this._ws && this._ws.send(JSON.stringify({ op, d }));
+        this._ws?.send(JSON.stringify({ op, d }));
 
     private _dispatchHandlers = {
-        [Events.READY]: (d: { session_id: string; user: User; }) => {
-            const { user, session_id } = d;
+        [Events.READY]: ({ user, session_id }: {
+            user: User;
+            session_id: string;
+        }) => {
             this._user = user;
             this._sessionId = session_id;
             this.emit(ClientEvents.CONNECT);
@@ -136,7 +142,11 @@ export class Client extends EventEmitter {
     };
 
     private _intentHandlers = {
-        [OPCode.DISPATCH]: (intent: { t: Events; s?: number; d: any; }) => {
+        [OPCode.DISPATCH]: (intent: {
+            t: Events;
+            s?: number;
+            d: any;
+        }) => {
             const { t, s, d } = intent;
 
             if(s && (s > this._lastSequence))
@@ -147,10 +157,12 @@ export class Client extends EventEmitter {
             this._eventHandler.emit(t, d);
         },
 
-        [OPCode.HELLO]: (intent: { d: { heartbeat_interval: number; }; }) => {
+        [OPCode.HELLO]: ({ d: { heartbeat_interval } }: {
+            d: { heartbeat_interval: number; };
+        }) => {
             this._identify();
             this._lastHeartbeatAck = true;
-            this._setHeartbeatTimer(intent.d.heartbeat_interval);
+            this._setHeartbeatTimer(heartbeat_interval);
             this._sendHeartbeat();
         },
 
@@ -160,8 +172,9 @@ export class Client extends EventEmitter {
         [OPCode.HEARTBEAT]: () =>
             this._sendHeartbeat(),
 
-        [OPCode.INVALID_SESSION]: (intent: { d: boolean; }) => {
-            const { d } = intent;
+        [OPCode.INVALID_SESSION]: ({ d }: {
+            d: boolean;
+        }) => {
             this.emit(ClientEvents.WARN, `Invalid session. Resumable: ${d}`);
             this._wsConnect(d);
         },
@@ -173,7 +186,7 @@ export class Client extends EventEmitter {
     };
 
     private _onMessage = (data: RawData) => {
-        const intent = SafeJsonParse(String(data)) as Intent | null;
+        const intent = SafeJsonParse<Intent>(String(data));
         intent && this._intentHandlers[intent.op]?.(intent);
     };
 
@@ -191,49 +204,60 @@ export class Client extends EventEmitter {
         });
 
     private _sendHeartbeat = () => {
-        if(this._lastHeartbeatAck) {
-            if(this._ws && (this._ws.readyState == 1)) {
-                this._lastHeartbeatAck = false;
-                this._send(OPCode.HEARTBEAT, this._lastSequence);
-            }
-        } else {
+        if(this._ws?.readyState != 1) return;
+        if(!this._lastHeartbeatAck) {
             this.emit(ClientEvents.WARN, 'Heartbeat timeout.');
             this._wsConnect(true);
+            return;
         }
+        this._lastHeartbeatAck = false;
+        this._send(OPCode.HEARTBEAT, this._lastSequence);
     };
 
     private _setHeartbeatTimer = (interval?: number) => {
-        if(this._heartbeatTimer) {
-            clearInterval(this._heartbeatTimer);
-            this._heartbeatTimer = undefined;
-        }
-        if(interval)
-            this._heartbeatTimer = setInterval(this._sendHeartbeat, interval);
+        this._heartbeatTimer && clearInterval(this._heartbeatTimer);
+        this._heartbeatTimer = interval ?
+            setInterval(this._sendHeartbeat, interval) : undefined;
     };
 
     private _onClose = (code: number) => {
         this._wsDisconnect(code);
-        fatalCodes.includes(code) ?
+        FATAL_CODES.includes(code) ?
             this.emit(ClientEvents.FATAL, `Fatal error. Code: ${code}`) :
-            this._wsConnect(!dropCodes.includes(code));
+            this._wsConnect(!DROP_CODES.includes(code));
     };
 
     private _onError = (error: Error) =>
         this.emit(ClientEvents.ERROR, error);
 
-    Connect = (authorization: Authorization, intents?: Intents, shard?: { id: number; total: number; }) => {
+    Connect = (
+        authorization: Authorization,
+        intents?: Intents,
+        shard?: {
+            id: number;
+            total: number;
+        },
+    ) => {
         this._auth = { authorization };
         this._intents = intents;
-        this._shard = shard ? [shard.id, shard.total] : undefined;
+        this._shard = shard ?
+            [shard.id, shard.total] : undefined;
         this._wsConnect(true);
     };
 
     Disconnect = (code?: number) =>
         this._wsDisconnect(code);
 
-    RequestGuildMembers = (params: { guild_id: string; presences?: boolean; nonce?: string; } &
-        ({ query: string; limit: number; } | { user_ids: string | string[]; })
-    ) => {
+    RequestGuildMembers = (params: {
+        guild_id: string;
+        presences?: boolean;
+        nonce?: string;
+    } & ({
+        query: string;
+        limit: number;
+    } | {
+        user_ids: string | string[];
+    })) => {
         if(!this._ws) throw 'No connection.';
         this._send(OPCode.REQUEST_GUILD_MEMBERS, params);
     };
@@ -264,7 +288,6 @@ export class Client extends EventEmitter {
 
     get events() { return this._eventHandler; }
     get user() { return this._user; }
-
     get props() { return this._props; }
     set props(value) { this._props = value; }
 }
@@ -281,7 +304,12 @@ export enum ClientEvents {
 type ClientEventTypes = {
     [ClientEvents.CONNECT]: void;
     [ClientEvents.DISCONNECT]: number;
-    [ClientEvents.INTENT]: { op: 0; s: number; t: string; d: any; };
+    [ClientEvents.INTENT]: {
+        op: 0;
+        s: number;
+        t: string;
+        d: any;
+    };
     [ClientEvents.WARN]: string;
     [ClientEvents.ERROR]: Error;
     [ClientEvents.FATAL]: string;

@@ -1,6 +1,5 @@
-import * as https from 'https';
 import type { OutgoingHttpHeaders } from 'http';
-import { SafeJsonParse } from './_common';
+import { HttpsRequest, SafeJsonParse, Sleep } from './_common';
 import { API_PATH, TokenTypes } from './helpers';
 
 const
@@ -12,7 +11,10 @@ export class Authorization {
     private _token: string;
     private _cache!: string;
 
-    constructor(token: string, type: TokenTypes = TokenTypes.BOT) {
+    constructor(
+        token: string,
+        type: TokenTypes = TokenTypes.BOT,
+    ) {
         this._token = token;
         this._type = type;
         this._update();
@@ -24,12 +26,21 @@ export class Authorization {
             this._token;
 
     get type() { return this._type; };
-    set type(value: TokenTypes) { this._type = value; this._update(); };
+
+    set type(value: TokenTypes) {
+        this._type = value;
+        this._update();
+    };
 
     get token() { return this._token; };
-    set token(value: string) { this._token = value; this._update(); };
+
+    set token(value: string) {
+        this._token = value;
+        this._update();
+    };
 
     get value() { return this._cache; };
+
     toString = () => this._cache;
 };
 
@@ -44,12 +55,18 @@ const enum ContentTypes {
     Json = 'application/json',
 }
 
+export type RateLimitResponse = {
+    message: string;
+    retry_after: number;
+    global: boolean;
+};
+
 export type RequestOptions = {
     authorization?: Authorization;
     connectionTimeout?: number;
     rateLimit?: {
         retryCount?: number;
-        callback?: (response: { message: string; retry_after: number; global: boolean; }, attempts: number) => void;
+        callback?: (response: RateLimitResponse, attempts: number) => void;
     };
 };
 
@@ -60,13 +77,24 @@ export const SetDefOptions = (options?: RequestOptions) =>
     defOptions = options ?? {};
 
 // @internal
-export const Request = <T>(
+export const Request = async <T>(
     method: string,
     endpoint: string,
-    { authorization, connectionTimeout, rateLimit }: RequestOptions = defOptions,
+    {
+        authorization,
+        connectionTimeout: timeout = DEFAULT_CONNECTION_TIMEOUT,
+        rateLimit: {
+            retryCount = DEFAULT_RETRY_COUNT,
+            callback: rateLimitCallback,
+        } = {},
+    } = defOptions,
     data?: object | string | null,
 ) => {
-    const headers: OutgoingHttpHeaders = {};
+    const
+        url = `${API_PATH}/${endpoint}`,
+        headers: OutgoingHttpHeaders = {},
+        requestOptions = { method, headers, timeout };
+
     let content: string | undefined;
 
     if(typeof data == 'object') {
@@ -83,80 +111,33 @@ export const Request = <T>(
     if(authorization instanceof Authorization)
         headers[Headers.Authorization] = String(authorization);
 
-    const requestOptions: https.RequestOptions = {
-        method,
-        headers,
-        timeout: connectionTimeout ?? DEFAULT_CONNECTION_TIMEOUT,
-    };
+    let attempts = 0;
 
-    const
-        url = `${API_PATH}/${endpoint}`,
-        retryCount = rateLimit?.retryCount ?? DEFAULT_RETRY_COUNT,
-        rateLimitCallback = rateLimit?.callback;
+    while(true) {
+        const { code, data } = await HttpsRequest(url, requestOptions, content);
 
-    return new Promise<T>((resolve, reject) => {
-        let attempts = 0;
+        if((code >= 200) && (code < 300))
+            return SafeJsonParse(data) as T;
 
-        const TryRequest = () => {
-            HttpsRequest(url, requestOptions, content).then((result) => {
-                const code = result.code;
+        if((code >= 400) && (code < 500)) {
+            if(code != 429) throw {
+                code,
+                response: SafeJsonParse(data),
+            };
 
-                if((code >= 200) && (code < 300))
-                    return resolve(SafeJsonParse(result.data));
+            const response = SafeJsonParse<RateLimitResponse>(data)!;
 
-                if((code >= 400) && (code < 500)) {
-                    const response = SafeJsonParse(result.data);
-                    if(code != 429)
-                        return reject({ code, response });
+            attempts++;
+            rateLimitCallback?.(response, attempts);
 
-                    attempts++;
-                    rateLimitCallback?.(response, attempts);
+            const { retry_after } = response;
+            if(!(retry_after && (attempts < retryCount)))
+                throw { code, response };
 
-                    return (response.retry_after && (attempts < retryCount)) ?
-                        setTimeout(TryRequest, Math.ceil(Number(response.retry_after) * 1000)) :
-                        reject({ code, response });
-                }
+            await Sleep(Math.ceil(Number(retry_after) * 1000));
+            continue;
+        }
 
-                reject({ code });
-            }).catch(reject);
-        };
-
-        TryRequest();
-    });
+        throw { code };
+    }
 };
-
-const HttpsRequest = (url: string, options: https.RequestOptions, content?: string | Buffer) =>
-    new Promise<{ code: number; data?: string; }>((resolve, reject) => {
-        const request = https.request(url, options, (response) => {
-            const code = response.statusCode;
-            if(!code) return reject('Unknown response.');
-
-            const ReturnResult = (data?: string) => resolve({ code, data });
-
-            const chunks: Buffer[] = [];
-            let totalLength = 0;
-
-            response.on('data', (chunk: Buffer) => {
-                chunks.push(chunk);
-                totalLength += chunk.length;
-            });
-
-            response.on('end', () => {
-                if(!response.complete)
-                    return reject('Response error.');
-
-                if(totalLength == 0)
-                    return ReturnResult();
-
-                if(chunks.length == 1)
-                    return ReturnResult(String(chunks[0]));
-
-                return ReturnResult(String(Buffer.concat(chunks, totalLength)));
-            });
-        });
-
-        request.on('error', reject);
-        request.on('timeout', () => reject('Request timeout.'));
-
-        request.end(content);
-    });

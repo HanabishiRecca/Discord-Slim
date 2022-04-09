@@ -3,8 +3,6 @@ import { EventEmitter } from 'events';
 import { Sleep, SafeJsonParse } from './_common';
 import { VoiceEncryptionModes, SpeakingStates } from './helpers';
 
-const VOICE_VERSION = 4;
-
 const enum OPCode {
     IDENTIFY = 0,
     SELECT_PROTOCOL = 1,
@@ -30,18 +28,28 @@ type Intent = {
 };
 
 const
-    fatalCodes = [4002, 4004, 4006, 4011, 4014],
-    dropCodes = [4009];
+    VOICE_VERSION = 4,
+    FATAL_CODES = Object.freeze([4002, 4004, 4006, 4011, 4014]),
+    DROP_CODES = Object.freeze([4009]);
 
 export class Voice extends EventEmitter {
     private _ws?: WebSocket;
-    private _options?: { server_id: string; user_id: string; session_id: string; token: string; };
+    private _options?: {
+        server_id: string;
+        user_id: string;
+        session_id: string;
+        token: string;
+    };
     private _endpoint?: string;
     private _encryption?: string;
     private _resume = false;
     private _lastHeartbeatAck = false;
-    private _heartbeatTimer?: NodeJS.Timeout;
-    private _broadcast?: { ip: string; port: number; ssrc: number; };
+    private _heartbeatTimer?: NodeJS.Timer;
+    private _broadcast?: {
+        ip: string;
+        port: number;
+        ssrc: number;
+    };
     private _ssrc?: number;
 
     constructor() {
@@ -75,19 +83,28 @@ export class Voice extends EventEmitter {
     };
 
     private _send = (op: OPCode, d: any) =>
-        this._ws && this._ws.send(JSON.stringify({ op, d }));
+        this._ws?.send(JSON.stringify({ op, d }));
 
     private _intentHandlers = {
-        [OPCode.HELLO]: (d: { heartbeat_interval: number; }) => {
-            this._send(this._resume ? OPCode.RESUME : OPCode.IDENTIFY, this._options);
+        [OPCode.HELLO]: ({ heartbeat_interval }: {
+            heartbeat_interval: number;
+        }) => {
+            this._send(
+                this._resume ?
+                    OPCode.RESUME : OPCode.IDENTIFY,
+                this._options,
+            );
             this._resume = true;
             this._lastHeartbeatAck = true;
-            this._setHeartbeatTimer(d.heartbeat_interval);
+            this._setHeartbeatTimer(heartbeat_interval);
             this._sendHeartbeat();
         },
 
-        [OPCode.READY]: (d: { ssrc: number; ip: string; port: number; }) => {
-            const { ssrc, ip, port } = d;
+        [OPCode.READY]: ({ ssrc, ip, port }: {
+            ssrc: number;
+            ip: string;
+            port: number;
+        }) => {
             this._broadcast = { ssrc, ip, port };
             this._send(OPCode.SELECT_PROTOCOL, {
                 protocol: 'udp',
@@ -99,9 +116,13 @@ export class Voice extends EventEmitter {
             });
         },
 
-        [OPCode.SESSION_DESCRIPTION]: (d: { secret_key: number[]; }) => {
-            const { secret_key } = d;
-            this.emit(VoiceEvents.CONNECT, { ...this._broadcast, secret_key });
+        [OPCode.SESSION_DESCRIPTION]: ({ secret_key }: {
+            secret_key: number[];
+        }) => {
+            this.emit(VoiceEvents.CONNECT, {
+                ...this._broadcast,
+                secret_key,
+            });
         },
 
         [OPCode.HEARTBEAT_ACK]: () =>
@@ -109,42 +130,45 @@ export class Voice extends EventEmitter {
     };
 
     private _onMessage = (data: RawData) => {
-        const intent = SafeJsonParse(String(data)) as Intent | null;
+        const intent = SafeJsonParse<Intent>(String(data));
         intent && this._intentHandlers[intent.op]?.(intent.d);
     };
 
     private _sendHeartbeat = () => {
-        if(this._lastHeartbeatAck) {
-            if(this._ws && (this._ws.readyState == 1)) {
-                this._lastHeartbeatAck = false;
-                this._send(OPCode.HEARTBEAT, null);
-            }
-        } else {
+        if(this._ws?.readyState != 1) return;
+        if(!this._lastHeartbeatAck) {
             this.emit(VoiceEvents.WARN, 'Heartbeat timeout.');
             this._wsConnect(true);
+            return;
         }
+        this._lastHeartbeatAck = false;
+        this._send(OPCode.HEARTBEAT, null);
     };
 
     private _setHeartbeatTimer = (interval?: number) => {
-        if(this._heartbeatTimer) {
-            clearInterval(this._heartbeatTimer);
-            this._heartbeatTimer = undefined;
-        }
-        if(interval)
-            this._heartbeatTimer = setInterval(this._sendHeartbeat, interval);
+        this._heartbeatTimer && clearInterval(this._heartbeatTimer);
+        this._heartbeatTimer = interval ?
+            setInterval(this._sendHeartbeat, interval) : undefined;
     };
 
     private _onClose = (code: number) => {
         this._wsDisconnect(code);
-        fatalCodes.includes(code) ?
+        FATAL_CODES.includes(code) ?
             this.emit(VoiceEvents.FATAL, `Fatal error. Code: ${code}`) :
-            this._wsConnect(!dropCodes.includes(code));
+            this._wsConnect(!DROP_CODES.includes(code));
     };
 
     private _onError = (error: Error) =>
         this.emit(VoiceEvents.ERROR, error);
 
-    Connect = (server_id: string, user_id: string, session_id: string, token: string, endpoint: string, encryption: VoiceEncryptionModes) => {
+    Connect = (
+        server_id: string,
+        user_id: string,
+        session_id: string,
+        token: string,
+        endpoint: string,
+        encryption: VoiceEncryptionModes,
+    ) => {
         this._options = { token, server_id, user_id, session_id };
         this._endpoint = endpoint;
         this._encryption = encryption;
@@ -155,11 +179,11 @@ export class Voice extends EventEmitter {
     Disconnect = (code?: number) =>
         this._wsDisconnect(code);
 
-    SetSpeakingState = (state: SpeakingStates, delay?: number) => {
+    SetSpeakingState = (speaking: SpeakingStates, delay = 0) => {
         if(!this._ws) throw 'No connection.';
         this._send(OPCode.SPEAKING, {
-            speaking: state,
-            delay: delay ?? 0,
+            speaking,
+            delay,
             ssrc: this._ssrc,
         });
     };
@@ -174,7 +198,12 @@ export enum VoiceEvents {
 }
 
 type VoiceEventTypes = {
-    [VoiceEvents.CONNECT]: { ip: string; port: number; ssrc: number; secret_key: number[]; };
+    [VoiceEvents.CONNECT]: {
+        ip: string;
+        port: number;
+        ssrc: number;
+        secret_key: number[];
+    };
     [VoiceEvents.DISCONNECT]: number;
     [VoiceEvents.WARN]: string;
     [VoiceEvents.ERROR]: Error;
