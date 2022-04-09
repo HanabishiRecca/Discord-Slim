@@ -144,6 +144,7 @@ export type GuildTextChannel = {
     type: (
         | helpers.ChannelTypes.GUILD_TEXT
         | helpers.ChannelTypes.GUILD_NEWS
+        | helpers.ChannelTypes.GUILD_FORUM
     );
     guild_id: string;
     position: number;
@@ -222,6 +223,7 @@ export type Thread = {
     thread_metadata: ThreadMetadata;
     member: ThreadMember;
     default_auto_archive_duration: helpers.ThreadArchiveDurations;
+    flags?: helpers.ChannelFlags;
 };
 
 export type Message = {

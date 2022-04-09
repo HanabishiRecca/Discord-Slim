@@ -36,6 +36,20 @@ export const Start = (channel_id: string, params: {
 }, requestOptions?: RequestOptions) =>
     Request<types.Thread>(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.threads), requestOptions, params);
 
+export const StartInForum = (channel_id: string, params: {
+    name: string;
+    auto_archive_duration?: helpers.ThreadArchiveDurations;
+    rate_limit_per_user?: number | null;
+} & {
+    content?: string;
+    embeds?: types.Embed[];
+    allowed_mentions?: types.AllowedMentions;
+    components?: types.ActionRow[];
+    sticker_ids?: string[];
+    flags?: helpers.MessageFlags;
+}, requestOptions?: RequestOptions) =>
+    Request<types.Thread>(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.threads), requestOptions, params);
+
 export const Join = (thread_id: string, requestOptions?: RequestOptions) =>
     Request<null>(METHODS.PUT, Path(PATHS.channels, thread_id, PATHS.thread_members, PATHS.me), requestOptions);
 

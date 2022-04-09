@@ -139,6 +139,7 @@ export enum ChannelTypes {
     GUILD_PRIVATE_THREAD = 12,
     GUILD_STAGE_VOICE = 13,
     GUILD_DIRECTORY = 14,
+    GUILD_FORUM = 15,
 }
 
 export enum MessageTypes {
@@ -559,4 +560,9 @@ export enum Locales {
     JAPANESE = 'ja',
     CHINESE_TAIWAN = 'zh-TW',
     KOREAN = 'ko',
+}
+
+export enum ChannelFlags {
+    NO_FLAGS = 0,
+    PINNED = 1 << 1,
 }
