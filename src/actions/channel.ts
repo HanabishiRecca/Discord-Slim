@@ -3,31 +3,28 @@ import { Request, RequestOptions } from '../request';
 import type * as helpers from '../helpers';
 import type * as types from '../types';
 
-export const Create = <T extends types.GuildChannel>(guild_id: string, params: {
+export const Create = <T extends types.GuildChannel['type']>(guild_id: string, params: {
     name: string;
+    type: T;
     position?: number;
     permission_overwrites?: types.PermissionsOverwrite[];
-} & ((T extends types.GuildTextChannel ? {
-    type?: (
-        | helpers.ChannelTypes.GUILD_TEXT
-        | helpers.ChannelTypes.GUILD_NEWS
-    );
+} & ({
+    type: types.GuildTextChannel['type'];
     topic?: string;
     rate_limit_per_user?: number;
     parent_id?: string;
     nsfw?: boolean;
-} : never) | (T extends types.GuildCategory ? {
-    type: helpers.ChannelTypes.GUILD_CATEGORY;
-} : never) | (T extends types.GuildVoiceChannel ? {
-    type: (
-        | helpers.ChannelTypes.GUILD_VOICE
-        | helpers.ChannelTypes.GUILD_STAGE_VOICE
-    );
+} | {
+    type: types.GuildCategory['type'];
+} | {
+    type: types.GuildVoiceChannel['type'];
     bitrate?: number;
     user_limit?: number;
     parent_id?: string;
-} : never)), requestOptions?: RequestOptions) =>
-    Request<T>(METHODS.POST, Path(PATHS.guilds, guild_id, PATHS.channels), requestOptions, params);
+}), requestOptions?: RequestOptions) =>
+    Request<types.GuildChannel & {
+        type: T;
+    }>(METHODS.POST, Path(PATHS.guilds, guild_id, PATHS.channels), requestOptions, params);
 
 export const Get = <T extends types.GuildChannel>(channel_id: string, requestOptions?: RequestOptions) =>
     Request<T>(METHODS.GET, Path(PATHS.channels, channel_id), requestOptions);
@@ -36,20 +33,20 @@ export const Modify = <T extends types.GuildChannel>(id: string, params: {
     name?: string;
     position?: number | null;
     permission_overwrites?: types.PermissionsOverwrite[] | null;
-} & (T extends types.GuildTextChannel ? {
+} & ((T extends types.GuildTextChannel ? {
     type?: types.GuildTextChannel['type'];
     topic?: string | null;
     nsfw?: boolean | null;
     rate_limit_per_user?: number | null;
     parent_id?: string | null;
     default_auto_archive_duration?: helpers.ThreadArchiveDurations | null;
-} : never) & (T extends types.GuildVoiceChannel ? {
+} : never) | (T extends types.GuildVoiceChannel ? {
     bitrate?: number | null;
     user_limit?: number | null;
     parent_id?: string | null;
     rtc_region?: string | null;
     video_quality_mode?: helpers.VideoQualityModes;
-} : never), requestOptions?: RequestOptions) =>
+} : never)), requestOptions?: RequestOptions) =>
     Request<T>(METHODS.PATCH, Path(PATHS.channels, id), requestOptions, params);
 
 export const Delete = <T extends types.GuildChannel>(channel_id: string, requestOptions?: RequestOptions) =>
