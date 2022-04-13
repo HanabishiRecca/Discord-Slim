@@ -1,6 +1,6 @@
 {
     "name": "discord-slim",
-    "version": "2.6.4",
+    "version": "2.6.5",
     "description": "Lightweight Discord API library for Node.js.",
     "author": "Hanabishi",
     "repository": {
