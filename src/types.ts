@@ -278,7 +278,9 @@ export type FollowedChannel = {
 export type Reaction = {
     count: number;
     me: boolean;
-    emoji: Emoji;
+    emoji: Omit<Emoji, 'name'> & {
+        name: string | null;
+    };
 };
 
 export type PermissionsOverwrite = {
@@ -396,7 +398,7 @@ export type AllowedMentions = {
 
 export type Emoji = {
     id: string | null;
-    name: string | null;
+    name: string;
     roles?: string[];
     user?: User;
     require_colons?: boolean;
