@@ -296,6 +296,7 @@ export enum ClientEvents {
     CONNECT = 'connect',
     DISCONNECT = 'disconnect',
     INTENT = 'intent',
+    INFO = 'info',
     WARN = 'warn',
     ERROR = 'error',
     FATAL = 'fatal',
@@ -310,6 +311,7 @@ type ClientEventTypes = {
         t: string;
         d: any;
     };
+    [ClientEvents.INFO]: string;
     [ClientEvents.WARN]: string;
     [ClientEvents.ERROR]: Error;
     [ClientEvents.FATAL]: string;

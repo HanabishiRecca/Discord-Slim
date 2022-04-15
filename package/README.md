@@ -40,6 +40,7 @@ import { Client, ClientEvents, Authorization, Events, Actions, Helpers, Tools } 
 const client = new Client();
 client.on(ClientEvents.CONNECT, () => console.log('Connection established.'));
 client.on(ClientEvents.DISCONNECT, (code) => console.error(`Disconnect. (${code})`));
+client.on(ClientEvents.INFO, console.log);
 client.on(ClientEvents.WARN, console.warn);
 client.on(ClientEvents.ERROR, console.error);
 client.on(ClientEvents.FATAL, (e) => { console.error(e); process.exit(1); });
