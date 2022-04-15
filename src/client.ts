@@ -5,7 +5,7 @@ import { Sleep, SafeJsonParse } from './_common';
 import { Authorization } from './request';
 import { Gateway } from './actions';
 import type { EventHandler } from './events';
-import type { User } from './types';
+import type { User, SessionStartLimit } from './types';
 
 const enum OPCode {
     DISPATCH = 0,
@@ -78,7 +78,10 @@ export class Client extends EventEmitter {
             (this._auth?.authorization.type == TokenTypes.BOT) ?
                 Gateway.GetBot :
                 Gateway.Get
-        )(this._auth).catch(() => {});
+        )(this._auth).catch(() => {}) as {
+            url: string;
+            session_start_limit?: SessionStartLimit;
+        } | undefined;
 
         if(this._ws)
             return this.emit(ClientEvents.WARN, 'The client is already connected.');

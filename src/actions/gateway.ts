@@ -5,8 +5,6 @@ import type * as types from '../types';
 export const Get = (requestOptions?: RequestOptions) =>
     Request<{
         url: string;
-        shards?: undefined;
-        session_start_limit?: undefined;
     }>(METHODS.GET, PATHS.gateway, requestOptions);
 
 export const GetBot = (requestOptions?: RequestOptions) =>
