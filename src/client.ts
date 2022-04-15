@@ -101,8 +101,14 @@ export class Client extends EventEmitter {
         if(typeof url != 'string')
             return this.emit(ClientEvents.FATAL, 'Unexpected gateway API response.');
 
-        if(Number(session_start_limit?.remaining) < 1)
-            return this.emit(ClientEvents.FATAL, 'Max session starts limit reached.');
+        if(session_start_limit) {
+            const { remaining, total, reset_after } = session_start_limit;
+
+            if(remaining < 1)
+                return this.emit(ClientEvents.FATAL, `Max session starts limit reached. Reset after: ${reset_after / 1000} sec.`);
+
+            this.emit(ClientEvents.INFO, `Session starts avaliable: ${remaining}/${total}. Reset after: ${reset_after / 1000} sec.`);
+        }
 
         try {
             this._ws = new WebSocket(`${url}?v=${API_VERSION}`);
