@@ -6,6 +6,7 @@ export * as Application from './actions/application';
 export * as Ban from './actions/ban';
 export * as Channel from './actions/channel';
 export * as Emoji from './actions/emoji';
+export * as Gateway from './actions/gateway';
 export * as GroupDM from './actions/groupdm';
 export * as Guild from './actions/guild';
 export * as Invite from './actions/invite';

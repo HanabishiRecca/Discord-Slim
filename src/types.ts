@@ -1046,6 +1046,13 @@ export type ClientStatus = {
     web?: string;
 };
 
+export type SessionStartLimit = {
+    total: number;
+    remaining: number;
+    reset_after: number;
+    max_concurrency: number;
+};
+
 // OAuth2 types
 
 export type Application = {

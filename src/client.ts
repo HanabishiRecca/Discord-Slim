@@ -2,7 +2,8 @@ import { WebSocket, RawData } from 'ws';
 import { EventEmitter } from 'events';
 import { Intents, TokenTypes, API_VERSION, ActivityTypes, StatusTypes } from './helpers';
 import { Sleep, SafeJsonParse } from './_common';
-import { Authorization, Request } from './request';
+import { Authorization } from './request';
+import { Gateway } from './actions';
 import type { EventHandler } from './events';
 import type { User } from './types';
 
@@ -39,17 +40,6 @@ type Intent = {
     d: any;
 };
 
-type GatewayResponse = {
-    url: string;
-    shards: number;
-    session_start_limit: {
-        total: number;
-        remaining: number;
-        reset_after: number;
-        max_concurrency: number;
-    };
-};
-
 const
     FATAL_CODES = Object.freeze([4004, 4010, 4011, 4012, 4013, 4014]),
     DROP_CODES = Object.freeze([4007, 4009]);
@@ -84,11 +74,11 @@ export class Client extends EventEmitter {
             await Sleep(5000);
         }
 
-        const response = await Request<Partial<GatewayResponse>>('GET',
+        const response = await (
             (this._auth?.authorization.type == TokenTypes.BOT) ?
-                '/gateway/bot' : '/gateway',
-            this._auth,
-        ).catch(() => {});
+                Gateway.GetBot :
+                Gateway.Get
+        )(this._auth).catch(() => {});
 
         if(this._ws)
             return this.emit(ClientEvents.WARN, 'The client is already connected.');
