@@ -14,6 +14,7 @@ export const Create = <T extends types.GuildChannel['type']>(guild_id: string, p
     rate_limit_per_user?: number;
     parent_id?: string;
     nsfw?: boolean;
+    default_auto_archive_duration?: helpers.ThreadArchiveDurations;
 } | {
     type: types.GuildCategory['type'];
 } | {
