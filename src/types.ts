@@ -49,7 +49,7 @@ export type AuditLogChangeKeys = {
     application_id: string;
     archived: boolean;
     asset: string;
-    auto_archive_duration: number;
+    auto_archive_duration: helpers.ThreadArchiveDurations;
     available: boolean;
     avatar_hash: boolean;
     banner_hash: string;
