@@ -9,6 +9,12 @@ export const Sleep = (time: number) =>
     new Promise((resolve) => setTimeout(resolve, time));
 
 // @internal
+export const TimestampString = (timestamp: number) => {
+    const str = new Date(timestamp).toISOString();
+    return `${str.slice(0, 10)} ${str.slice(11, -5)} UTC`;
+};
+
+// @internal
 export const HttpsRequest = (
     url: string,
     options: RequestOptions,

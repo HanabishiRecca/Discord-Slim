@@ -1,7 +1,7 @@
 import { WebSocket, RawData } from 'ws';
 import { EventEmitter } from 'events';
 import { Intents, TokenTypes, API_VERSION, ActivityTypes, StatusTypes } from './helpers';
-import { Sleep, SafeJsonParse } from './_common';
+import { Sleep, SafeJsonParse, TimestampString } from './_common';
 import { Authorization } from './request';
 import { Gateway } from './actions';
 import type { EventHandler } from './events';
@@ -43,6 +43,9 @@ type Intent = {
 const
     FATAL_CODES = Object.freeze([4004, 4010, 4011, 4012, 4013, 4014]),
     DROP_CODES = Object.freeze([4007, 4009]);
+
+const AfterMessage = (after: number) =>
+    `Reset after: ${TimestampString(Date.now() + after)}`;
 
 export class Client extends EventEmitter {
     private _sessionId?: string;
@@ -94,13 +97,13 @@ export class Client extends EventEmitter {
         if(typeof url != 'string')
             return this.emit(ClientEvents.FATAL, 'Unexpected gateway API response.');
 
-        if(session_start_limit) {
+        if(!this._sessionId && session_start_limit) {
             const { remaining, total, reset_after } = session_start_limit;
 
             if(remaining < 1)
-                return this.emit(ClientEvents.FATAL, `Max session starts limit reached. Reset after: ${reset_after / 1000} sec.`);
+                return this.emit(ClientEvents.FATAL, `Max session start limit reached. ${AfterMessage(reset_after)}`);
 
-            this.emit(ClientEvents.INFO, `Session starts avaliable: ${remaining}/${total}. Reset after: ${reset_after / 1000} sec.`);
+            this.emit(ClientEvents.INFO, `Session starts avaliable: ${remaining}/${total}. ${AfterMessage(reset_after)}`);
         }
 
         try {
