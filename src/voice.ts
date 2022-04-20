@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import { Sleep, SafeJsonParse } from './_common';
 import { VoiceEncryptionModes, SpeakingStates } from './helpers';
 
-const enum OPCode {
+const enum OPCodes {
     IDENTIFY = 0,
     SELECT_PROTOCOL = 1,
     READY = 2,
@@ -17,14 +17,29 @@ const enum OPCode {
     CLIENT_DISCONNECT = 13,
 }
 
-type Intent = {
-    op: (
-        | OPCode.HELLO
-        | OPCode.READY
-        | OPCode.SESSION_DESCRIPTION
-        | OPCode.HEARTBEAT_ACK
-    );
-    d: any;
+type Broadcast = {
+    ssrc: number;
+    ip: string;
+    port: number;
+};
+
+type Session = {
+    secret_key: number[];
+};
+
+type PacketTypes = {
+    [OPCodes.HELLO]: {
+        heartbeat_interval: number;
+    };
+    [OPCodes.READY]: Broadcast;
+    [OPCodes.SESSION_DESCRIPTION]: Session;
+    [OPCodes.HEARTBEAT_ACK]: {};
+};
+
+type Packet<T extends keyof PacketTypes> = { op: T; } & PacketTypes[T];
+
+type PacketHandlers = {
+    [T in keyof PacketTypes]?: (data: Packet<T>) => void;
 };
 
 const
@@ -45,11 +60,7 @@ export class Voice extends EventEmitter {
     private _resume = false;
     private _lastHeartbeatAck = false;
     private _heartbeatTimer?: NodeJS.Timer;
-    private _broadcast?: {
-        ip: string;
-        port: number;
-        ssrc: number;
-    };
+    private _broadcast?: Broadcast;
     private _ssrc?: number;
 
     constructor() {
@@ -65,7 +76,7 @@ export class Voice extends EventEmitter {
         }
 
         if(this._ws)
-            return this.emit(VoiceEvents.WARN, 'Voice already connected.');
+            return this.emit(VoiceEvents.WARN, 'The voice client is already connected.');
 
         this._ws = new WebSocket(`wss://${this._endpoint}?v=${VOICE_VERSION}`);
         this._ws.on('message', this._onMessage);
@@ -82,16 +93,14 @@ export class Voice extends EventEmitter {
         this._ws = undefined;
     };
 
-    private _send = (op: OPCode, d: any) =>
+    private _send = (op: OPCodes, d: any) =>
         this._ws?.send(JSON.stringify({ op, d }));
 
-    private _intentHandlers = {
-        [OPCode.HELLO]: ({ heartbeat_interval }: {
-            heartbeat_interval: number;
-        }) => {
+    private _packetHandlers: PacketHandlers = {
+        [OPCodes.HELLO]: ({ heartbeat_interval }) => {
             this._send(
                 this._resume ?
-                    OPCode.RESUME : OPCode.IDENTIFY,
+                    OPCodes.RESUME : OPCodes.IDENTIFY,
                 this._options,
             );
             this._resume = true;
@@ -100,13 +109,9 @@ export class Voice extends EventEmitter {
             this._sendHeartbeat();
         },
 
-        [OPCode.READY]: ({ ssrc, ip, port }: {
-            ssrc: number;
-            ip: string;
-            port: number;
-        }) => {
+        [OPCodes.READY]: ({ ssrc, ip, port }) => {
             this._broadcast = { ssrc, ip, port };
-            this._send(OPCode.SELECT_PROTOCOL, {
+            this._send(OPCodes.SELECT_PROTOCOL, {
                 protocol: 'udp',
                 data: {
                     address: ip,
@@ -116,22 +121,21 @@ export class Voice extends EventEmitter {
             });
         },
 
-        [OPCode.SESSION_DESCRIPTION]: ({ secret_key }: {
-            secret_key: number[];
-        }) => {
+        [OPCodes.SESSION_DESCRIPTION]: ({ secret_key }) => {
             this.emit(VoiceEvents.CONNECT, {
                 ...this._broadcast,
                 secret_key,
             });
         },
 
-        [OPCode.HEARTBEAT_ACK]: () =>
+        [OPCodes.HEARTBEAT_ACK]: () =>
             this._lastHeartbeatAck = true,
     };
 
-    private _onMessage = (data: RawData) => {
-        const intent = SafeJsonParse<Intent>(String(data));
-        intent && this._intentHandlers[intent.op]?.(intent.d);
+    private _onMessage = <T extends keyof PacketTypes>(data: RawData) => {
+        const packet = SafeJsonParse<Packet<T>>(String(data));
+        if(!packet) return;
+        this._packetHandlers[packet.op]?.(packet);
     };
 
     private _sendHeartbeat = () => {
@@ -142,7 +146,7 @@ export class Voice extends EventEmitter {
             return;
         }
         this._lastHeartbeatAck = false;
-        this._send(OPCode.HEARTBEAT, null);
+        this._send(OPCodes.HEARTBEAT, null);
     };
 
     private _setHeartbeatTimer = (interval?: number) => {
@@ -181,7 +185,7 @@ export class Voice extends EventEmitter {
 
     SetSpeakingState = (speaking: SpeakingStates, delay = 0) => {
         if(!this._ws) throw 'No connection.';
-        this._send(OPCode.SPEAKING, {
+        this._send(OPCodes.SPEAKING, {
             speaking,
             delay,
             ssrc: this._ssrc,
@@ -198,12 +202,7 @@ export enum VoiceEvents {
 }
 
 type VoiceEventTypes = {
-    [VoiceEvents.CONNECT]: {
-        ip: string;
-        port: number;
-        ssrc: number;
-        secret_key: number[];
-    };
+    [VoiceEvents.CONNECT]: Broadcast & Session;
     [VoiceEvents.DISCONNECT]: number;
     [VoiceEvents.WARN]: string;
     [VoiceEvents.ERROR]: Error;
@@ -211,7 +210,7 @@ type VoiceEventTypes = {
 };
 
 export interface Voice extends EventEmitter {
-    on<K extends VoiceEvents>(event: K, callback: (data: VoiceEventTypes[K]) => void): this;
-    once<K extends VoiceEvents>(event: K, callback: (data: VoiceEventTypes[K]) => void): this;
-    off<K extends VoiceEvents>(event: K, callback: (data: VoiceEventTypes[K]) => void): this;
+    on<E extends VoiceEvents>(event: E, callback: (data: VoiceEventTypes[E]) => void): this;
+    once<E extends VoiceEvents>(event: E, callback: (data: VoiceEventTypes[E]) => void): this;
+    off<E extends VoiceEvents>(event: E, callback: (data: VoiceEventTypes[E]) => void): this;
 }

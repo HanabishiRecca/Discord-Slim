@@ -4,10 +4,10 @@ import { Intents, TokenTypes, API_VERSION, ActivityTypes, StatusTypes } from './
 import { Sleep, SafeJsonParse, TimestampString } from './_common';
 import { Authorization } from './request';
 import { Gateway } from './actions';
-import type { EventHandler } from './events';
+import { Events, EventTypes, EventHandler } from './events';
 import type { User, SessionStartLimit } from './types';
 
-const enum OPCode {
+const enum OPCodes {
     DISPATCH = 0,
     HEARTBEAT = 1,
     IDENTIFY = 2,
@@ -21,23 +21,33 @@ const enum OPCode {
     HEARTBEAT_ACK = 11,
 }
 
-const enum Events {
-    READY = 'READY',
-    RESUMED = 'RESUMED',
-}
+type DispatchPacket<E extends Events> = {
+    t: E;
+    s?: number;
+    d: EventTypes[E];
+};
 
-type Intent = {
-    op: (
-        | OPCode.DISPATCH
-        | OPCode.HELLO
-        | OPCode.HEARTBEAT_ACK
-        | OPCode.HEARTBEAT
-        | OPCode.INVALID_SESSION
-        | OPCode.RECONNECT
-    );
-    t: any;
-    s: any;
-    d: any;
+type PacketTypes = {
+    [OPCodes.DISPATCH]: DispatchPacket<Events>;
+    [OPCodes.HELLO]: {
+        d: { heartbeat_interval: number; };
+    };
+    [OPCodes.HEARTBEAT_ACK]: {};
+    [OPCodes.HEARTBEAT]: {};
+    [OPCodes.INVALID_SESSION]: {
+        d: boolean;
+    };
+    [OPCodes.RECONNECT]: {};
+};
+
+type Packet<T extends keyof PacketTypes> = { op: T; } & PacketTypes[T];
+
+type PacketHandlers = {
+    [T in keyof PacketTypes]?: (data: Packet<T>) => void;
+};
+
+type DispatchHandlers = {
+    [E in Events]?: (data: EventTypes[E]) => void;
 };
 
 const
@@ -53,7 +63,7 @@ export class Client extends EventEmitter {
     private _lastHeartbeatAck = false;
     private _heartbeatTimer?: NodeJS.Timer;
     private _ws?: WebSocket;
-    private _auth?: { authorization: Authorization; };
+    private _authorization?: Authorization;
     private _intents?: Intents;
     private _eventHandler = new EventEmitter() as EventHandler;
     private _user?: User;
@@ -77,14 +87,15 @@ export class Client extends EventEmitter {
             await Sleep(5000);
         }
 
-        const response = await (
-            (this._auth?.authorization.type == TokenTypes.BOT) ?
-                Gateway.GetBot :
-                Gateway.Get
-        )(this._auth).catch(() => {}) as {
+        const { _authorization: authorization } = this;
+
+        const response: {
             url: string;
             session_start_limit?: SessionStartLimit;
-        } | undefined;
+        } | undefined = await (
+            (authorization?.type == TokenTypes.BOT) ?
+                Gateway.GetBot : Gateway.Get
+        )({ authorization }).catch(() => undefined);
 
         if(this._ws)
             return this.emit(ClientEvents.WARN, 'The client is already connected.');
@@ -126,14 +137,11 @@ export class Client extends EventEmitter {
         this._ws = undefined;
     };
 
-    private _send = (op: OPCode, d: any) =>
+    private _send = (op: OPCodes, d: any) =>
         this._ws?.send(JSON.stringify({ op, d }));
 
-    private _dispatchHandlers = {
-        [Events.READY]: ({ user, session_id }: {
-            user: User;
-            session_id: string;
-        }) => {
+    private _dispatchHandlers: DispatchHandlers = {
+        [Events.READY]: ({ user, session_id }) => {
             this._user = user;
             this._sessionId = session_id;
             this.emit(ClientEvents.CONNECT);
@@ -141,65 +149,61 @@ export class Client extends EventEmitter {
 
         [Events.RESUMED]: () =>
             this.emit(ClientEvents.CONNECT),
+
+        [Events.USER_UPDATE]: (user) =>
+            this._user = user,
     };
 
-    private _intentHandlers = {
-        [OPCode.DISPATCH]: (intent: {
-            t: Events;
-            s?: number;
-            d: any;
-        }) => {
-            const { t, s, d } = intent;
+    private _packetHandlers: PacketHandlers = {
+        [OPCodes.DISPATCH]: <E extends Events>(packet: DispatchPacket<E>) => {
+            const { t, s, d } = packet;
 
             if(s && (s > this._lastSequence))
                 this._lastSequence = s;
 
             this._dispatchHandlers[t]?.(d);
-            this.emit(ClientEvents.INTENT, intent);
+            this.emit(ClientEvents.INTENT, packet);
             this._eventHandler.emit(t, d);
         },
 
-        [OPCode.HELLO]: ({ d: { heartbeat_interval } }: {
-            d: { heartbeat_interval: number; };
-        }) => {
+        [OPCodes.HELLO]: ({ d: { heartbeat_interval } }) => {
             this._identify();
             this._lastHeartbeatAck = true;
             this._setHeartbeatTimer(heartbeat_interval);
             this._sendHeartbeat();
         },
 
-        [OPCode.HEARTBEAT_ACK]: () =>
+        [OPCodes.HEARTBEAT_ACK]: () =>
             this._lastHeartbeatAck = true,
 
-        [OPCode.HEARTBEAT]: () =>
+        [OPCodes.HEARTBEAT]: () =>
             this._sendHeartbeat(),
 
-        [OPCode.INVALID_SESSION]: ({ d }: {
-            d: boolean;
-        }) => {
+        [OPCodes.INVALID_SESSION]: ({ d }) => {
             this.emit(ClientEvents.WARN, `Invalid session. Resumable: ${d}`);
             this._wsConnect(d);
         },
 
-        [OPCode.RECONNECT]: () => {
+        [OPCodes.RECONNECT]: () => {
             this.emit(ClientEvents.WARN, 'Server forced reconnect.');
             this._wsConnect(true);
         },
     };
 
-    private _onMessage = (data: RawData) => {
-        const intent = SafeJsonParse<Intent>(String(data));
-        intent && this._intentHandlers[intent.op]?.(intent);
+    private _onMessage = <T extends keyof PacketTypes>(data: RawData) => {
+        const packet = SafeJsonParse<Packet<T>>(String(data));
+        if(!packet) return;
+        this._packetHandlers[packet.op]?.(packet);
     };
 
     private _identify = () => this._sessionId ?
-        this._send(OPCode.RESUME, {
-            token: this._auth?.authorization.token,
+        this._send(OPCodes.RESUME, {
+            token: this._authorization?.token,
             session_id: this._sessionId,
             seq: this._lastSequence,
         }) :
-        this._send(OPCode.IDENTIFY, {
-            token: this._auth?.authorization.token,
+        this._send(OPCodes.IDENTIFY, {
+            token: this._authorization?.token,
             properties: this._props,
             intents: this._intents ?? Intents.SYSTEM,
             shard: this._shard,
@@ -213,7 +217,7 @@ export class Client extends EventEmitter {
             return;
         }
         this._lastHeartbeatAck = false;
-        this._send(OPCode.HEARTBEAT, this._lastSequence);
+        this._send(OPCodes.HEARTBEAT, this._lastSequence);
     };
 
     private _setHeartbeatTimer = (interval?: number) => {
@@ -240,7 +244,7 @@ export class Client extends EventEmitter {
             total: number;
         },
     ) => {
-        this._auth = { authorization };
+        this._authorization = authorization;
         this._intents = intents;
         this._shard = shard ?
             [shard.id, shard.total] : undefined;
@@ -261,7 +265,7 @@ export class Client extends EventEmitter {
         user_ids: string | string[];
     })) => {
         if(!this._ws) throw 'No connection.';
-        this._send(OPCode.REQUEST_GUILD_MEMBERS, params);
+        this._send(OPCodes.REQUEST_GUILD_MEMBERS, params);
     };
 
     UpdateVoiceState = (params: {
@@ -271,7 +275,7 @@ export class Client extends EventEmitter {
         self_deaf: boolean;
     }) => {
         if(!this._ws) throw 'No connection.';
-        this._send(OPCode.VOICE_STATE_UPDATE, params);
+        this._send(OPCodes.VOICE_STATE_UPDATE, params);
     };
 
     UpdatePresence = (params: {
@@ -285,7 +289,7 @@ export class Client extends EventEmitter {
         afk: boolean;
     }) => {
         if(!this._ws) throw 'No connection.';
-        this._send(OPCode.PRESENCE_UPDATE, params);
+        this._send(OPCodes.PRESENCE_UPDATE, params);
     };
 
     get events() { return this._eventHandler; }
@@ -304,15 +308,14 @@ export enum ClientEvents {
     FATAL = 'fatal',
 }
 
+type DispatchPackets = {
+    [E in Events]: DispatchPacket<E>;
+};
+
 type ClientEventTypes = {
     [ClientEvents.CONNECT]: void;
     [ClientEvents.DISCONNECT]: number;
-    [ClientEvents.INTENT]: {
-        op: 0;
-        s: number;
-        t: string;
-        d: any;
-    };
+    [ClientEvents.INTENT]: DispatchPackets[keyof DispatchPackets];
     [ClientEvents.INFO]: string;
     [ClientEvents.WARN]: string;
     [ClientEvents.ERROR]: Error;
@@ -320,7 +323,7 @@ type ClientEventTypes = {
 };
 
 export interface Client extends EventEmitter {
-    on<K extends ClientEvents>(event: K, callback: (data: ClientEventTypes[K]) => void): this;
-    once<K extends ClientEvents>(event: K, callback: (data: ClientEventTypes[K]) => void): this;
-    off<K extends ClientEvents>(event: K, callback: (data: ClientEventTypes[K]) => void): this;
+    on<E extends ClientEvents>(event: E, callback: (data: ClientEventTypes[E]) => void): this;
+    once<E extends ClientEvents>(event: E, callback: (data: ClientEventTypes[E]) => void): this;
+    off<E extends ClientEvents>(event: E, callback: (data: ClientEventTypes[E]) => void): this;
 }

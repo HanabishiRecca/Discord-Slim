@@ -56,7 +56,7 @@ export enum Events {
     WEBHOOKS_UPDATE = 'WEBHOOKS_UPDATE',
 }
 
-type EventTypes = {
+export type EventTypes = {
     [Events.READY]: {
         v: number;
         user: types.User;
@@ -257,7 +257,7 @@ type EventTypes = {
 };
 
 export interface EventHandler extends EventEmitter {
-    on<K extends Events>(event: K, callback: (data: EventTypes[K]) => void): this;
-    once<K extends Events>(event: K, callback: (data: EventTypes[K]) => void): this;
-    off<K extends Events>(event: K, callback: (data: EventTypes[K]) => void): this;
+    on<E extends Events>(event: E, callback: (data: EventTypes[E]) => void): this;
+    once<E extends Events>(event: E, callback: (data: EventTypes[E]) => void): this;
+    off<E extends Events>(event: E, callback: (data: EventTypes[E]) => void): this;
 }
