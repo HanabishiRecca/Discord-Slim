@@ -501,7 +501,7 @@ export type Integration = {
     id: string;
     name: string;
     type: string;
-    enabled: boolean;
+    enabled?: boolean;
     syncing?: boolean;
     role_id?: string;
     enable_emoticons?: boolean;
