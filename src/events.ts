@@ -63,10 +63,10 @@ export type EventTypes = {
         guilds: types.UnavailableGuild[];
         session_id: string;
         shard?: [shard_id: number, num_shards: number];
-        application: {
-            id: string;
-            flags: number;
-        };
+        application: Required<Pick<types.Application, (
+            | 'id'
+            | 'flags'
+        )>>;
     };
     [Events.RESUMED]: {};
     [Events.CHANNEL_CREATE]: types.GuildChannel;
