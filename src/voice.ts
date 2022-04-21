@@ -1,6 +1,6 @@
 import { WebSocket, RawData } from 'ws';
 import { EventEmitter } from 'events';
-import { Sleep, SafeJsonParse } from './_common';
+import { SafeJsonParse } from './_common';
 import { VoiceEncryptionModes, SpeakingStates } from './helpers';
 
 const enum OPCodes {
@@ -45,7 +45,8 @@ type PacketHandlers = {
 const
     VOICE_VERSION = 4,
     FATAL_CODES = Object.freeze([4002, 4004, 4006, 4011, 4014]),
-    DROP_CODES = Object.freeze([4009]);
+    DROP_CODES = Object.freeze([4009]),
+    RECONNECT_TIMEOUT = 5000;
 
 export class Voice extends EventEmitter {
     private _ws?: WebSocket;
@@ -69,28 +70,30 @@ export class Voice extends EventEmitter {
 
     private _wsConnect = async (resume?: boolean) => {
         this._wsDisconnect();
-
-        if(!resume) {
-            this._resume = false;
-            await Sleep(5000);
-        }
+        this._resume = Boolean(resume);
 
         if(this._ws)
             return this.emit(VoiceEvents.WARN, 'The voice client is already connected.');
 
-        this._ws = new WebSocket(`wss://${this._endpoint}?v=${VOICE_VERSION}`);
+        try {
+            this._ws = new WebSocket(`wss://${this._endpoint}?v=${VOICE_VERSION}`);
+        } catch {
+            return this.emit(VoiceEvents.FATAL, 'Unable to create a socket.');
+        }
+
         this._ws.on('message', this._onMessage);
         this._ws.on('close', this._onClose);
         this._ws.on('error', this._onError);
     };
 
     private _wsDisconnect = (code = 1012) => {
-        if(!this._ws) return;
-        this.emit(VoiceEvents.DISCONNECT, code);
+        const ws = this._ws;
+        if(!ws) return;
         this._setHeartbeatTimer();
-        this._ws.removeAllListeners();
-        this._ws.close(code);
+        this.emit(VoiceEvents.DISCONNECT, code);
         this._ws = undefined;
+        ws.removeAllListeners();
+        ws.close(code);
     };
 
     private _send = (op: OPCodes, d: any) =>
@@ -159,7 +162,7 @@ export class Voice extends EventEmitter {
         this._wsDisconnect(code);
         FATAL_CODES.includes(code) ?
             this.emit(VoiceEvents.FATAL, `Fatal error. Code: ${code}`) :
-            this._wsConnect(!DROP_CODES.includes(code));
+            setTimeout(this._wsConnect, RECONNECT_TIMEOUT, !DROP_CODES.includes(code));
     };
 
     private _onError = (error: Error) =>
@@ -176,8 +179,7 @@ export class Voice extends EventEmitter {
         this._options = { token, server_id, user_id, session_id };
         this._endpoint = endpoint;
         this._encryption = encryption;
-        this._resume = false;
-        this._wsConnect(true);
+        this._wsConnect();
     };
 
     Disconnect = (code?: number) =>

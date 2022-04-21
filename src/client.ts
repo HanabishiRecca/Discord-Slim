@@ -1,7 +1,7 @@
 import { WebSocket, RawData } from 'ws';
 import { EventEmitter } from 'events';
 import { Intents, TokenTypes, API_VERSION, ActivityTypes, StatusTypes } from './helpers';
-import { Sleep, SafeJsonParse, TimestampString } from './_common';
+import { SafeJsonParse, TimestampString } from './_common';
 import { Authorization } from './request';
 import { Gateway } from './actions';
 import { Events, EventTypes, EventHandler } from './events';
@@ -20,6 +20,11 @@ const enum OPCodes {
     HELLO = 10,
     HEARTBEAT_ACK = 11,
 }
+
+type Session = {
+    id: string;
+    seq: number;
+};
 
 type DispatchPacket<E extends Events> = {
     t: E;
@@ -52,22 +57,23 @@ type DispatchHandlers = {
 
 const
     FATAL_CODES = Object.freeze([4004, 4010, 4011, 4012, 4013, 4014]),
-    DROP_CODES = Object.freeze([4007, 4009]);
+    DROP_CODES = Object.freeze([4007, 4009]),
+    RECONNECT_TIMEOUT = 5000;
 
 const AfterMessage = (after: number) =>
     `Reset after: ${TimestampString(Date.now() + after)}`;
 
 export class Client extends EventEmitter {
-    private _sessionId?: string;
-    private _lastSequence = 0;
-    private _lastHeartbeatAck = false;
-    private _heartbeatTimer?: NodeJS.Timer;
     private _ws?: WebSocket;
     private _authorization?: Authorization;
     private _intents?: Intents;
-    private _eventHandler = new EventEmitter() as EventHandler;
     private _user?: User;
     private _shard?: [number, number];
+    private _eventHandler: EventHandler = new EventEmitter();
+    private _heartbeatTimer?: NodeJS.Timer;
+    private _lastHeartbeatAck = false;
+    private _session?: Session;
+
     private _props?: object | null = {
         $os: 'linux',
         $browser: 'bot',
@@ -81,11 +87,8 @@ export class Client extends EventEmitter {
     private _wsConnect = async (resume?: boolean) => {
         this._wsDisconnect();
 
-        if(!resume) {
-            this._sessionId = undefined;
-            this._lastSequence = 0;
-            await Sleep(5000);
-        }
+        if(!resume)
+            this._session = undefined;
 
         const { _authorization: authorization } = this;
 
@@ -108,7 +111,7 @@ export class Client extends EventEmitter {
         if(typeof url != 'string')
             return this.emit(ClientEvents.FATAL, 'Unexpected gateway API response.');
 
-        if(!this._sessionId && session_start_limit) {
+        if(!this._session && session_start_limit) {
             const { remaining, total, reset_after } = session_start_limit;
 
             if(remaining < 1)
@@ -119,7 +122,7 @@ export class Client extends EventEmitter {
 
         try {
             this._ws = new WebSocket(`${url}?v=${API_VERSION}`);
-        } catch(e) {
+        } catch {
             return this.emit(ClientEvents.FATAL, 'Unable to create a socket.');
         }
 
@@ -129,12 +132,13 @@ export class Client extends EventEmitter {
     };
 
     private _wsDisconnect = (code = 1012) => {
-        if(!this._ws) return;
-        this.emit(ClientEvents.DISCONNECT, code);
+        const ws = this._ws;
+        if(!ws) return;
         this._setHeartbeatTimer();
-        this._ws.removeAllListeners();
-        this._ws.close(code);
+        this.emit(ClientEvents.DISCONNECT, code);
         this._ws = undefined;
+        ws.removeAllListeners();
+        ws.close(code);
     };
 
     private _send = (op: OPCodes, d: any) =>
@@ -143,7 +147,10 @@ export class Client extends EventEmitter {
     private _dispatchHandlers: DispatchHandlers = {
         [Events.READY]: ({ user, session_id }) => {
             this._user = user;
-            this._sessionId = session_id;
+            this._session = {
+                id: session_id,
+                seq: 0,
+            };
             this.emit(ClientEvents.CONNECT);
         },
 
@@ -156,10 +163,12 @@ export class Client extends EventEmitter {
 
     private _packetHandlers: PacketHandlers = {
         [OPCodes.DISPATCH]: <E extends Events>(packet: DispatchPacket<E>) => {
-            const { t, s, d } = packet;
+            const
+                { t, s, d } = packet,
+                session = this._session;
 
-            if(s && (s > this._lastSequence))
-                this._lastSequence = s;
+            if(s && session && (s > session.seq))
+                session.seq = s;
 
             this._dispatchHandlers[t]?.(d);
             this.emit(ClientEvents.INTENT, packet);
@@ -196,11 +205,11 @@ export class Client extends EventEmitter {
         this._packetHandlers[packet.op]?.(packet);
     };
 
-    private _identify = () => this._sessionId ?
+    private _identify = () => this._session ?
         this._send(OPCodes.RESUME, {
             token: this._authorization?.token,
-            session_id: this._sessionId,
-            seq: this._lastSequence,
+            session_id: this._session.id,
+            seq: this._session.seq,
         }) :
         this._send(OPCodes.IDENTIFY, {
             token: this._authorization?.token,
@@ -217,7 +226,7 @@ export class Client extends EventEmitter {
             return;
         }
         this._lastHeartbeatAck = false;
-        this._send(OPCodes.HEARTBEAT, this._lastSequence);
+        this._send(OPCodes.HEARTBEAT, this._session?.seq ?? 0);
     };
 
     private _setHeartbeatTimer = (interval?: number) => {
@@ -230,7 +239,7 @@ export class Client extends EventEmitter {
         this._wsDisconnect(code);
         FATAL_CODES.includes(code) ?
             this.emit(ClientEvents.FATAL, `Fatal error. Code: ${code}`) :
-            this._wsConnect(!DROP_CODES.includes(code));
+            setTimeout(this._wsConnect, RECONNECT_TIMEOUT, !DROP_CODES.includes(code));
     };
 
     private _onError = (error: Error) =>
@@ -248,6 +257,15 @@ export class Client extends EventEmitter {
         this._intents = intents;
         this._shard = shard ?
             [shard.id, shard.total] : undefined;
+        this._wsConnect();
+    };
+
+    Resume = (
+        authorization: Authorization,
+        session: Session,
+    ) => {
+        this._authorization = authorization;
+        this._session = session;
         this._wsConnect(true);
     };
 
@@ -296,6 +314,11 @@ export class Client extends EventEmitter {
     get user() { return this._user; }
     get props() { return this._props; }
     set props(value) { this._props = value; }
+
+    get session() {
+        if(!this._session) return;
+        return Object.assign({}, this._session);
+    }
 }
 
 export enum ClientEvents {
