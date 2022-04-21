@@ -34,7 +34,7 @@ export const Delete = (webhook_id: string, requestOptions?: RequestOptions) =>
 export const DeleteWithToken = (webhook_id: string, webhook_token: string, requestOptions?: RequestOptions) =>
     Request<null>(METHODS.DELETE, Path(PATHS.webhooks, webhook_id, webhook_token), requestOptions);
 
-export const Execute = (webhook_id: string, webhook_token: string, params1: {
+export const Execute = <T extends boolean>(webhook_id: string, webhook_token: string, params1: {
     content?: string;
     username?: string;
     avatar_url?: string;
@@ -44,10 +44,12 @@ export const Execute = (webhook_id: string, webhook_token: string, params1: {
     components?: types.ActionRow[];
     flags?: helpers.MessageFlags;
 }, params2?: {
-    wait?: boolean;
+    wait?: T;
     thread_id?: string;
 }, requestOptions?: RequestOptions) =>
-    Request<types.Message | null>(METHODS.POST, Path(PATHS.webhooks, webhook_id, webhook_token) + Query(params2), requestOptions, params1);
+    Request<T extends true ?
+        types.Message : null
+    >(METHODS.POST, Path(PATHS.webhooks, webhook_id, webhook_token) + Query(params2), requestOptions, params1);
 
 export const ExecuteSlack = (webhook_id: string, webhook_token: string, params?: {
     thread_id?: string;
