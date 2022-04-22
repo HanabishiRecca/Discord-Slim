@@ -2,7 +2,7 @@ import { WebSocket, RawData } from 'ws';
 import { EventEmitter } from 'events';
 import { Intents, TokenTypes, API_VERSION, ActivityTypes, StatusTypes } from './helpers';
 import { SafeJsonParse, TimestampString } from './_common';
-import { Authorization } from './request';
+import { Authorization } from './authorization';
 import { Gateway } from './actions';
 import { Events, EventTypes, EventHandler } from './events';
 import type { User, SessionStartLimit } from './types';
