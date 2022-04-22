@@ -1,4 +1,3 @@
-import type { OutgoingHttpHeaders } from 'http';
 import { HttpsRequest, SafeJsonParse, Sleep } from './_common';
 import { API_PATH, TokenTypes } from './helpers';
 
@@ -92,7 +91,7 @@ export const Request = async <T>(
 ) => {
     const
         url = `${API_PATH}/${endpoint}`,
-        headers: OutgoingHttpHeaders = {},
+        headers: Record<string, string> = {},
         requestOptions = { method, headers, timeout };
 
     let content: string | undefined;
@@ -106,7 +105,7 @@ export const Request = async <T>(
     }
 
     if(content)
-        headers[Headers.ContentLength] = Buffer.byteLength(content);
+        headers[Headers.ContentLength] = String(Buffer.byteLength(content));
 
     if(authorization instanceof Authorization)
         headers[Headers.Authorization] = String(authorization);
@@ -125,7 +124,8 @@ export const Request = async <T>(
                 response: SafeJsonParse(data),
             };
 
-            const response = SafeJsonParse<RateLimitResponse>(data)!;
+            const response = SafeJsonParse<RateLimitResponse>(data);
+            if(!response) throw { code };
 
             attempts++;
             rateLimitCallback?.(response, attempts);
