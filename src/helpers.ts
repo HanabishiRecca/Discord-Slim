@@ -125,6 +125,7 @@ export enum AuditLogEvents {
     THREAD_CREATE = 110,
     THREAD_UPDATE = 111,
     THREAD_DELETE = 112,
+    APPLICATION_COMMAND_PERMISSION_UPDATE = 121,
 }
 
 export enum ChannelTypes {
@@ -365,6 +366,7 @@ export enum ApplicationCommandOptionTypes {
 export enum ApplicationCommandPermissionTypes {
     ROLE = 1,
     USER = 2,
+    CHANNEL = 3,
 }
 
 export enum InteractionTypes {
@@ -392,6 +394,7 @@ export enum OAuth2Scopes {
     APPLICATIONS_BUILDS_UPLOAD = 'applications.builds.upload',
     APPLICATIONS_COMMANDS = 'applications.commands',
     APPLICATIONS_COMMANDS_UPDATE = 'applications.commands.update',
+    APPLICATIONS_COMMANDS_PERMISSIONS_UPDATE = 'applications.commands.permissions.update',
     APPLICATIONS_STORE_UPDATE = 'applications.store.update',
     APPLICATIONS_ENTITLEMENTS = 'applications.entitlements',
     BOT = 'bot',

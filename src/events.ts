@@ -5,6 +5,7 @@ import type * as types from './types';
 export enum Events {
     READY = 'READY',
     RESUMED = 'RESUMED',
+    APPLICATION_COMMAND_PERMISSIONS_UPDATE = 'APPLICATION_COMMAND_PERMISSIONS_UPDATE',
     CHANNEL_CREATE = 'CHANNEL_CREATE',
     CHANNEL_UPDATE = 'CHANNEL_UPDATE',
     CHANNEL_DELETE = 'CHANNEL_DELETE',
@@ -69,6 +70,7 @@ export type EventTypes = {
         )>>;
     };
     [Events.RESUMED]: {};
+    [Events.APPLICATION_COMMAND_PERMISSIONS_UPDATE]: types.ApplicationCommandPermissions;
     [Events.CHANNEL_CREATE]: types.GuildChannel;
     [Events.CHANNEL_UPDATE]: types.GuildChannel | types.GroupDMChannel;
     [Events.CHANNEL_DELETE]: types.GuildChannel | types.GroupDMChannel;
