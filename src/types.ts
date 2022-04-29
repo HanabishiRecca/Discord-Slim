@@ -861,7 +861,7 @@ export type InteractionDataComponent = {
 
 export type InteractionDataModal = {
     custom_id: string;
-    components: Component[];
+    components: TextInput[];
 };
 
 export type InteractionDataResolved = {
@@ -1099,16 +1099,12 @@ export type InstallParams = {
 
 // Message Components types
 
-export type Component = (
-    | ActionRow
-    | Button
-    | SelectMenu
-    | TextInput
-);
-
 export type ActionRow = {
     type: helpers.ComponentTypes.ACTION_ROW;
-    components: Exclude<Component, ActionRow>[];
+    components: (
+        | Button
+        | SelectMenu
+    )[];
 };
 
 export type Button = {
