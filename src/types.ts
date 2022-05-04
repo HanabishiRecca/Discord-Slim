@@ -389,10 +389,10 @@ export type ChannelMention = {
 };
 
 export type AllowedMentions = {
-    parse: helpers.AllowedMentionTypes[];
-    roles: string[];
-    users: string[];
-    replied_user: boolean;
+    parse?: helpers.AllowedMentionTypes[];
+    roles?: string[];
+    users?: string[];
+    replied_user?: boolean;
 };
 
 // Emoji types
