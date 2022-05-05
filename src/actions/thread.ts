@@ -21,13 +21,11 @@ export const StartWithMessage = (channel_id: string, message_id: string, params:
     auto_archive_duration?: helpers.ThreadArchiveDurations;
     rate_limit_per_user?: number | null;
 }, requestOptions?: RequestOptions) =>
-    Request<types.Thread>(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.messages, message_id, PATHS.threads), requestOptions, params);
+    Request<types.Thread & {
+        type: Exclude<types.Thread['type'], helpers.ChannelTypes.GUILD_PRIVATE_THREAD>;
+    }>(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.messages, message_id, PATHS.threads), requestOptions, params);
 
-export const Start = <T extends (
-    | helpers.ChannelTypes.GUILD_PRIVATE_THREAD
-    | helpers.ChannelTypes.GUILD_PUBLIC_THREAD
-    | helpers.ChannelTypes.GUILD_NEWS_THREAD
-)>(channel_id: string, params: {
+export const Start = <T extends types.Thread['type']>(channel_id: string, params: {
     name: string;
     type: T;
     auto_archive_duration?: helpers.ThreadArchiveDurations;
@@ -54,6 +52,7 @@ export const StartInForum = (channel_id: string, params: {
     };
 }, requestOptions?: RequestOptions) =>
     Request<types.Thread & {
+        type: helpers.ChannelTypes.GUILD_PUBLIC_THREAD;
         message: types.Message;
     }>(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.threads), requestOptions, params);
 
