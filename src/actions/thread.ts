@@ -23,18 +23,22 @@ export const StartWithMessage = (channel_id: string, message_id: string, params:
 }, requestOptions?: RequestOptions) =>
     Request<types.Thread>(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.messages, message_id, PATHS.threads), requestOptions, params);
 
-export const Start = (channel_id: string, params: {
+export const Start = <T extends (
+    | helpers.ChannelTypes.GUILD_PRIVATE_THREAD
+    | helpers.ChannelTypes.GUILD_PUBLIC_THREAD
+    | helpers.ChannelTypes.GUILD_NEWS_THREAD
+)>(channel_id: string, params: {
     name: string;
+    type: T;
     auto_archive_duration?: helpers.ThreadArchiveDurations;
-    type?: (
-        | helpers.ChannelTypes.GUILD_PRIVATE_THREAD
-        | helpers.ChannelTypes.GUILD_PUBLIC_THREAD
-        | helpers.ChannelTypes.GUILD_NEWS_THREAD
-    );
-    invitable?: boolean;
     rate_limit_per_user?: number | null;
-}, requestOptions?: RequestOptions) =>
-    Request<types.Thread>(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.threads), requestOptions, params);
+} & ({
+    type: helpers.ChannelTypes.GUILD_PRIVATE_THREAD;
+    invitable?: boolean;
+} | {}), requestOptions?: RequestOptions) =>
+    Request<types.Thread & {
+        type: T;
+    }>(METHODS.POST, Path(PATHS.channels, channel_id, PATHS.threads), requestOptions, params);
 
 export const StartInForum = (channel_id: string, params: {
     name: string;
