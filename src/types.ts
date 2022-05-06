@@ -737,6 +737,8 @@ export type ApplicationCommandOption = {
 } & ({
     type: helpers.ApplicationCommandOptionTypes.STRING;
     choices?: ApplicationCommandOptionChoice<string>[];
+    options?: undefined;
+    channel_types?: undefined;
     min_value?: undefined;
     max_value?: undefined;
 } | {
@@ -745,8 +747,44 @@ export type ApplicationCommandOption = {
         | helpers.ApplicationCommandOptionTypes.NUMBER
     );
     choices?: ApplicationCommandOptionChoice<number>[];
+    options?: undefined;
+    channel_types?: undefined;
+} | {
+    type: helpers.ApplicationCommandOptionTypes.SUB_COMMAND;
+    required?: undefined;
+    choices?: undefined;
+    options?: (ApplicationCommandOption & {
+        type: Exclude<helpers.ApplicationCommandOptionTypes, (
+            | helpers.ApplicationCommandOptionTypes.SUB_COMMAND
+            | helpers.ApplicationCommandOptionTypes.SUB_COMMAND_GROUP
+        )>;
+    })[];
+    channel_types?: undefined;
+    min_value?: undefined;
+    max_value?: undefined;
+    autocomplete?: undefined;
+} | {
+    type: helpers.ApplicationCommandOptionTypes.SUB_COMMAND_GROUP;
+    required?: undefined;
+    choices?: undefined;
+    options: (ApplicationCommandOption & {
+        type: helpers.ApplicationCommandOptionTypes.SUB_COMMAND;
+    })[];
+    channel_types?: undefined;
+    min_value?: undefined;
+    max_value?: undefined;
+    autocomplete?: undefined;
+} | {
+    type: helpers.ApplicationCommandOptionTypes.CHANNEL;
+    choices?: undefined;
+    options?: undefined;
+    min_value?: undefined;
+    max_value?: undefined;
+    autocomplete?: undefined;
 } | {
     choices?: undefined;
+    options?: undefined;
+    channel_types?: undefined;
     min_value?: undefined;
     max_value?: undefined;
     autocomplete?: undefined;
