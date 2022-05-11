@@ -397,6 +397,7 @@ export enum OAuth2Scopes {
     APPLICATIONS_ENTITLEMENTS = 'applications.entitlements',
     BOT = 'bot',
     CONNECTIONS = 'connections',
+    DM_CHANNELS_READ = 'dm_channels.read',
     EMAIL = 'email',
     GDM_JOIN = 'gdm.join',
     GUILDS = 'guilds',
@@ -410,6 +411,7 @@ export enum OAuth2Scopes {
     RPC_NOTIFICATIONS_READ = 'rpc.notifications.read',
     RPC_VOICE_READ = 'rpc.voice.read',
     RPC_VOICE_WRITE = 'rpc.voice.write',
+    VOICE = 'voice',
     WEBHOOK_INCOMING = 'webhook.incoming',
 }
 
