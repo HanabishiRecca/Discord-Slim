@@ -5,7 +5,7 @@ import { SafeJsonParse, TimestampString } from './_common';
 import { Authorization } from './authorization';
 import { Gateway } from './actions';
 import { Events, EventTypes, EventHandler } from './events';
-import type { User, SessionStartLimit } from './types';
+import type { SessionStartLimit } from './types';
 
 const enum OPCodes {
     DISPATCH = 0,
@@ -67,7 +67,6 @@ export class Client extends EventEmitter {
     private _ws?: WebSocket;
     private _authorization?: Authorization;
     private _intents?: Intents;
-    private _user?: User;
     private _shard?: [number, number];
     private _eventHandler: EventHandler = new EventEmitter();
     private _heartbeatTimer?: NodeJS.Timer;
@@ -145,8 +144,7 @@ export class Client extends EventEmitter {
         this._ws?.send(JSON.stringify({ op, d }));
 
     private _dispatchHandlers: DispatchHandlers = {
-        [Events.READY]: ({ user, session_id }) => {
-            this._user = user;
+        [Events.READY]: ({ session_id }) => {
             this._session = {
                 id: session_id,
                 seq: 0,
@@ -156,9 +154,6 @@ export class Client extends EventEmitter {
 
         [Events.RESUMED]: () =>
             this.emit(ClientEvents.CONNECT),
-
-        [Events.USER_UPDATE]: (user) =>
-            this._user = user,
     };
 
     private _packetHandlers: PacketHandlers = {
@@ -311,7 +306,6 @@ export class Client extends EventEmitter {
     };
 
     get events() { return this._eventHandler; }
-    get user() { return this._user; }
     get props() { return this._props; }
     set props(value) { this._props = value; }
 
