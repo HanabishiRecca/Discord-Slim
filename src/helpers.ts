@@ -1,7 +1,7 @@
 export const
     HOST = 'https://discord.com',
     API = `${HOST}/api` as const,
-    API_VERSION = 9,
+    API_VERSION = 10,
     API_PATH = `${API}/v${API_VERSION}` as const,
     CDN = 'https://cdn.discordapp.com';
 
