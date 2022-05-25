@@ -5,6 +5,7 @@ export const setDefaultRequestOptions = SetDefOptions;
 export * as Application from './actions/application';
 export * as Ban from './actions/ban';
 export * as Channel from './actions/channel';
+export * as DM from './actions/dm';
 export * as Emoji from './actions/emoji';
 export * as Gateway from './actions/gateway';
 export * as GroupDM from './actions/groupdm';

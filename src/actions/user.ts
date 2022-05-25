@@ -34,10 +34,5 @@ export const GetCurrentMember = (guild_id: string, requestOptions?: RequestOptio
 export const LeaveGuild = (guild_id: string, requestOptions?: RequestOptions) =>
     Request<null>(METHODS.DELETE, Path(PATHS.users, PATHS.me, PATHS.guilds, guild_id), requestOptions);
 
-export const CreateDM = (params: {
-    recipient_id: string;
-}, requestOptions?: RequestOptions) =>
-    Request<types.DMChannel>(METHODS.POST, Path(PATHS.users, PATHS.me, PATHS.channels), requestOptions, params);
-
 export const GetConnections = (requestOptions?: RequestOptions) =>
     Request<types.Connection[]>(METHODS.GET, Path(PATHS.users, PATHS.me, PATHS.connections), requestOptions);

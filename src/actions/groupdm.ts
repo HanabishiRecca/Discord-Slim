@@ -16,3 +16,14 @@ export const Modify = (id: string, params: {
     icon?: string;
 }, requestOptions?: RequestOptions) =>
     Request<types.GroupDMChannel>(METHODS.PATCH, Path(PATHS.channels, id), requestOptions, params);
+
+export const Create = (params: {
+    access_tokens: string[];
+    nicks: {
+        [id: string]: string;
+    };
+}, requestOptions?: RequestOptions) =>
+    Request<types.DMChannel>(METHODS.POST, Path(PATHS.users, PATHS.me, PATHS.channels), requestOptions, params);
+
+export const Close = (channel_id: string, requestOptions?: RequestOptions) =>
+    Request<types.GroupDMChannel>(METHODS.DELETE, Path(PATHS.channels, channel_id), requestOptions);
