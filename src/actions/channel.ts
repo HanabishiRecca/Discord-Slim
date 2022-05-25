@@ -22,6 +22,8 @@ export const Create = <T extends types.GuildChannel['type']>(guild_id: string, p
     bitrate?: number;
     user_limit?: number;
     parent_id?: string;
+    rtc_region?: string;
+    video_quality_mode?: helpers.VideoQualityModes;
 }), requestOptions?: RequestOptions) =>
     Request<types.GuildChannel & {
         type: T;

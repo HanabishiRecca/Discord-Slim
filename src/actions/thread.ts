@@ -10,6 +10,7 @@ export const Modify = (thread_id: string, params: {
     locked?: boolean;
     invitable?: boolean;
     rate_limit_per_user?: number | null;
+    flags?: helpers.MessageFlags;
 }, requestOptions?: RequestOptions) =>
     Request<types.Thread>(METHODS.PATCH, Path(PATHS.channels, thread_id), requestOptions, params);
 
