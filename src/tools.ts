@@ -184,7 +184,8 @@ export const Resource = {
         application: types.Application | { id: string; } | string,
         achievement_id: string | number | BigInt,
         icon_hash: string,
-        size?: number, ext?: 'png' | 'jpg' | 'webp',
+        size?: number,
+        ext?: 'png' | 'jpg' | 'webp',
     ) => `${helpers.CDN}/app-assets/${EID(application)}/achievements/${achievement_id}/icons/${icon_hash}${SizeExtOpt(size, ext)}`,
 
     StickerPackBanner: (
@@ -218,6 +219,14 @@ export const Resource = {
         ext?: 'png' | 'jpg' | 'webp',
     ) => event.image ?
             `${helpers.CDN}/guild-events/${event.id}/${event.image}${SizeExtOpt(size, ext)}` : null,
+
+    GuildMemberBanner: (
+        guild: types.Guild | { id: string; } | string,
+        user: types.User | { id: string; } | string,
+        banner: string,
+        size?: number,
+        ext?: 'png' | 'jpg' | 'webp' | 'gif',
+    ) => `${helpers.CDN}/guilds/${EID(guild)}/users/${EID(user)}/banners/${banner}${SizeExtOpt(size, ext)}`,
 
 };
 
