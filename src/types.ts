@@ -704,8 +704,8 @@ export type ApplicationCommandBase = {
     description?: string;
     description_localizations?: LocaleDictionary | null;
     options?: ApplicationCommandOption[];
-    default_member_permissions?: string | null;
-    dm_permission?: boolean | null;
+    default_member_permissions: string | null;
+    dm_permission?: boolean;
 } & ({
     type?: helpers.ApplicationCommandTypes.CHAT_INPUT;
     description: string;
