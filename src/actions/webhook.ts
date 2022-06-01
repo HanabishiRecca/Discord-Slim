@@ -43,6 +43,7 @@ export const Execute = <T extends boolean>(webhook_id: string, webhook_token: st
     allowed_mentions?: types.AllowedMentions;
     components?: types.ActionRow[];
     flags?: helpers.MessageFlags;
+    thread_name?: string;
 }, params2?: {
     wait?: T;
     thread_id?: string;
