@@ -85,8 +85,8 @@ You can read about intents [here](https://discordapp.com/developers/docs/topics/
 ```js
 client.events.on(Events.MESSAGE_CREATE, (message) => {
 
-    // Filter out own messages.
-    if(message.author.id == client.user.id) return;
+    // Filter out any bot messages.
+    if(message.author.bot) return;
 
     // Check that the message contains "hello" word.
     if(message.content.search(/(^|\s)hello($|\s)/i) < 0) return;
@@ -134,7 +134,8 @@ client.events.on(Events.GUILD_CREATE, (guild) => {
 
     // Create a command in your guild(s).
     // This example represents a simple command that just echoing the text back.
-    Actions.Application.CreateGuildCommand(client.user.id, guild.id, {
+    Actions.Application.CreateGuildCommand('bot_id_here', guild.id, {
+        type: Helpers.ApplicationCommandTypes.CHAT_INPUT,
         name: 'echo',
         description: 'Test application command.',
         options: [
@@ -152,8 +153,19 @@ client.events.on(Events.GUILD_CREATE, (guild) => {
 // Respond to interaction event.
 client.events.on(Events.INTERACTION_CREATE, (interaction) => {
 
+    // Check that the interaction is an application command
+    if(interaction.type != Helpers.InteractionTypes.APPLICATION_COMMAND) return;
+
+    // Check that the command is a chat command
+    const data = interaction.data;
+    if(data?.type != Helpers.ApplicationCommandTypes.CHAT_INPUT) return;
+
     // Check the command by name.
-    if(interaction.data?.name != 'echo') return;
+    if(data.name != 'echo') return;
+
+    // Check the data type.
+    const option = data.options?.[0];
+    if(option?.type != Helpers.ApplicationCommandOptionTypes.STRING) return;
 
     // Make a response.
     Actions.Application.CreateInteractionResponse(interaction.id, interaction.token, {
@@ -161,7 +173,7 @@ client.events.on(Events.INTERACTION_CREATE, (interaction) => {
         data: {
 
             // Just echoing the content.
-            content: interaction.data.options[0].value,
+            content: option.value,
 
             // "EPHEMERAL" flag means that the response will be visible only by the caller.
             flags: Helpers.MessageFlags.EPHEMERAL,
