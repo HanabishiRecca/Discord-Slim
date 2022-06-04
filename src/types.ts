@@ -698,16 +698,16 @@ export type Webhook = {
 // Application commands types
 
 export type ApplicationCommandBase = {
-    type?: helpers.ApplicationCommandTypes;
+    type: helpers.ApplicationCommandTypes;
     name: string;
     name_localizations?: LocaleDictionary | null;
     description?: string;
     description_localizations?: LocaleDictionary | null;
     options?: ApplicationCommandOption[];
-    default_member_permissions: string | null;
+    default_member_permissions?: string | null;
     dm_permission?: boolean;
 } & ({
-    type?: helpers.ApplicationCommandTypes.CHAT_INPUT;
+    type: helpers.ApplicationCommandTypes.CHAT_INPUT;
     description: string;
 } | {
     description?: '';
@@ -718,6 +718,7 @@ export type ApplicationCommand = {
     id: string;
     application_id: string;
     guild_id?: string;
+    default_member_permissions: string | null;
     version: string;
 } & ApplicationCommandBase;
 
