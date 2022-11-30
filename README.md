@@ -1,3 +1,7 @@
+# DISCONTINUATION NOTICE
+The project is discontinued and will not be maintained further.  
+I don't use Discord anymore and don't want to work with it. Sorry.  
+
 # Discord Slim
 [![npm](https://img.shields.io/npm/v/discord-slim?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/discord-slim)  
 
